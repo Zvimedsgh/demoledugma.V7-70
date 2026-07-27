@@ -221,9 +221,9 @@ Attribute VB_Name = "Goren_Claude2_016"
 
 ' --- General constants ---
 
-Private Const APP_VERSION As String = "2.016"
-Private Const APP_DATE As String = "01/07/2026 16:01"
-Private Const FORCE_DEMO_MODE As Boolean = True   ' TRUE = Read internal DATA_ sheets. FALSE = Read external files.
+Private Const APP_VERSION As String = "2.019"
+Private Const APP_DATE As String = "02/07/2026 11:00"
+Private Const FORCE_DEMO_MODE As Boolean = False  ' Set to False. Now controlled by DEMO_MODE in parameters sheet.
 Private Const DATA_SHEET_NAME As String = "TmpClientPolicyListEx"
 
 ' --- New Clients sheet names: NC_TEMP_SHEET_NAME() and NC_MASTER_SHEET_NAME() functions are below ---

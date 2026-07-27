@@ -1,0 +1,12 @@
+﻿import sys
+
+filepath = r'c:\LEVAV PROJECT\SOURCE\Goren_Claude_V2.042_20260702_1530.bas'
+
+with open(filepath, 'r', encoding='utf-8') as f:
+    lines = f.readlines()
+
+for i, line in enumerate(lines):
+    if "Value = GetActiveAgencyName()" in line:
+        for j in range(i-2, i+5):
+            print(f"[{j}] {lines[j].strip()}")
+        break

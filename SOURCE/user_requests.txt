@@ -1,0 +1,139 @@
+<USER_REQUEST>
+nv erv
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-14T13:54:56+03:00.
+</ADDITIONAL_METADATA>
+===
+<USER_REQUEST>
+כן נתחיל בסעיף 1 ונשמור את התוצאה לפני שנתחיל בסעיף 2 וכו'
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-14T14:01:26+03:00.
+</ADDITIONAL_METADATA>
+===
+<USER_REQUEST>
+OK
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-14T14:08:09+03:00.
+</ADDITIONAL_METADATA>
+===
+<USER_REQUEST>
+אני רוצה להריץ עכשיו את מה שתיקנת לפני השינויים ולמדוד זמן. תגידי לי איזה כפתור להריץ
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-14T14:39:40+03:00.
+</ADDITIONAL_METADATA>
+===
+<USER_REQUEST>
+זה כפתור 2
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-14T14:40:50+03:00.
+</ADDITIONAL_METADATA>
+===
+<USER_REQUEST>
+50שניות
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-14T14:42:39+03:00.
+</ADDITIONAL_METADATA>
+===
+<USER_REQUEST>
+רגע, זה 50 שניות לפני התיקון
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-14T14:43:42+03:00.
+</ADDITIONAL_METADATA>
+===
+<USER_REQUEST>
+איפה שמרת אותו
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-14T14:44:13+03:00.
+</ADDITIONAL_METADATA>
+===
+<USER_REQUEST>
+למה שמרת אותו באותו השם? אני שומר את הגרסאות הישנות. וגם יותר נוח כשרוצים לבדוק איזה גרסה עובדת בזמן נתון. 
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-14T14:45:57+03:00.
+</ADDITIONAL_METADATA>
+===
+<USER_REQUEST>
+בתוך הקוד לא שינית ל 7.5. אני מופתע שאני צריל להגיד לך את זה
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-14T14:51:07+03:00.
+</ADDITIONAL_METADATA>
+===
+<USER_REQUEST>
+
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-14T14:53:48+03:00.
+</ADDITIONAL_METADATA>
+===
+<USER_REQUEST>
+wharws going on?
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-14T15:22:15+03:00.
+</ADDITIONAL_METADATA>
+===
+<USER_REQUEST>
+צריך להעלות את המספור של נ BAS או 7.51 או 7.6
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-14T15:28:45+03:00.
+</ADDITIONAL_METADATA>
+===
+<USER_REQUEST>
+
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-14T15:31:08+03:00.
+</ADDITIONAL_METADATA>
+===
+<USER_REQUEST>
+למה אתה מבקש כל הזמן אישור לכל צעד, גם אם אני מאשר לכל הפרויקאט או בכלל
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-14T15:40:00+03:00.
+</ADDITIONAL_METADATA>
+===
+<USER_REQUEST>
+אני לא יודע איפה אתה רואה את המודול  הישן
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-14T15:42:54+03:00.
+</ADDITIONAL_METADATA>
+===
+<USER_REQUEST>
+
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-14T15:48:12+03:00.
+</ADDITIONAL_METADATA>
+===
+<USER_REQUEST>
+זה צריך להיות 7.53
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-14T15:51:11+03:00.
+</ADDITIONAL_METADATA>
+===
+<USER_REQUEST>
+תעשה בדיקה, על הגדרות שלא יקפוץ כל רגע משהו
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-14T15:58:14+03:00.
+</ADDITIONAL_METADATA>
+===
+<USER_REQUEST>
+44 שניות
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-14T19:16:47+03:00.
+</ADDITIONAL_METADATA>

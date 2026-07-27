@@ -1,0 +1,440 @@
+Public Sub ApplyCorrectionsAndBuildReports()
+
+10      Dim wsMain As Worksheet
+20      Dim wsMgmt As Worksheet
+30      Dim wsRev As Worksheet
+40      Dim wbSrc As Workbook
+50      Dim wsSrc As Worksheet
+60      Dim wbRef As Workbook
+70      Dim wsRef As Worksheet
+80      Dim wsBase As Worksheet
+81      Dim wsBaseRef As Worksheet
+90      Dim dictHelper As Object
+100     Dim dictBranch As Object
+110     Dim yearVal As String
+120     Dim refYear As String
+130     Dim srcPath As String
+140     Dim refPath As String
+150     Dim threshold As Double
+160     Dim maxMonth As Long
+        Dim minMonth As Long
+        Dim dateCol As Long
+170     Dim lastRow As Long
+180     Dim r As Long
+190     Dim outRow As Long
+200     Dim baseSheetName As String
+210     Dim refBaseSheetName As String
+220     Dim corrCount As Long
+230     Dim ignoreCount As Long
+240     Dim unhandledCount As Long
+250     Dim reviewCount As Long
+260     Dim countRef As Long
+270     Dim countCurrent As Long
+280     Dim prevScreenUpdating As Boolean
+290     Dim prevDisplayAlerts As Boolean
+300     Dim prevEnableEvents As Boolean
+310     Dim prevCalculation As XlCalculation
+320     Dim debugStep As String
+330     Dim revLastRow As Long
+340     Dim revLastCol As Long
+350     Dim actionText As String
+360     Dim fixText As String
+370     Dim srcRowNum As Long
+380     Dim dictCorrections As Object
+390     Dim dictIgnore As Object
+400     Dim ans As VbMsgBoxResult
+410     Dim monthVal As Long
+420     Dim premVal As Double
+        Dim commVal As Double
+        Dim currCode As Variant
+430     Dim bordereu As Variant
+        Dim fixParts() As String
+        Dim fp As Long
+        Dim oneFix As String
+        Dim fixPrem As Double
+        Dim fixComm As Double
+        Dim curRevName As String
+        Dim actionColIdx As Long
+        Dim fixColIdx As Long
+        Dim hdrCol As Long
+        Dim hdrActionText As String
+        Dim hdrFixText As String
+        Dim dictHasFix As Object
+        Dim dictHasIgnore As Object
+        Dim dictHasUnhandled As Object
+        Dim srcKey As Variant
+        Dim allKeys As Object
+        Dim c As Long
+        Dim refRevName As String
+        Dim dictRefCorr As Object
+        Dim dictRefIgnore As Object
+        Dim wsRefRev As Worksheet
+        Dim refRevLastRow As Long
+        Dim refRevLastCol As Long
+        Dim refActionColIdx As Long
+        Dim refFixColIdx As Long
+        Dim refHdrCol As Long
+        Dim refSrcRowNum As Long
+        Dim refActionText As String
+        Dim refFixText As String
+        Dim dictRefHasFix As Object
+        Dim dictRefHasIgnore As Object
+        Dim dictRefHasUnhandled As Object
+        Dim refSrcKey As Variant
+        Dim refAllKeys As Object
+        Dim periodDesc As String
+        Dim reasonColIdx As Long
+        Dim hdrReasonText As String
+        Dim reasonText As String
+        Dim dictRowFixes As Object
+        Dim fixKey As Variant
+        Dim refReasonColIdx As Long
+        Dim refReasonText As String
+        Dim dictRefRowFixes As Object
+        Dim refFixKey As Variant
+        Dim rowBordMonth As String
+        Dim rowRate As Double
+        Dim dtStr As String
+        Dim mPart As String
+        Dim dollarRate As Double
+        Dim clientFilter As String
+
+440     On Error GoTo ERR_HANDLER
+
+        ' Remove any leftover sheet protection
+        Dim wsUp2 As Worksheet
+        For Each wsUp2 In ThisWorkbook.Worksheets
+            On Error Resume Next
+            wsUp2.Unprotect "Z961814r"
+            On Error GoTo ERR_HANDLER
+        Next wsUp2
+
+        ' --- Check if reports already exist for these parameters ---
+        Dim wsChk2 As Worksheet
+        Set wsChk2 = ThisWorkbook.Worksheets(CONTROL_SHEET_NAME())
+        Dim chkSheets2 As String
+        chkSheets2 = SHEET_COMPANIES()
+        If SheetExists(chkSheets2) Then
+            Dim alreadyMsg2 As String
+            ' "dochot elu kvar keiyamim. nitan litzpot bahem bekaftor 5. ha'im leharitz shuv?"
+            alreadyMsg2 = ChrW(1491) & ChrW(1493) & ChrW(1495) & ChrW(1493) & ChrW(1514) & " " & ChrW(1488) & ChrW(1500) & ChrW(1493) & " " & ChrW(1499) & ChrW(1489) & ChrW(1512) & " " & ChrW(1511) & ChrW(1497) & ChrW(1497) & ChrW(1502) & ChrW(1497) & ChrW(1501) & "." & vbCrLf & _
+                ChrW(1504) & ChrW(1497) & ChrW(1514) & ChrW(1503) & " " & ChrW(1500) & ChrW(1510) & ChrW(1508) & ChrW(1493) & ChrW(1514) & " " & ChrW(1489) & ChrW(1492) & ChrW(1501) & " " & ChrW(1489) & ChrW(1499) & ChrW(1508) & ChrW(1514) & ChrW(1493) & ChrW(1512) & " 5." & vbCrLf & vbCrLf & _
+                ChrW(1492) & ChrW(1488) & ChrW(1501) & " " & ChrW(1500) & ChrW(1492) & ChrW(1512) & ChrW(1497) & ChrW(1509) & " " & ChrW(1513) & ChrW(1493) & ChrW(1489) & "?"
+            If MsgBoxU(alreadyMsg2, vbYesNo + vbQuestion) <> vbYes Then
+                Exit Sub
+            End If
+        End If
+
+        ' --- Validate required dropdown selections ---
+        Dim wsCheck As Worksheet
+        Set wsCheck = ThisWorkbook.Worksheets(CONTROL_SHEET_NAME())
+        Dim selText As String
+        selText = ChrW(1489) & ChrW(1495) & ChrW(1512) & ChrW(47) & ChrW(1497)  ' "bechar/i"
+        
+        clientFilter = Trim$(CStr(wsCheck.Range("rngClientName").Value2))
+        If clientFilter = selText Or clientFilter = "" Then
+            clientFilter = ""
+        End If
+        
+        Dim ptVal As String
+        ptVal = Trim$(CStr(wsCheck.Range("rngPeriodType").Value2))
+        ' If period type requires a value (not shnatit/yearly), check G6
+        If ptVal <> "" And ptVal <> selText Then
+            ' Check if NOT shnatit (yearly doesn't need G6)
+            ' Must check it's shnatit but NOT chatzi shnati (which contains shnatit as substring)
+            Dim isYearly As Boolean
+            isYearly = (InStr(1, ptVal, ChrW(1513) & ChrW(1504) & ChrW(1514) & ChrW(1497), vbTextCompare) > 0) And _
+                        (InStr(1, ptVal, ChrW(1495) & ChrW(1510) & ChrW(1497), vbTextCompare) = 0)
+            If Not isYearly Then
+                Dim pvVal As String
+                pvVal = Trim$(CStr(wsCheck.Range("rngPeriodValue").Value2))
+                If pvVal = "" Or pvVal = selText Then
+                    MsgBoxU ChrW(1497) & ChrW(1513) & " " & ChrW(1500) & ChrW(1489) & ChrW(1495) & ChrW(1493) & ChrW(1512) & " " & ChrW(1506) & ChrW(1512) & ChrW(1498) & " " & ChrW(1514) & ChrW(1511) & ChrW(1493) & ChrW(1508) & ChrW(1492) & " " & ChrW(1489) & ChrW(1514) & ChrW(1488) & " G6", vbExclamation
+                    Exit Sub
+                End If
+            End If
+        End If
+        
+        Dim ftVal As String
+        ftVal = Trim$(CStr(wsCheck.Range("rngFilterType").Value2))
+        If ftVal <> "" And ftVal <> selText Then
+            Dim fvVal As String
+            fvVal = Trim$(CStr(wsCheck.Range("rngFilterValue").Value2))
+            If fvVal = "" Or fvVal = selText Then
+                MsgBoxU ChrW(1497) & ChrW(1513) & " " & ChrW(1500) & ChrW(1489) & ChrW(1495) & ChrW(1493) & ChrW(1512) & " " & ChrW(1506) & ChrW(1512) & ChrW(1498) & " " & ChrW(1505) & ChrW(1497) & ChrW(1504) & ChrW(1493) & ChrW(1503) & " " & ChrW(1489) & ChrW(1514) & ChrW(1488) & " G10", vbExclamation
+                Exit Sub
+            End If
+        End If
+        ' --- End validation ---
+
+        Dim wsMsgSrc2 As Worksheet
+        Dim msgBase2 As Long
+        Set wsMsgSrc2 = ThisWorkbook.Worksheets(MANAGEMENT_SHEET_NAME())
+        msgBase2 = ThisWorkbook.Names("rngSection_Messages").RefersToRange.Row
+
+        ' Show prominent processing message on Main sheet (below currency area)
+        Dim wsProgress As Worksheet
+        Set wsProgress = ThisWorkbook.Worksheets(CONTROL_SHEET_NAME())
+        wsProgress.Unprotect "Z961814r"
+470     wsProgress.Range("G15:K15").UnMerge
+        wsProgress.Range("G15:K15").Merge
+        With wsProgress.Range("G15")
+            .Value = ChrW(1502) & ChrW(1506) & ChrW(1489) & ChrW(1491) & " " & ChrW(1504) & ChrW(1514) & ChrW(1493) & ChrW(1504) & ChrW(1497) & ChrW(1501) & " " & ChrW(1488) & ChrW(1504) & ChrW(1488) & " " & ChrW(1492) & ChrW(1502) & ChrW(1514) & ChrW(1497) & ChrW(1504) & ChrW(1493) & "..."
+            .Font.Size = 18
+            .Font.Bold = True
+            .Font.Color = RGB(255, 0, 0)
+            .Interior.Color = RGB(255, 255, 200)
+            .HorizontalAlignment = -4108
+        End With
+        wsProgress.Activate
+        wsProgress.Protect UserInterfaceOnly:=True
+        Application.ScreenUpdating = True
+        DoEvents
+        Application.ScreenUpdating = False
+
+475     debugStep = "INIT"
+
+480     prevScreenUpdating = Application.ScreenUpdating
+490     prevDisplayAlerts = Application.DisplayAlerts
+500     prevEnableEvents = Application.EnableEvents
+510     prevCalculation = Application.Calculation
+
+520     Application.ScreenUpdating = False
+530     Application.DisplayAlerts = False
+540     Application.EnableEvents = False
+550     Application.Calculation = xlCalculationManual
+
+560     debugStep = "LOAD_SHEETS"
+570     Set wsMain = ThisWorkbook.Worksheets(CONTROL_SHEET_NAME())
+580     Set wsMgmt = ThisWorkbook.Worksheets(MANAGEMENT_SHEET_NAME())
+
+590     debugStep = "READ_YEARS"
+600     yearVal = Trim$(CStr(wsMain.Range("rngCurrentYear").Value2))
+610     refYear = Trim$(CStr(wsMain.Range("rngBaseYear").Value2))
+620     If yearVal = "" Or refYear = "" Then Err.Raise vbObjectError + 2001, "ApplyCorrections", "B2 OR B3 IS EMPTY"
+
+630     debugStep = "LOAD_HELPER"
+640     Set dictHelper = LoadHelperDictionary(wsMgmt)
+
+650     debugStep = "LOAD_BRANCH"
+660     Set dictBranch = LoadBranchMapping(wsMgmt)
+
+670     debugStep = "GET_THRESHOLD"
+680     threshold = GetNumericParameter(wsMgmt, PARAM_PREMIUM_THRESHOLD)
+
+        ' Load dollar exchange rate (from matach sheet / BOI API / rngDOLAR fallback)
+682     dollarRate = GetDollarRate(wsMain, , False)
+
+690     debugStep = "GET_PERIOD"
+700     GetMonthRange wsMain, minMonth, maxMonth
+        dateCol = GetDateColumn(wsMain)
+
+        ' ---- Read corrections from REVIEW ----
+
+    corrCount = 0
+    ignoreCount = 0
+    unhandledCount = 0
+    reviewCount = 0
+
+    LoadCorrectionsToDicts wsMgmt, yearVal, dictHelper, _
+        dictCorrections, dictIgnore, dictHasFix, dictHasIgnore, dictHasUnhandled, dictRowFixes, _
+        corrCount, ignoreCount, unhandledCount, reviewCount
+
+    LoadCorrectionsToDicts wsMgmt, refYear, dictHelper, _
+        dictRefCorr, dictRefIgnore, dictRefHasFix, dictRefHasIgnore, dictRefHasUnhandled, dictRefRowFixes, _
+        corrCount, ignoreCount, unhandledCount, reviewCount
+
+1040    debugStep = "CHECK_SRC"
+        Dim isDemoMode As Boolean
+        isDemoMode = FORCE_DEMO_MODE
+        Dim demoParam As String
+        demoParam = UCase$(Trim$(GetStringParameter(ThisWorkbook.Worksheets(MANAGEMENT_SHEET_NAME()), "DEMO_MODE")))
+        If demoParam = ChrW(1499) & ChrW(1503) Or demoParam = "YES" Then isDemoMode = True
+        
+        If isDemoMode Then
+            On Error Resume Next
+            Set wsSrc = ThisWorkbook.Worksheets("DATA_" & yearVal)
+            On Error GoTo ERR_HANDLER
+            If Not wsSrc Is Nothing Then Set wbSrc = ThisWorkbook
+        End If
+        
+        If wbSrc Is Nothing Then
+1050        srcPath = FindSourceFile(yearVal)
+1060        If srcPath = "" Then Err.Raise vbObjectError + 2002, "ApplyCorrections", "SOURCE NOT FOUND: " & yearVal
+
+1070        debugStep = "OPEN_SRC"
+1080        Set wbSrc = SafeOpenWorkbook(srcPath)
+            If wbSrc Is Nothing Then Err.Raise 424, "OPEN_SRC", "Failed to open source file. Excel might be blocking it."
+1090        Set wsSrc = OpenDataSheet(wbSrc)
+        End If
+
+    baseSheetName = H_BASE() & "_" & yearVal
+    BuildBaseSheet wsSrc, wsBase, baseSheetName, _
+        dictIgnore, dictCorrections, dictRowFixes, dictHasFix, dictHasUnhandled, _
+        dictBranch, _
+        minMonth, maxMonth, filterCol, filterVal, dollarRate, dateCol, threshold, wsMain, countCurrent
+
+        Dim isRefDemoMode As Boolean
+        isRefDemoMode = FORCE_DEMO_MODE
+        Dim refDemoParam As String
+        refDemoParam = UCase$(Trim$(GetStringParameter(ThisWorkbook.Worksheets(MANAGEMENT_SHEET_NAME()), "DEMO_MODE")))
+        If refDemoParam = ChrW(1499) & ChrW(1503) Or refDemoParam = "YES" Then isRefDemoMode = True
+        
+        If isRefDemoMode Then
+            On Error Resume Next
+            Set wsRef = ThisWorkbook.Worksheets("DATA_" & refYear)
+            On Error GoTo ERR_HANDLER
+            If Not wsRef Is Nothing Then Set wbRef = ThisWorkbook
+        End If
+        
+        If wbRef Is Nothing Then
+            refPath = FindSourceFile(refYear)
+            If refPath = "" Then Err.Raise vbObjectError + 2003, "ApplyCorrections", "REF SOURCE NOT FOUND: " & refYear
+            
+            debugStep = "OPEN_REF"
+            Set wbRef = SafeOpenWorkbook(refPath)
+            If wbRef Is Nothing Then Err.Raise 424, "OPEN_REF", "Failed to open ref file. Excel might be blocking it."
+            Set wsRef = OpenDataSheet(wbRef)
+        End If
+
+    refBaseSheetName = H_BASE() & "_" & refYear
+    BuildBaseSheet wsRef, wsBaseRef, refBaseSheetName, _
+        dictRefIgnore, dictRefCorr, dictRefRowFixes, dictRefHasFix, dictRefHasUnhandled, _
+        dictBranch, _
+        minMonth, maxMonth, filterCol, filterVal, dollarRate, dateCol, threshold, wsMain, countRef
+
+2630    debugStep = "BUILD_COMPANIES"
+2640    BuildComparisonSheet wsBase, wsBaseRef, SHEET_COMPANIES(), BASE_COL_COMPANY, minMonth, maxMonth, yearVal, refYear, filterCol, filterValue, hashvaatText & SHEET_COMPANIES() & " | " & titlePrefix, clientFilter
+        On Error Resume Next
+        ThisWorkbook.Worksheets(SHEET_COMPANIES()).Tab.Color = RGB(173, 216, 230)  ' pastel blue
+        ApplyZebraStriping ThisWorkbook.Worksheets(SHEET_COMPANIES())
+        On Error GoTo ERR_HANDLER
+
+2650    debugStep = "BUILD_BRANCH"
+2660    BuildComparisonSheet wsBase, wsBaseRef, SHEET_BRANCH(), BASE_COL_BRANCHNAME, minMonth, maxMonth, yearVal, refYear, filterCol, filterValue, hashvaatText & SHEET_BRANCH() & " | " & titlePrefix, clientFilter
+        On Error Resume Next
+        ThisWorkbook.Worksheets(SHEET_BRANCH()).Tab.Color = RGB(255, 218, 185)  ' pastel peach
+        ApplyZebraStriping ThisWorkbook.Worksheets(SHEET_BRANCH())
+        On Error GoTo ERR_HANDLER
+
+2665    debugStep = "BUILD_MAINBRANCH"
+2666    BuildComparisonSheet wsBase, wsBaseRef, SHEET_MAINBRANCH(), BASE_COL_MAINBRANCH, minMonth, maxMonth, yearVal, refYear, filterCol, filterValue, hashvaatText & SHEET_MAINBRANCH() & " | " & titlePrefix, clientFilter
+        On Error Resume Next
+        ThisWorkbook.Worksheets(SHEET_MAINBRANCH()).Tab.Color = RGB(255, 182, 193)  ' pastel pink
+        ApplyZebraStriping ThisWorkbook.Worksheets(SHEET_MAINBRANCH())
+        On Error GoTo ERR_HANDLER
+
+2670    debugStep = "BUILD_TELLERS"
+2680    BuildComparisonSheet wsBase, wsBaseRef, SHEET_TELLERS(), BASE_COL_TELLER, minMonth, maxMonth, yearVal, refYear, filterCol, filterValue, hashvaatText & SHEET_TELLERS() & " | " & titlePrefix, clientFilter
+        On Error Resume Next
+        ThisWorkbook.Worksheets(SHEET_TELLERS()).Tab.Color = RGB(204, 204, 255)  ' pastel lavender
+        ApplyZebraStriping ThisWorkbook.Worksheets(SHEET_TELLERS())
+        On Error GoTo ERR_HANDLER
+
+2690    debugStep = "BUILD_AGENTS"
+2700    BuildComparisonSheet wsBase, wsBaseRef, SHEET_AGENTS(), BASE_COL_AGENTNAME, minMonth, maxMonth, yearVal, refYear, filterCol, filterValue, hashvaatText & SHEET_AGENTS() & " | " & titlePrefix, clientFilter
+        On Error Resume Next
+        ThisWorkbook.Worksheets(SHEET_AGENTS()).Tab.Color = RGB(176, 226, 172)  ' pastel green
+        ApplyZebraStriping ThisWorkbook.Worksheets(SHEET_AGENTS())
+        On Error GoTo ERR_HANDLER
+
+2710    debugStep = "BUILD_MONTHS"
+2720    BuildComparisonSheet wsBase, wsBaseRef, SHEET_MONTHS(), BASE_COL_MONTH, minMonth, maxMonth, yearVal, refYear, filterCol, filterValue, hashvaatText & SHEET_MONTHS() & " | " & titlePrefix, clientFilter
+        On Error Resume Next
+        ThisWorkbook.Worksheets(SHEET_MONTHS()).Tab.Color = RGB(255, 255, 186)  ' pastel yellow
+        ApplyZebraStriping ThisWorkbook.Worksheets(SHEET_MONTHS())
+        On Error GoTo ERR_HANDLER
+
+2730    debugStep = "BUILD_SUMMARY"
+        periodDesc = Trim$(CStr(wsMain.Range("rngPeriodType").Value2))
+        If Trim$(CStr(wsMain.Range("rngPeriodValue").Value2)) <> "" Then periodDesc = periodDesc & " " & Trim$(CStr(wsMain.Range("rngPeriodValue").Value2))
+2740    BuildSummarySheet countRef, countCurrent, reviewCount, corrCount, ignoreCount, unhandledCount, yearVal, refYear, periodDesc, hashvaatText & SHEET_SUMMARY() & " | " & titlePrefix
+        ThisWorkbook.Worksheets(SHEET_SUMMARY()).Tab.Color = RGB(255, 204, 153)  ' pastel orange
+
+CLEANUP:
+        On Error Resume Next
+        If Not wbSrc Is Nothing Then
+            If Not wbSrc Is ThisWorkbook Then wbSrc.Close SaveChanges:=False
+        End If
+        If Not wbRef Is Nothing Then
+            If Not wbRef Is ThisWorkbook Then wbRef.Close SaveChanges:=False
+        End If
+        On Error GoTo 0
+        
+2750    Application.ScreenUpdating = prevScreenUpdating
+2760    Application.DisplayAlerts = prevDisplayAlerts
+2770    Application.EnableEvents = prevEnableEvents
+2780    Application.Calculation = prevCalculation
+
+        ' Clear processing message from Main sheet and restore green background
+2785    On Error Resume Next
+        ThisWorkbook.Worksheets(CONTROL_SHEET_NAME()).Unprotect "Z961814r"
+        ThisWorkbook.Worksheets(CONTROL_SHEET_NAME()).Range("G15:K15").UnMerge
+        With ThisWorkbook.Worksheets(CONTROL_SHEET_NAME()).Range("G15:K15")
+            .Value = ""
+            .Interior.Color = RGB(220, 240, 220)
+        End With
+        ThisWorkbook.Worksheets(CONTROL_SHEET_NAME()).Protect UserInterfaceOnly:=True
+        On Error GoTo 0
+2790    Application.StatusBar = False
+
+        ' Hide internal sheets (reshimot, letipul, basis, hagdarot)
+        On Error Resume Next
+        Dim wsHide As Worksheet
+        For Each wsHide In ThisWorkbook.Worksheets
+            If wsHide.Name = MANAGEMENT_SHEET_NAME() Then
+                wsHide.Visible = xlSheetVeryHidden
+            ElseIf Left$(wsHide.Name, Len(REVIEW_SHEET_NAME())) = REVIEW_SHEET_NAME() Then
+                wsHide.Visible = xlSheetVeryHidden
+            ElseIf Left$(wsHide.Name, 5) = H_BASE() & "_" Then
+                wsHide.Visible = xlSheetVeryHidden
+            ElseIf wsHide.Name = H_RESHIMOT() Then
+                wsHide.Visible = xlSheetVeryHidden
+            End If
+        Next wsHide
+        On Error GoTo 0
+
+        ' Ensure home sheet is visible and activate it
+        ThisWorkbook.Worksheets(CONTROL_SHEET_NAME()).Visible = xlSheetVisible
+        ThisWorkbook.Worksheets(CONTROL_SHEET_NAME()).Activate
+
+2795    MsgBoxU ChrW(1492) & ChrW(1506) & ChrW(1497) & ChrW(1489) & ChrW(1493) & ChrW(1491) & " " & ChrW(1492) & ChrW(1505) & ChrW(1514) & ChrW(1497) & ChrW(1497) & ChrW(1501), vbInformation
+
+2800    Exit Sub
+
+ERR_HANDLER:
+        Application.EnableEvents = True
+        Application.DisplayAlerts = True
+2810    Dim errLine As Long
+2820    Dim errNum As Long
+2830    Dim errSrc As String
+2840    Dim errDesc As String
+2850    errLine = Erl
+2860    errNum = Err.Number
+2870    errSrc = Err.Source
+2880    errDesc = Err.Description
+
+2890    On Error Resume Next
+2900    If Not wbSrc Is Nothing Then
+            If Not wbSrc Is ThisWorkbook Then wbSrc.Close SaveChanges:=False
+        End If
+2910    If Not wbRef Is Nothing Then
+            If Not wbRef Is ThisWorkbook Then wbRef.Close SaveChanges:=False
+        End If
+2920    Application.ScreenUpdating = True
+2930    Application.DisplayAlerts = True
+2940    Application.EnableEvents = True
+2950    Application.Calculation = xlCalculationAutomatic
+        On Error Resume Next
+        ThisWorkbook.Worksheets(CONTROL_SHEET_NAME()).Unprotect "Z961814r"
+        ThisWorkbook.Worksheets(CONTROL_SHEET_NAME()).Range("G15:K15").UnMerge
+        With ThisWorkbook.Worksheets(CONTROL_SHEET_NAME()).Range("G15:K15")
+            .Value = ""
+            .Interior.Color = RGB(220, 240, 220)
+        End With
+        ThisWorkbook.Worksheets(CONTROL_SHEET_NAME()).Protect UserInterfaceOnly:=True
+2955    Application.StatusBar = False
+
+2960    MsgBoxU wsMsgSrc2.Cells(msgBase2 + 5, 1).Value & errLine & vbCrLf & wsMsgSrc2.Cells(msgBase2 + 6, 1).Value & errNum & vbCrLf & wsMsgSrc2.Cells(msgBase2 + 7, 1).Value & debugStep & vbCrLf & errSrc & vbCrLf & errDesc, vbCritical
+
+End Sub

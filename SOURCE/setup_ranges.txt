@@ -1,0 +1,45 @@
+Public Sub SetupSectionNamedRanges()
+    Dim wsMgmt As Worksheet
+    Dim nm As Name
+    
+    On Error Resume Next
+    Set wsMgmt = ThisWorkbook.Worksheets(MANAGEMENT_SHEET_NAME())
+    On Error GoTo 0
+    If wsMgmt Is Nothing Then Exit Sub
+    
+    ' --- Delete ALL existing rngSection_* names (including typos) ---
+    On Error Resume Next
+    For Each nm In ThisWorkbook.Names
+        If LCase$(Left$(nm.Name, 10)) = "rngsection" Then
+            nm.Delete
+        End If
+        ' Also catch old misspelled names
+        If LCase$(Left$(nm.Name, 10)) = "rngsrction" Then
+            nm.Delete
+        End If
+    Next nm
+    
+    ' Also delete old rngFILES_FOLDER and rngREPORTS_FOLDER (will be recreated with correct refs)
+    ThisWorkbook.Names("rngFILES_FOLDER").Delete
+    ThisWorkbook.Names("rngREPORTS_FOLDER").Delete
+    Err.Clear
+    On Error GoTo 0
+    
+    Dim offsetRow As Long
+    offsetRow = 0
+    If wsMgmt.Range("A1").Value = "MENU_AREA" Then offsetRow = 4
+
+    ' --- Create section Named Ranges ---
+    ThisWorkbook.Names.Add "rngSection_FieldMap", wsMgmt.Range("A" & 1 + offsetRow)
+    ThisWorkbook.Names.Add "rngSection_BranchName", wsMgmt.Range("A" & 57 + offsetRow)
+    ThisWorkbook.Names.Add "rngSection_Params", wsMgmt.Range("A" & 173 + offsetRow)
+    ThisWorkbook.Names.Add "rngSection_PeriodLists", wsMgmt.Range("A" & 250 + offsetRow)
+    ThisWorkbook.Names.Add "rngSection_Messages", wsMgmt.Range("A" & 300 + offsetRow)
+    ThisWorkbook.Names.Add "rngSection_Permissions", wsMgmt.Range("A" & 350 + offsetRow)
+    ThisWorkbook.Names.Add "rngSection_ReasonCode", wsMgmt.Range("A" & 400 + offsetRow)
+    ThisWorkbook.Names.Add "rngSection_Clients", wsMgmt.Range("A" & 500 + offsetRow)
+    
+    ' --- Create folder path Named Ranges (Params section) ---
+    ThisWorkbook.Names.Add "rngFILES_FOLDER", wsMgmt.Range("B" & 176 + offsetRow)
+    ThisWorkbook.Names.Add "rngREPORTS_FOLDER", wsMgmt.Range("B" & 177 + offsetRow)
+End Sub

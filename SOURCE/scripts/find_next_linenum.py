@@ -1,0 +1,12 @@
+﻿import sys
+
+filepath = r'c:\LEVAV PROJECT\SOURCE\Goren_Claude_V2.052_20260702_1645.bas'
+
+with open(filepath, 'r', encoding='utf-8') as f:
+    lines = f.readlines()
+
+for i, line in enumerate(lines):
+    if "560     xlCht.Export imgComm" in line:
+        for j in range(i, i+60):
+            if "570" in lines[j] or "580" in lines[j] or "590" in lines[j] or "600" in lines[j] or "610" in lines[j] or "620" in lines[j]:
+                print(f"[{j}] {lines[j].strip()}")

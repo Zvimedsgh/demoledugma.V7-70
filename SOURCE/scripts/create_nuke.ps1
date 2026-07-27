@@ -1,0 +1,32 @@
+$code = @"
+Public Sub NukeAndRestore()
+    On Error Resume Next
+    Dim ws As Worksheet
+    Set ws = ThisWorkbook.Worksheets("בקרה")
+    
+    ' 1. Turn on all events and calculations
+    Application.EnableEvents = True
+    Application.ScreenUpdating = True
+    Application.Calculation = xlCalculationAutomatic
+    
+    ' 2. Unprotect sheet
+    ws.Unprotect "Z961814r"
+    
+    ' 3. Delete ALL shapes (to make sure no transparent shape is blocking)
+    Dim shp As Shape
+    For Each shp In ws.Shapes
+        If shp.Type = msoShapeRectangle Then
+            shp.Delete
+        End If
+    Next shp
+    
+    ' 4. Ensure G3:G12 is unlocked
+    ws.Range("G3:G12").Locked = False
+    
+    ' 5. Call Setup
+    Call A00_SetupMainSheet
+    
+    MsgBox "Nuke completed. Check G now.", vbInformation
+End Sub
+"@
+Set-Content "c:\LEVAV PROJECT\SOURCE\nuke.txt" $code -Encoding UTF8

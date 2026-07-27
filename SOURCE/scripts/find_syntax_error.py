@@ -1,0 +1,11 @@
+﻿import sys
+
+filepath = r'c:\LEVAV PROJECT\SOURCE\Goren_Claude_V2.055_20260702_1655.bas'
+
+with open(filepath, 'r', encoding='utf-8') as f:
+    lines = f.readlines()
+
+for i, line in enumerate(lines):
+    if "If chartItems = 0 Then" in line:
+        for j in range(max(0, i-5), min(len(lines), i+15)):
+            print(f"{j+1}: {lines[j].strip()}")

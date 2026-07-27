@@ -1,0 +1,676 @@
+[3283] Public Sub A00_SetupMainSheet()
+[3284] 
+[3285]     Dim wsMain As Worksheet
+[3286]     Dim wsMgmt As Worksheet
+[3287]     Dim shp As Shape
+[3288]     Dim s As Shape
+[3289]     Dim blueClr As Long
+[3290]     Dim lblShnBasis As String
+[3291]     Dim lblShnShotef As String
+[3292]     Dim lblTkufa As String
+[3293]     Dim lblPirutTkufa As String
+[3294]     Dim lblSugTaarih As String
+[3295]     Dim periodTypeList As String
+[3296]     Dim halfList As String
+[3297]     Dim quarterList As String
+[3298]     Dim monthList As String
+[3299]     Dim periodTypeFormula As String
+[3300]     Dim dvC4 As String
+[3301]     Dim btnSearch As Shape
+[3302]     Dim btnAll As Shape
+[3303]     Dim btnReset As Shape
+[3304]     Dim hdrRng As Range
+[3305]     Dim foundBackup As Boolean
+[3306]     Dim filterTypeList As String
+[3307]     Dim wsLoop As Worksheet
+[3308]     Dim rngMsg As Range
+[3309]     Dim msgTxt As String
+[3310]     Dim borderShp As Shape
+[3311]     Dim rEdge As Variant
+[3312]     Dim cellRate As Range
+[3313]     Dim cellBorder As Range
+[3314]     Dim bEdge As Variant
+[3315]     Dim wsMatachSetup As Worksheet
+[3316]     Dim curRate As Double
+[3317]     Dim eurRate As Double
+[3318]     Dim matachMsg As String
+[3319]     Dim existingPath As String
+[3320]     Dim paramStartRow As Long
+[3321]     Dim paramLastRow As Long
+[3322]     Dim foundEmail As Boolean
+[3323]     Dim pr As Long
+[3324]     Dim msgBaseRow As Long
+[3325]     Dim periodBaseRow As Long
+[3326]     Dim wsTemp As Worksheet
+[3327]     Dim shtNames As Variant
+[3328]     Dim shtName As Variant
+[3329]     Dim shtHeaders As Variant
+[3330]     Dim iIdx As Long
+[3331]     
+[3332]     ' Disable events to prevent Worksheet_Change from firing during setupp
+[3333] 10  Application.EnableEvents = False
+[3334] 20  On Error GoTo ERR_HANDLER
+[3335] 
+[3336]     ' Try to find Main sheet by current Hebrew name or old English name
+[3337] 30  On Error Resume Next
+[3338] 40  Set wsMain = ThisWorkbook.Worksheets(CONTROL_SHEET_NAME())
+[3339] 50  If wsMain Is Nothing Then Set wsMain = ThisWorkbook.Worksheets("Main")
+[3340] 60  On Error GoTo ERR_HANDLER
+[3341]     ' If not found, create it as the first sheet
+[3342] 70  If wsMain Is Nothing Then
+[3343] 80  Set wsMain = ThisWorkbook.Worksheets.Add(Before:=ThisWorkbook.Worksheets(1))
+[3344] 90  wsMain.Name = CONTROL_SHEET_NAME()
+[3345] 100  End If
+[3346]     ' Rename to Hebrew if still English
+[3347] 110  If wsMain.Name <> CONTROL_SHEET_NAME() Then wsMain.Name = CONTROL_SHEET_NAME()
+[3348]     ' Unprotect home sheet in case it's protected
+[3349] 120  On Error Resume Next
+[3350] 130  wsMain.Unprotect "Z961814r"
+[3351] 140  Err.Clear
+[3352] 150  On Error GoTo ERR_HANDLER
+[3353]     ' Try to find NIHUL/hagdarot sheet by current Hebrew name or old English name
+[3354] 160  On Error Resume Next
+[3355] 170  Set wsMgmt = ThisWorkbook.Worksheets(MANAGEMENT_SHEET_NAME())
+[3356] 180  If wsMgmt Is Nothing Then Set wsMgmt = ThisWorkbook.Worksheets("NIHUL")
+[3357] 190  Err.Clear
+[3358] 200  On Error GoTo ERR_HANDLER
+[3359] 210  If wsMgmt Is Nothing Then Err.Raise vbObjectError + 9002, "SetupMainSheet", "Cannot find NIHUL/hagdarot sheet"
+[3360]     ' Rename to Hebrew if still English
+[3361] 220  If wsMgmt.Name <> MANAGEMENT_SHEET_NAME() Then wsMgmt.Name = MANAGEMENT_SHEET_NAME()
+[3362]     ' Unprotect management sheet in case it's protected
+[3363] 230  On Error Resume Next
+[3364] 240  wsMgmt.Unprotect "Z961814r"
+[3365] 250  Err.Clear
+[3366] 260  On Error GoTo ERR_HANDLER
+[3367] 270  blueClr = RGB(0, 70, 140)
+[3368] 
+[3369]     ' ---- Hebrew label strings ----
+[3370]     ' "shnat basis" = year of reference
+[3371] 280  lblShnBasis = ChrW(1513) & ChrW(1504) & ChrW(1514) & " " & H_BASE()
+[3372]     ' "shna shoteft" = current year
+[3373] 290  lblShnShotef = ChrW(1513) & ChrW(1504) & ChrW(1492) & " " & ChrW(1513) & ChrW(1493) & ChrW(1496) & ChrW(1508) & ChrW(1514)
+[3374]     ' "tkufa" = period
+[3375] 300  lblTkufa = ChrW(1514) & ChrW(1511) & ChrW(1493) & ChrW(1508) & ChrW(1492)
+[3376]     ' "pirot tkufa" = period detail
+[3377] 310  lblPirutTkufa = ChrW(1508) & ChrW(1497) & ChrW(1512) & ChrW(1493) & ChrW(1496) & " " & ChrW(1514) & ChrW(1511) & ChrW(1493) & ChrW(1508) & ChrW(1492)
+[3378]     ' "sug taarih" = date type
+[3379] 320  lblSugTaarih = ChrW(1505) & ChrW(1493) & ChrW(1490) & " " & ChrW(1514) & ChrW(1488) & ChrW(1512) & ChrW(1497) & ChrW(1498)
+[3380] 
+[3381]     ' ---- Clear old labels from A2:D5 (no longer used) ----
+[3382] wsMain.Range("A1:Z1").UnMerge
+[3383] wsMain.Range("A1:Z1").ClearContents
+[3384]     wsMain.Range("A2:K20").ClearContents
+[3385]     wsMain.Cells.Font.Size = 14
+[3386]     wsMain.Cells.Interior.ColorIndex = xlNone
+[3387]     wsMain.Range("A1:AZ40").Interior.Color = RGB(220, 240, 220)
+[3388]     wsMain.Range("A2:K20").Borders.LineStyle = xlNone
+[3389] 
+[3390]     ' ---- CREATE 8 SETTINGS SHEETS ----
+[3391]     shtNames = Array(H_SET_FIELDMAP(), H_SET_BRANCHES(), H_SET_PARAMS(), H_SET_PERIODS(), H_SET_MESSAGES(), H_SET_PERMISSIONS(), H_SET_REASONS(), H_SET_CLIENTS())
+[3392]     shtHeaders = Array(ChrW(1502) & ChrW(1497) & ChrW(1508) & ChrW(1493) & ChrW(1497) & " " & ChrW(1513) & ChrW(1491) & ChrW(1493) & ChrW(1514), _
+[3393]                        ChrW(1512) & ChrW(1513) & ChrW(1497) & ChrW(1502) & ChrW(1514) & " " & ChrW(1506) & ChrW(1504) & ChrW(1508) & ChrW(1497) & ChrW(1501), _
+[3394]                        ChrW(1508) & ChrW(1512) & ChrW(1502) & ChrW(1496) & ChrW(1512) & ChrW(1497) & ChrW(1501) & " " & ChrW(1499) & ChrW(1500) & ChrW(1500) & ChrW(1497) & ChrW(1497) & ChrW(1501), _
+[3395]                        ChrW(1512) & ChrW(1513) & ChrW(1497) & ChrW(1502) & ChrW(1514) & " " & ChrW(1514) & ChrW(1511) & ChrW(1493) & ChrW(1508) & ChrW(1493) & ChrW(1514), _
+[3396]                        ChrW(1492) & ChrW(1493) & ChrW(1491) & ChrW(1506) & ChrW(1493) & ChrW(1514) & " " & ChrW(1502) & ChrW(1506) & ChrW(1512) & ChrW(1499) & ChrW(1514), _
+[3397]                        ChrW(1492) & ChrW(1512) & ChrW(1513) & ChrW(1488) & ChrW(1493) & ChrW(1514) & " " & ChrW(1502) & ChrW(1513) & ChrW(1514) & ChrW(1502) & ChrW(1513) & ChrW(1497) & ChrW(1501), _
+[3398]                        ChrW(1505) & ChrW(1497) & ChrW(1489) & ChrW(1493) & ChrW(1514) & " " & ChrW(1513) & ChrW(1490) & ChrW(1497) & ChrW(1488) & ChrW(1492), _
+[3399]                        ChrW(1512) & ChrW(1513) & ChrW(1497) & ChrW(1502) & ChrW(1514) & " " & ChrW(1500) & ChrW(1511) & ChrW(1493) & ChrW(1495) & ChrW(1493) & ChrW(1514))
+[3400]     
+[3401]     For iIdx = 0 To UBound(shtNames)
+[3402]         On Error Resume Next
+[3403]         Set wsTemp = ThisWorkbook.Worksheets(shtNames(iIdx))
+[3404]         If Err.Number <> 0 Then
+[3405]             Set wsTemp = ThisWorkbook.Worksheets.Add(After:=ThisWorkbook.Worksheets(ThisWorkbook.Worksheets.Count))
+[3406]             wsTemp.Name = shtNames(iIdx)
+[3407]             wsTemp.Cells(1, 1).Value = shtHeaders(iIdx)
+[3408]             wsTemp.Cells(1, 1).Font.Bold = True
+[3409]             wsTemp.Cells(1, 1).Font.Size = 14
+[3410]         End If
+[3411]         Err.Clear
+[3412]         On Error GoTo ERR_HANDLER
+[3413]     Next iIdx
+[3414] 
+[3415]     ' ---- Period Lists ----
+[3416]     Set wsTemp = ThisWorkbook.Worksheets(H_SET_PERIODS())
+[3417]     wsTemp.Range("A2:A50").ClearContents
+[3418]     wsTemp.Cells(2, 1).Value = "PERIOD_TYPE"
+[3419]     wsTemp.Cells(3, 1).Value = ChrW(1513) & ChrW(1504) & ChrW(1514) & ChrW(1497)
+[3420]     wsTemp.Cells(4, 1).Value = ChrW(1495) & ChrW(1510) & ChrW(1497) & " " & ChrW(1513) & ChrW(1504) & ChrW(1514) & ChrW(1497)
+[3421]     wsTemp.Cells(5, 1).Value = ChrW(1512) & ChrW(1489) & ChrW(1506) & ChrW(1493) & ChrW(1503)
+[3422]     wsTemp.Cells(6, 1).Value = ChrW(1495) & ChrW(1493) & ChrW(1491) & ChrW(1513) & ChrW(1497)
+[3423]     wsTemp.Cells(7, 1).Value = "HALF_YEAR"
+[3424]     wsTemp.Cells(8, 1).Value = ChrW(1502) & ChrW(1495) & ChrW(1510) & ChrW(1497) & ChrW(1514) & " " & ChrW(1512) & ChrW(1488) & ChrW(1513) & ChrW(1493) & ChrW(1504) & ChrW(1492)
+[3425]     wsTemp.Cells(9, 1).Value = ChrW(1502) & ChrW(1495) & ChrW(1510) & ChrW(1497) & ChrW(1514) & " " & ChrW(1513) & ChrW(1504) & ChrW(1497) & ChrW(1492)
+[3426]     
+[3427]     On Error Resume Next
+[3428]     ThisWorkbook.Names("lst_period_type").Delete
+[3429]     ThisWorkbook.Names("lst_half_year").Delete
+[3430]     ThisWorkbook.Names("lst_quarter").Delete
+[3431]     ThisWorkbook.Names("lst_month").Delete
+[3432]     Err.Clear
+[3433]     On Error GoTo ERR_HANDLER
+[3434]     ThisWorkbook.Names.Add "lst_empty", wsTemp.Range(wsTemp.Cells(50, 1), wsTemp.Cells(50, 1))
+[3435] ThisWorkbook.Names.Add "lst_period_type", wsTemp.Range(wsTemp.Cells(3, 1), wsTemp.Cells(6, 1))
+[3436]     ThisWorkbook.Names.Add "lst_half_year", wsTemp.Range(wsTemp.Cells(8, 1), wsTemp.Cells(9, 1))
+[3437]     
+[3438]     wsTemp.Cells(11, 1).Value = ChrW(1512) & ChrW(1489) & ChrW(1506) & ChrW(1493) & ChrW(1503) & " " & ChrW(1512) & ChrW(1488) & ChrW(1513) & ChrW(1493) & ChrW(1503)
+[3439]     wsTemp.Cells(12, 1).Value = ChrW(1512) & ChrW(1489) & ChrW(1506) & ChrW(1493) & ChrW(1503) & " " & ChrW(1513) & ChrW(1504) & ChrW(1497)
+[3440]     wsTemp.Cells(13, 1).Value = ChrW(1512) & ChrW(1489) & ChrW(1506) & ChrW(1493) & ChrW(1503) & " " & ChrW(1513) & ChrW(1500) & ChrW(1497) & ChrW(1513) & ChrW(1497)
+[3441]     wsTemp.Cells(14, 1).Value = ChrW(1512) & ChrW(1489) & ChrW(1506) & ChrW(1493) & ChrW(1503) & " " & ChrW(1512) & ChrW(1489) & ChrW(1497) & ChrW(1506) & ChrW(1497)
+[3442]     ThisWorkbook.Names.Add "lst_quarter", wsTemp.Range(wsTemp.Cells(11, 1), wsTemp.Cells(14, 1))
+[3443]     
+[3444]     wsTemp.Cells(16, 1).Value = ChrW(1497) & ChrW(1504) & ChrW(1493) & ChrW(1488) & ChrW(1512)
+[3445]     wsTemp.Cells(17, 1).Value = ChrW(1508) & ChrW(1489) & ChrW(1512) & ChrW(1493) & ChrW(1488) & ChrW(1512)
+[3446]     wsTemp.Cells(18, 1).Value = ChrW(1502) & ChrW(1512) & ChrW(1509)
+[3447]     wsTemp.Cells(19, 1).Value = ChrW(1488) & ChrW(1508) & ChrW(1512) & ChrW(1497) & ChrW(1500)
+[3448]     wsTemp.Cells(20, 1).Value = ChrW(1502) & ChrW(1488) & ChrW(1497)
+[3449]     wsTemp.Cells(21, 1).Value = ChrW(1497) & ChrW(1493) & ChrW(1504) & ChrW(1497)
+[3450]     wsTemp.Cells(22, 1).Value = ChrW(1497) & ChrW(1493) & ChrW(1500) & ChrW(1497)
+[3451]     wsTemp.Cells(23, 1).Value = ChrW(1488) & ChrW(1493) & ChrW(1490) & ChrW(1493) & ChrW(1505) & ChrW(1496)
+[3452]     wsTemp.Cells(24, 1).Value = ChrW(1505) & ChrW(1508) & ChrW(1496) & ChrW(1502) & ChrW(1489) & ChrW(1512)
+[3453]     wsTemp.Cells(25, 1).Value = ChrW(1488) & ChrW(1493) & ChrW(1511) & ChrW(1496) & ChrW(1493) & ChrW(1489) & ChrW(1512)
+[3454]     wsTemp.Cells(26, 1).Value = ChrW(1504) & ChrW(1493) & ChrW(1489) & ChrW(1502) & ChrW(1489) & ChrW(1512)
+[3455]     wsTemp.Cells(27, 1).Value = ChrW(1491) & ChrW(1510) & ChrW(1502) & ChrW(1489) & ChrW(1512)
+[3456]     ThisWorkbook.Names.Add "lst_month", wsTemp.Range(wsTemp.Cells(16, 1), wsTemp.Cells(27, 1))
+[3457] 
+[3458] ' --- Build Maps for Native Dropdowns ---
+[3459] wsTemp.Cells(1, 5).Value = tHalf: wsTemp.Cells(1, 6).Value = "lst_half_year"
+[3460] wsTemp.Cells(2, 5).Value = tQuarter: wsTemp.Cells(2, 6).Value = "lst_quarter"
+[3461] wsTemp.Cells(3, 5).Value = tMonth: wsTemp.Cells(3, 6).Value = "lst_month"
+[3462] wsTemp.Cells(4, 5).Value = ChrW(1513) & ChrW(1504) & ChrW(1514) & ChrW(1497): wsTemp.Cells(4, 6).Value = "lst_empty"
+[3463] ThisWorkbook.Names.Add "map_period", wsTemp.Range("E1:F4")
+[3464] 
+[3465] wsTemp.Cells(1, 7).Value = H_COMPANY(): wsTemp.Cells(1, 8).Value = "lst_companies"
+[3466] wsTemp.Cells(2, 7).Value = H_AGENT(): wsTemp.Cells(2, 8).Value = "lst_agents"
+[3467] wsTemp.Cells(3, 7).Value = H_TELLER(): wsTemp.Cells(3, 8).Value = "lst_tellers"
+[3468] wsTemp.Cells(4, 7).Value = H_BRANCH(): wsTemp.Cells(4, 8).Value = "lst_branches"
+[3469] wsTemp.Cells(5, 7).Value = H_BRANCH() & " " & ChrW(1502) & ChrW(1512) & ChrW(1499) & ChrW(1494): wsTemp.Cells(5, 8).Value = "lst_main_branches"
+[3470] ThisWorkbook.Names.Add "map_filter", wsTemp.Range("G1:H5")
+[3471]     wsTemp.Cells(28, 1).Value = EOD_MARKER
+[3472]     
+[3473]     ' ---- Layout setup for Home Sheet ----
+[3474]     ' Parameters Table (F2:G10)
+[3475]     wsMain.Range("F2").Value = ChrW(1508) & ChrW(1512) & ChrW(1502) & ChrW(1496) & ChrW(1512)
+[3476]     wsMain.Range("G2").Value = ChrW(1506) & ChrW(1512) & ChrW(1498)
+[3477]     Set hdrRng = wsMain.Range("F2:G2")
+[3478]     hdrRng.Interior.Color = RGB(0, 100, 0)
+[3479]     hdrRng.Font.Color = RGB(255, 255, 255)
+[3480]     hdrRng.Font.Bold = True
+[3481]     hdrRng.Font.Size = 12
+[3482]     hdrRng.HorizontalAlignment = xlCenter
+[3483]     
+[3484]     wsMain.Range("F3").Value = ChrW(1513) & ChrW(1504) & ChrW(1514) & " " & ChrW(1489) & ChrW(1505) & ChrW(1497) & ChrW(1505)
+[3485]     wsMain.Range("F4").Value = ChrW(1513) & ChrW(1504) & ChrW(1514) & " " & ChrW(1504) & ChrW(1493) & ChrW(1499) & ChrW(1495) & ChrW(1497) & ChrW(1514)
+[3486]     wsMain.Range("F5").Value = ChrW(1505) & ChrW(1493) & ChrW(1490) & " " & ChrW(1514) & ChrW(1511) & ChrW(1493) & ChrW(1508) & ChrW(1492)
+[3487]     wsMain.Range("F6").Value = ChrW(1506) & ChrW(1512) & ChrW(1498) & " " & ChrW(1514) & ChrW(1511) & ChrW(1493) & ChrW(1508) & ChrW(1492)
+[3488]     wsMain.Range("F7").Value = ChrW(1505) & ChrW(1493) & ChrW(1490) & " " & ChrW(1514) & ChrW(1488) & ChrW(1512) & ChrW(1497) & ChrW(1498)
+[3489]     wsMain.Range("F8").Value = ChrW(1495) & ChrW(1497) & ChrW(1514) & ChrW(1493) & ChrW(1498) & " " & ChrW(1500) & ChrW(1508) & ChrW(1497)
+[3490]     wsMain.Range("F9").Value = ChrW(1506) & ChrW(1512) & ChrW(1498) & " " & ChrW(1495) & ChrW(1497) & ChrW(1514) & ChrW(1493) & ChrW(1498)
+[3491]     wsMain.Range("F10").Value = ChrW(1513) & ChrW(1501) & " " & ChrW(1500) & ChrW(1511) & ChrW(1493) & ChrW(1495)
+[3492]     
+[3493]     wsMain.Range("F3:F10").Font.Color = RGB(0, 70, 140)
+[3494]     wsMain.Range("F3:F10").Font.Bold = True
+[3495]     wsMain.Range("F3:F10").Interior.Color = RGB(200, 230, 255)
+[3496]     wsMain.Range("G3:G10").Interior.Color = RGB(255, 245, 230)
+[3497]     wsMain.Range("F3:G10").HorizontalAlignment = xlCenter
+[3498]     wsMain.Range("F3:F10").HorizontalAlignment = xlRight
+[3499]     wsMain.Range("G3:G12").Locked = False
+[3500]     
+[3501]     On Error Resume Next
+[3502]     ThisWorkbook.Names("rngCurrentYear").Delete
+[3503]     ThisWorkbook.Names("rngBaseYear").Delete
+[3504]     ThisWorkbook.Names("rngPeriodType").Delete
+[3505]     ThisWorkbook.Names("rngPeriodValue").Delete
+[3506]     ThisWorkbook.Names("rngDateType").Delete
+[3507]     ThisWorkbook.Names("rngFilterType").Delete
+[3508]     ThisWorkbook.Names("rngFilterValue").Delete
+[3509]     ThisWorkbook.Names("rngClientName").Delete
+[3510]     Err.Clear
+[3511]     On Error GoTo ERR_HANDLER
+[3512]     
+[3513]     ThisWorkbook.Names.Add "rngBaseYear", wsMain.Range("G3")
+[3514]     ThisWorkbook.Names.Add "rngCurrentYear", wsMain.Range("G4")
+[3515]     ThisWorkbook.Names.Add "rngPeriodType", wsMain.Range("G5")
+[3516]     ThisWorkbook.Names.Add "rngPeriodValue", wsMain.Range("G6")
+[3517]     ThisWorkbook.Names.Add "rngDateType", wsMain.Range("G7")
+[3518]     ThisWorkbook.Names.Add "rngFilterType", wsMain.Range("G8")
+[3519]     ThisWorkbook.Names.Add "rngFilterValue", wsMain.Range("G9")
+[3520]     ThisWorkbook.Names.Add "rngClientName", wsMain.Range("G10")
+[3521]     
+[3522]     ' Set defaults
+[3523]     If IsEmpty(wsMain.Range("G3").Value) Then wsMain.Range("G3").Value = 2025
+[3524]     If IsEmpty(wsMain.Range("G4").Value) Then wsMain.Range("G4").Value = 2026
+[3525] 
+[3526]     Dim isDemoMode As Boolean
+[3527]     Dim demoParam As String
+[3528]     isDemoMode = FORCE_DEMO_MODE
+[3529]     On Error Resume Next
+[3530]     demoParam = UCase$(Trim$(GetStringParameter(ThisWorkbook.Worksheets(H_SET_PARAMS()), "DEMO_MODE")))
+[3531]     If demoParam = ChrW(1499) & ChrW(1503) Or demoParam = "YES" Then isDemoMode = True
+[3532]     On Error GoTo ERR_HANDLER
+[3533] 
+[3534]     ' Lock years if demo mode
+[3535]     If isDemoMode Then
+[3536]         wsMain.Range("G3").Value = 2024
+[3537]         wsMain.Range("G4").Value = 2025
+[3538]         With wsMain.Range("G3:G4").Validation
+[3539]             .Delete
+[3540]             .Add Type:=xlValidateCustom, AlertStyle:=xlValidAlertStop, Formula1:="=FALSE"
+[3541]             .ErrorMessage = ChrW(1513) & ChrW(1497) & ChrW(1504) & ChrW(1493) & ChrW(1497) & " " & ChrW(1488) & ChrW(1508) & ChrW(1513) & ChrW(1512) & ChrW(1497) & " " & ChrW(1489) & ChrW(1490) & ChrW(1512) & ChrW(1505) & ChrW(1492) & " " & ChrW(1492) & ChrW(1502) & ChrW(1500) & ChrW(1488) & ChrW(1492) & "."
+[3542]             .ShowError = True
+[3543]         End With
+[3544]         wsMain.Range("G3:G4").Interior.Color = RGB(230, 230, 230) ' Gray out visually
+[3545]     Else
+[3546]         wsMain.Range("G3:G4").Validation.Delete
+[3547]         wsMain.Range("G3:G4").Interior.Color = xlNone
+[3548]     End If
+[3549]     If IsEmpty(wsMain.Range("G5").Value) Then wsMain.Range("G5").Value = ChrW(1513) & ChrW(1504) & ChrW(1514) & ChrW(1497)
+[3550]     If IsEmpty(wsMain.Range("G8").Value) Then wsMain.Range("G8").Value = ChrW(1489) & ChrW(1495) & ChrW(1512) & ChrW(47) & ChrW(1497)
+[3551]     If IsEmpty(wsMain.Range("G10").Value) Then wsMain.Range("G10").Value = ChrW(1489) & ChrW(1495) & ChrW(1512) & ChrW(47) & ChrW(1497)
+[3552]     
+[3553]     On Error Resume Next
+[3554]     wsMain.Range("G5").MergeArea.Validation.Delete
+[3555]     wsMain.Range("G5").MergeArea.Validation.Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Formula1:="=lst_period_type"
+[3556]     wsMain.Range("G6").MergeArea.Validation.Delete
+[3557]     
+[3558]     Dim tHalf As String, tQuarter As String, tMonth As String
+[3559]     tHalf = ChrW(1495) & ChrW(1510) & ChrW(1497) & " " & ChrW(1513) & ChrW(1504) & ChrW(1514) & ChrW(1497)
+[3560]     tQuarter = ChrW(1512) & ChrW(1489) & ChrW(1506) & ChrW(1493) & ChrW(1503)
+[3561]     tMonth = ChrW(1495) & ChrW(1493) & ChrW(1491) & ChrW(1513) & ChrW(1497)
+[3562] Dim backupG5 As String
+[3563] backupG5 = wsMain.Range("G5").Value
+[3564] wsMain.Range("G5").Value = tHalf
+[3565] wsMain.Range("G6").MergeArea.Validation.Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Formula1:="=INDIRECT(VLOOKUP($G$5,map_period,2,0))"
+[3566] wsMain.Range("G5").Value = backupG5
+[3567]     
+[3568]     wsMain.Range("G7").MergeArea.Validation.Delete
+[3569]     dateTypeList = ChrW(1489) & ChrW(1493) & ChrW(1512) & ChrW(1491) & ChrW(1512) & ChrW(1493) & "," & ChrW(1514) & ChrW(1495) & ChrW(1497) & ChrW(1500) & ChrW(1514) & " " & ChrW(1489) & ChrW(1497) & ChrW(1496) & ChrW(1493) & ChrW(1495)
+[3570]     wsMain.Range("G7").MergeArea.Validation.Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Formula1:=dateTypeList
+[3571]         wsMain.Range("G7").Value = ChrW(1489) & ChrW(1493) & ChrW(1512) & ChrW(1491) & ChrW(1512) & ChrW(1493)
+[3572]     wsMain.Range("G8").Value = ChrW(1489) & ChrW(1495) & ChrW(1512) & "/" & ChrW(1497)
+[3573]     wsMain.Range("G8").MergeArea.Validation.Delete
+[3574]     filterTypeList = ChrW(1489) & ChrW(1495) & ChrW(1512) & ChrW(47) & ChrW(1497) & "," & H_COMPANY() & "," & H_TELLER() & "," & H_AGENT() & "," & H_BRANCH() & "," & H_BRANCH() & " " & ChrW(1502) & ChrW(1512) & ChrW(1499) & ChrW(1494)
+[3575]     wsMain.Range("G8").MergeArea.Validation.Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Formula1:=filterTypeList
+[3576]     wsMain.Range("G9").MergeArea.Validation.Delete
+[3577]     
+[3578]     Dim tComp As String, tTeller As String, tAgent As String, tBranch As String, tMainBranch As String
+[3579]     tComp = H_COMPANY(): tTeller = H_TELLER(): tAgent = H_AGENT(): tBranch = H_BRANCH(): tMainBranch = H_BRANCH() & " " & ChrW(1502) & ChrW(1512) & ChrW(1499) & ChrW(1494)
+[3580] Dim backupG8 As String
+[3581] backupG8 = wsMain.Range("G8").Value
+[3582] wsMain.Range("G8").Value = H_COMPANY()
+[3583] wsMain.Range("G9").MergeArea.Validation.Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Formula1:="=INDIRECT(VLOOKUP($G$8,map_filter,2,0))"
+[3584] wsMain.Range("G8").Value = backupG8
+[3585]     Err.Clear
+[3586]     On Error GoTo ERR_HANDLER
+[3587]     
+[3588]     ' ---- Currency Table J2:K4 ----
+[3589]     wsMain.Range("J2").Value = ChrW(1502) & ChrW(1496) & ChrW(1489) & ChrW(1506)
+[3590]     wsMain.Range("K2").Value = ChrW(1513) & ChrW(1506) & ChrW(1512)
+[3591]     wsMain.Range("J2:K2").Interior.Color = RGB(0, 100, 0)
+[3592]     wsMain.Range("J2:K2").Font.Color = RGB(255, 255, 255)
+[3593]     wsMain.Range("J2:K2").Font.Bold = True
+[3594]     wsMain.Range("J2:K2").Font.Size = 12
+[3595]     wsMain.Range("J2:K2").HorizontalAlignment = xlCenter
+[3596]     wsMain.Range("J3").Value = "$" & " " & ChrW(1491) & ChrW(1493) & ChrW(1500) & ChrW(1512)
+[3597]     wsMain.Range("J4").Value = ChrW(8364) & " " & ChrW(1488) & ChrW(1497) & ChrW(1512) & ChrW(1493)
+[3598]     wsMain.Range("J3:J4").Font.Bold = True
+[3599]     wsMain.Range("K3:K4").HorizontalAlignment = xlCenter
+[3600]     wsMain.Range("J3:J4").Interior.Color = RGB(200, 230, 255)
+[3601]     wsMain.Range("K3:K4").Interior.Color = RGB(255, 245, 230)
+[3602]     
+[3603]     On Error Resume Next
+[3604]     ThisWorkbook.Names("rngDOLAR").Delete
+[3605]     Err.Clear
+[3606]     On Error GoTo ERR_HANDLER
+[3607]     ThisWorkbook.Names.Add "rngDOLAR", wsMain.Range("K3")
+[3608]     
+[3609]     curRate = FetchBOIRate()
+[3610]     If curRate > 0 Then
+[3611]         wsMain.Range("K3").Value = curRate
+[3612]     ElseIf IsEmpty(wsMain.Range("K3").Value) Then
+[3613]         wsMain.Range("K3").Value = 3.6
+[3614]     End If
+[3615]     wsMain.Range("K3").NumberFormat = "0.0000"
+[3616]     
+[3617]     eurRate = FetchBOIMonthlyAvg("EUR", "")
+[3618]     If eurRate > 0 Then
+[3619]         wsMain.Range("K4").Value = eurRate
+[3620]     ElseIf IsEmpty(wsMain.Range("K4").Value) Then
+[3621]         wsMain.Range("K4").Value = 3.9
+[3622]     End If
+[3623]     wsMain.Range("K4").NumberFormat = "0.0000"
+[3624]     wsMain.Range("K3:K4").HorizontalAlignment = xlCenter
+[3625]     
+[3626]     matachMsg = ChrW(1492) & ChrW(1513) & ChrW(1506) & ChrW(1512) & " " & _
+[3627]         ChrW(1502) & ChrW(1514) & ChrW(1506) & ChrW(1491) & ChrW(1499) & ChrW(1504) & " " & _
+[3628]         ChrW(1506) & ChrW(34) & ChrW(1508) & " " & _
+[3629]         ChrW(1489) & ChrW(1504) & ChrW(1511) & " " & _
+[3630]         ChrW(1497) & ChrW(1513) & ChrW(1512) & ChrW(1488) & ChrW(1500) & " " & _
+[3631]         ChrW(1488) & ChrW(1501) & " " & _
+[3632]         ChrW(1500) & ChrW(1488) & " " & _
+[3633]         ChrW(1497) & ChrW(1497) & ChrW(1502) & ChrW(1510) & ChrW(1488) & " " & _
+[3634]         ChrW(1513) & ChrW(1506) & ChrW(1512) & " " & _
+[3635]         ChrW(1497) & ChrW(1513) & ChrW(1502) & ChrW(1513) & " " & _
+[3636]         ChrW(1492) & ChrW(1513) & ChrW(1506) & ChrW(1512) & " " & _
+[3637]         ChrW(1492) & ChrW(1512) & ChrW(1513) & ChrW(1493) & ChrW(1501) & " " & _
+[3638]         ChrW(1499) & ChrW(1488) & ChrW(1503)
+[3639]     wsMain.Range("J5:L7").UnMerge
+[3640]     wsMain.Range("J5:K7").ClearContents
+[3641]     wsMain.Range("J5").Value = matachMsg
+[3642]     wsMain.Range("J5:K7").Merge
+[3643]     wsMain.Range("J5").WrapText = True
+[3644]     wsMain.Range("J5").Font.Size = 11
+[3645]     wsMain.Range("J5").Font.Color = RGB(0, 70, 140)
+[3646]     wsMain.Range("J5").ShrinkToFit = False
+[3647]     wsMain.Range("J5").VerticalAlignment = xlCenter
+[3648]     wsMain.Range("J5").HorizontalAlignment = xlCenter
+[3649]     wsMain.Range("J5:K7").Interior.Color = RGB(220, 230, 255)
+[3650]     
+[3651]     ' ---- Formatting Columns ----
+[3652]     wsMain.Columns("A").ColumnWidth = 43
+[3653]     wsMain.Columns("B").ColumnWidth = 8
+[3654]     wsMain.Columns("C").ColumnWidth = 50
+[3655]     wsMain.Columns("D").ColumnWidth = 8
+[3656]     wsMain.Columns("E").ColumnWidth = 8
+[3657]     wsMain.Columns("F").ColumnWidth = 14
+[3658]     wsMain.Columns("G").ColumnWidth = 24
+[3659]     wsMain.Columns("H").ColumnWidth = 13
+[3660]     wsMain.Columns("I").ColumnWidth = 13
+[3661]     wsMain.Columns("J").ColumnWidth = 12
+[3662]     wsMain.Columns("K").ColumnWidth = 12
+[3663]     wsMain.Columns("L").ColumnWidth = 45
+[3664]     wsMain.Rows("1:24").RowHeight = 22
+[3665]     wsMain.Rows("1").RowHeight = 120
+[3666]     
+[3667] 
+[3668]     ' ---- Borders ----
+[3669]     For Each cellBorder In wsMain.Range("F2:G10")
+[3670]         For Each bEdge In Array(xlEdgeLeft, xlEdgeTop, xlEdgeBottom, xlEdgeRight)
+[3671]             cellBorder.Borders(bEdge).LineStyle = xlContinuous
+[3672]             cellBorder.Borders(bEdge).Color = RGB(0, 70, 140)
+[3673]             cellBorder.Borders(bEdge).Weight = xlThin
+[3674]         Next bEdge
+[3675]     Next cellBorder
+[3676]     For Each cellBorder In wsMain.Range("J2:K4")
+[3677]         For Each bEdge In Array(xlEdgeLeft, xlEdgeTop, xlEdgeBottom, xlEdgeRight)
+[3678]             cellBorder.Borders(bEdge).LineStyle = xlContinuous
+[3679]             cellBorder.Borders(bEdge).Color = RGB(0, 70, 140)
+[3680]             cellBorder.Borders(bEdge).Weight = xlThin
+[3681]         Next bEdge
+[3682]     Next cellBorder
+[3683]     wsMain.Range("J5:K7").BorderAround LineStyle:=xlContinuous, Weight:=xlThin, Color:=RGB(0, 70, 140)
+[3684]     
+[3685]     ' ---- Remove ALL old buttons ----
+[3686]     On Error Resume Next
+[3687]     For Each s In wsMain.Shapes
+[3688]         s.Delete
+[3689]     Next s
+[3690]     Err.Clear
+[3691]     On Error GoTo ERR_HANDLER
+[3692]     
+[3693]     ' ---- Buttons Column C (1 to 6) ----
+[3694]     Dim btnLeft As Double, btnW As Double, btnH As Double
+[3695]     btnW = 140
+[3696]     btnH = 35
+[3697]     btnLeft = wsMain.Range("C2").Left + (wsMain.Range("C2").Width - btnW) / 2
+[3698]     
+[3699]     Set shp = wsMain.Shapes.AddShape(msoShapeRoundedRectangle, btnLeft, wsMain.Range("C2").Top, btnW, btnH)
+[3700]     shp.Name = "btnBuildReview"
+[3701]     shp.Fill.ForeColor.RGB = blueClr
+[3702]     shp.TextFrame2.TextRange.Text = "1 - " & ChrW(1489) & ChrW(1491) & ChrW(1497) & ChrW(1511) & ChrW(1514) & " " & ChrW(1504) & ChrW(1514) & ChrW(1493) & ChrW(1504) & ChrW(1497) & ChrW(1501)
+[3703]     shp.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = RGB(255, 255, 255)
+[3704]     shp.TextFrame2.TextRange.Font.Size = 12
+[3705]     shp.TextFrame2.TextRange.Font.Bold = msoTrue
+[3706]     shp.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+[3707]     shp.OnAction = "BuildReview"
+[3708]     
+[3709]     Set shp = wsMain.Shapes.AddShape(msoShapeRoundedRectangle, btnLeft, wsMain.Range("C2").Top + 44, btnW, btnH)
+[3710]     shp.Name = "btnApplyCorrections"
+[3711]     shp.Fill.ForeColor.RGB = RGB(0, 150, 80)
+[3712]     shp.TextFrame2.TextRange.Text = "2 - " & ChrW(1497) & ChrW(1497) & ChrW(1513) & ChrW(1493) & ChrW(1501) & " " & ChrW(1493) & ChrW(1491) & ChrW(1493) & ChrW(34) & ChrW(1495) & ChrW(1493) & ChrW(1514)
+[3713]     shp.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = RGB(255, 255, 255)
+[3714]     shp.TextFrame2.TextRange.Font.Size = 12
+[3715]     shp.TextFrame2.TextRange.Font.Bold = msoTrue
+[3716]     shp.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+[3717]     shp.OnAction = "ApplyCorrectionsAndBuildReports"
+[3718]     
+[3719]     Set shp = wsMain.Shapes.AddShape(msoShapeRoundedRectangle, btnLeft, wsMain.Range("C2").Top + 88, btnW, btnH)
+[3720]     shp.Name = "btnBuildPresentation"
+[3721]     shp.Fill.ForeColor.RGB = RGB(200, 100, 0)
+[3722]     shp.TextFrame2.TextRange.Text = "3 - " & ChrW(1497) & ChrW(1497) & ChrW(1510) & ChrW(1493) & ChrW(1512) & " " & ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1514)
+[3723]     shp.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = RGB(255, 255, 255)
+[3724]     shp.TextFrame2.TextRange.Font.Size = 12
+[3725]     shp.TextFrame2.TextRange.Font.Bold = msoTrue
+[3726]     shp.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+[3727]     shp.OnAction = "BuildPresentation"
+[3728]     
+[3729]     Set shp = wsMain.Shapes.AddShape(msoShapeRoundedRectangle, btnLeft, wsMain.Range("C2").Top + 132, btnW, btnH)
+[3730]     shp.Name = "btnSaveReports"
+[3731]     shp.Fill.ForeColor.RGB = blueClr
+[3732]     shp.TextFrame2.TextRange.Text = "4 - " & ChrW(1513) & ChrW(1502) & ChrW(1497) & ChrW(1512) & ChrW(1514) & " " & ChrW(1491) & ChrW(1493) & ChrW(1495) & ChrW(1493) & ChrW(1514)
+[3733]     shp.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = RGB(255, 255, 255)
+[3734]     shp.TextFrame2.TextRange.Font.Size = 12
+[3735]     shp.TextFrame2.TextRange.Font.Bold = msoTrue
+[3736]     shp.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+[3737]     shp.OnAction = "SaveReportsToFolder"
+[3738]     
+[3739]     Set shp = wsMain.Shapes.AddShape(msoShapeRoundedRectangle, btnLeft, wsMain.Range("C2").Top + 176, btnW, btnH)
+[3740]     shp.Name = "btnViewReports"
+[3741]     shp.Fill.ForeColor.RGB = RGB(0, 150, 80)
+[3742]     shp.TextFrame2.TextRange.Text = "5 - " & ChrW(1510) & ChrW(1508) & ChrW(1497) & ChrW(1497) & ChrW(1492) & " " & ChrW(1489) & ChrW(1491) & ChrW(1493) & ChrW(1495) & ChrW(1493) & ChrW(1514)
+[3743]     shp.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = RGB(255, 255, 255)
+[3744]     shp.TextFrame2.TextRange.Font.Size = 12
+[3745]     shp.TextFrame2.TextRange.Font.Bold = msoTrue
+[3746]     shp.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+[3747]     shp.OnAction = "ViewReportsFolder"
+[3748]     
+[3749]     Set shp = wsMain.Shapes.AddShape(msoShapeRoundedRectangle, btnLeft, wsMain.Range("C2").Top + 220, btnW, btnH)
+[3750]     shp.Name = "btnNewClients"
+[3751]     shp.Fill.ForeColor.RGB = RGB(200, 100, 0)
+[3752]     shp.TextFrame2.TextRange.Text = "6 - " & ChrW(1500) & ChrW(1511) & ChrW(1493) & ChrW(1495) & ChrW(1493) & ChrW(1514) & " " & ChrW(1495) & ChrW(1491) & ChrW(1513) & ChrW(1497) & ChrW(1501)
+[3753]     shp.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = RGB(255, 255, 255)
+[3754]     shp.TextFrame2.TextRange.Font.Size = 12
+[3755]     shp.TextFrame2.TextRange.Font.Bold = msoTrue
+[3756]     shp.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+[3757]     shp.OnAction = "NewClients"
+[3758] 
+[3759]     ' ---- Helper buttons ----
+[3760]     ' Add Large Red Title for Agency Name
+[3761]     wsMain.Range("A1:F1").Merge
+[3762]     wsMain.Range("A1").Value = GetActiveAgencyName()
+[3763]     wsMain.Range("A1").Font.Size = 28
+[3764]     wsMain.Range("A1").Font.Bold = True
+[3765]     wsMain.Range("A1").Font.Color = RGB(200, 0, 0)
+[3766]     wsMain.Range("A1").HorizontalAlignment = xlCenter
+[3767]     wsMain.Range("A1").VerticalAlignment = xlCenter
+[3768] 
+[3769]     Set btnSearch = wsMain.Shapes.AddShape(msoShapeRoundedRectangle, wsMain.Range("F11").Left + (wsMain.Range("F11").Width - 60) / 2, wsMain.Range("F11").Top + 5, 60, 25)
+[3770]     btnSearch.Name = "btnSearchClient"
+[3771]     btnSearch.TextFrame2.TextRange.Text = ChrW(1495) & ChrW(1508) & ChrW(1513)
+[3772]     btnSearch.TextFrame2.TextRange.Font.Size = 10
+[3773]     btnSearch.TextFrame2.TextRange.Font.Bold = msoTrue
+[3774]     btnSearch.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+[3775]     btnSearch.Fill.ForeColor.RGB = RGB(0, 150, 80)
+[3776]     btnSearch.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = RGB(255, 255, 255)
+[3777]     btnSearch.OnAction = "SearchClientName"
+[3778]     
+[3779]     Set btnAll = wsMain.Shapes.AddShape(msoShapeRoundedRectangle, wsMain.Range("G11").Left + (wsMain.Range("G11").Width - 60) / 2, wsMain.Range("G11").Top + 5, 60, 25)
+[3780]     btnAll.Name = "btnAllClients"
+[3781]     btnAll.TextFrame2.TextRange.Text = ChrW(1499) & ChrW(1493) & ChrW(1500) & ChrW(1501)
+[3782]     btnAll.TextFrame2.TextRange.Font.Size = 10
+[3783]     btnAll.TextFrame2.TextRange.Font.Bold = msoTrue
+[3784]     btnAll.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+[3785]     btnAll.Fill.ForeColor.RGB = blueClr
+[3786]     btnAll.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = RGB(255, 255, 255)
+[3787]     btnAll.OnAction = "ResetClientFilter"
+[3788]     
+[3789]     Set btnReset = wsMain.Shapes.AddShape(msoShapeRoundedRectangle, btnAll.Left + (btnSearch.Left + btnSearch.Width - btnAll.Left - 120) / 2, wsMain.Range("F11").Top + 32, 120, 25)
+[3790]     btnReset.Name = "btnResetDefaults"
+[3791]     btnReset.TextFrame2.TextRange.Text = ChrW(1488) & ChrW(1497) & ChrW(1508) & ChrW(1493) & ChrW(1505) & " " & ChrW(1504) & ChrW(1514) & ChrW(1493) & ChrW(1504) & ChrW(1497) & ChrW(1501)
+[3792]     btnReset.TextFrame2.TextRange.Font.Size = 11
+[3793]     btnReset.TextFrame2.TextRange.Font.Bold = msoTrue
+[3794]     btnReset.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+[3795]     btnReset.Fill.ForeColor.RGB = RGB(180, 50, 50)
+[3796]     btnReset.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = RGB(255, 255, 255)
+[3797]     btnReset.OnAction = "ResetHomeDefaults"
+[3798]     
+[3799]     ' Show/Hide Sheets in L19
+[3800]     Set shp = wsMain.Shapes.AddShape(msoShapeRoundedRectangle, wsMain.Range("L19").Left, wsMain.Range("L19").Top, 160, 30)
+[3801]     shp.Name = "btnShowHidden"
+[3802]     shp.Fill.ForeColor.RGB = RGB(80, 80, 80)
+[3803]     shp.TextFrame2.TextRange.Text = ChrW(1492) & ChrW(1510) & ChrW(1490) & "/" & ChrW(1492) & ChrW(1505) & ChrW(1514) & ChrW(1512) & " " & ChrW(1490) & ChrW(1497) & ChrW(1500) & ChrW(1497) & ChrW(1493) & ChrW(1504) & ChrW(1493) & ChrW(1514)
+[3804]     shp.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = RGB(255, 255, 255)
+[3805]     shp.TextFrame2.TextRange.Font.Size = 10
+[3806]     shp.TextFrame2.TextRange.Font.Bold = msoTrue
+[3807]     shp.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+[3808]     shp.OnAction = "ToggleHiddenSheets"
+[3809]     
+[3810]     ' ---- Add Exit System Button (Row 21) ----
+[3811]     On Error Resume Next
+[3812]     wsMain.Shapes("btnNavExit").Delete
+[3813]     On Error GoTo 0
+[3814]     Dim shpExit As Shape
+[3815]     Set shpExit = wsMain.Shapes.AddShape(msoShapeRoundedRectangle, wsMain.Range("A19").Left + 60, wsMain.Range("A19").Top, 120, 25)
+[3816]     shpExit.Name = "btnNavExit"
+[3817]     shpExit.Fill.ForeColor.RGB = RGB(180, 0, 0)
+[3818]     shpExit.TextFrame2.TextRange.Text = ChrW(1497) & ChrW(1510) & ChrW(1497) & ChrW(1488) & ChrW(1492) & " " & ChrW(1502) & ChrW(1492) & ChrW(1502) & ChrW(1506) & ChrW(1512) & ChrW(1499) & ChrW(1514)
+[3819]     shpExit.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = RGB(255, 255, 255)
+[3820]     shpExit.TextFrame2.TextRange.Font.Size = 10
+[3821]     shpExit.TextFrame2.TextRange.Font.Bold = msoTrue
+[3822]     shpExit.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+[3823]     shpExit.OnAction = "ExitSystem"
+[3824] 
+[3825]     ' ---- Write Credit Text to F20 ----
+[3826]     wsMain.Range("F19").Value = ChrW(1504) & ChrW(1489) & ChrW(1504) & ChrW(1492) & " " & ChrW(1506) & ChrW(1500) & " " & ChrW(1497) & ChrW(1491) & ChrW(1497) & " " & ChrW(1490) & ChrW(1493) & ChrW(1512) & ChrW(1504) & ChrW(1496) & ChrW(1511) & " 054-6677396 - v" & APP_VERSION
+[3827]         wsMain.Range("F19").Font.Size = 12
+[3828]     wsMain.Range("F19").Font.Color = RGB(0, 0, 0)
+[3829]     wsMain.Range("F19").Font.Bold = True
+[3830]     wsMain.Range("F19").HorizontalAlignment = -4108
+[3831] 
+[3832]     
+[3833]     ' ---- rngFILES_FOLDER and rngREPORTS_FOLDER ----
+[3834]     On Error Resume Next
+[3835]     existingPath = Trim$(CStr(ThisWorkbook.Names("rngFILES_FOLDER").RefersToRange.Value2))
+[3836]     If existingPath = "" Then
+[3837]         ThisWorkbook.Names("rngFILES_FOLDER").Delete
+[3838]         Err.Clear
+[3839]         ThisWorkbook.Names.Add "rngFILES_FOLDER", ThisWorkbook.Worksheets(H_SET_PARAMS()).Range("B176")
+[3840]     End If
+[3841]     existingPath = Trim$(CStr(ThisWorkbook.Names("rngREPORTS_FOLDER").RefersToRange.Value2))
+[3842]     If existingPath = "" Then
+[3843]         ThisWorkbook.Names("rngREPORTS_FOLDER").Delete
+[3844]         Err.Clear
+[3845]         ThisWorkbook.Names.Add "rngREPORTS_FOLDER", ThisWorkbook.Worksheets(H_SET_PARAMS()).Range("B177")
+[3846]     End If
+[3847]     Err.Clear
+[3848]     On Error GoTo ERR_HANDLER
+[3849]     
+[3850]     Set wsTemp = ThisWorkbook.Worksheets(H_SET_MESSAGES())
+[3851] 1800  wsTemp.Cells(2, 1).Value = ChrW(1492) & ChrW(1505) & ChrW(1514) & ChrW(1497) & ChrW(1497) & ChrW(1501) & " " & "-" & " " & ChrW(1504) & ChrW(1502) & ChrW(1510) & ChrW(1488) & ChrW(1493) & " "
+[3852] 1810  wsTemp.Cells(3, 1).Value = " " & ChrW(1495) & ChrW(1512) & ChrW(1497) & ChrW(1490) & ChrW(1493) & ChrW(1514)
+[3853] 1820  wsTemp.Cells(4, 1).Value = ChrW(1492) & ChrW(1505) & ChrW(1514) & ChrW(1497) & ChrW(1497) & ChrW(1501) & " " & ChrW(1489) & ChrW(1492) & ChrW(1510) & ChrW(1500) & ChrW(1495) & ChrW(1492)
+[3854] 1830  wsTemp.Cells(5, 1).Value = ChrW(1513) & ChrW(1493) & ChrW(1512) & ChrW(1492) & " "
+[3855] 1840  wsTemp.Cells(6, 1).Value = ChrW(1513) & ChrW(1490) & ChrW(1497) & ChrW(1488) & ChrW(1492) & " "
+[3856] 1850  wsTemp.Cells(7, 1).Value = ChrW(1513) & ChrW(1500) & ChrW(1489) & ":" & " "
+[3857] 1860  wsTemp.Cells(8, 1).Value = ChrW(1488) & ChrW(1497) & ChrW(1513) & ChrW(1493) & ChrW(1512) & " " & ChrW(1500) & ChrW(1508) & ChrW(1504) & ChrW(1497) & " " & ChrW(1506) & ChrW(1497) & ChrW(1489) & ChrW(1493) & ChrW(1491)
+[3858] 1870  wsTemp.Cells(9, 1).Value = ChrW(1492) & ChrW(1488) & ChrW(1501) & " " & ChrW(1500) & ChrW(1497) & ChrW(1497) & ChrW(1513) & ChrW(1501) & " " & ChrW(1514) & ChrW(1497) & ChrW(1511) & ChrW(1493) & ChrW(1504) & ChrW(1497) & ChrW(1501) & " " & ChrW(1493) & ChrW(1500) & ChrW(1497) & ChrW(1497) & ChrW(1510) & ChrW(1512) & " " & ChrW(1491) & ChrW(1493) & ChrW(1495) & ChrW(1493) & ChrW(1514) & "?"
+[3859] 1880  wsTemp.Cells(10, 1).Value = ChrW(1513) & ChrW(1490) & ChrW(1497) & ChrW(1488) & ChrW(1492) & " " & ChrW(1489) & ChrW(1492) & ChrW(1490) & ChrW(1491) & ChrW(1512) & ChrW(1514) & " " & ChrW(1491) & ChrW(1507) & " " & ChrW(1492) & ChrW(1489) & ChrW(1497) & ChrW(1514) & ":" & " "
+[3860] 1890  wsTemp.Cells(11, 1).Value = ChrW(1513) & ChrW(1490) & ChrW(1497) & ChrW(1488) & ChrW(1492) & " " & ChrW(1489) & ChrW(1506) & ChrW(1491) & ChrW(1499) & ChrW(1493) & ChrW(1503) & " " & ChrW(1514) & ChrW(1511) & ChrW(1493) & ChrW(1508) & ChrW(1492) & ":" & " "
+[3861] 1900  wsTemp.Cells(12, 1).Value = ChrW(1490) & ChrW(1497) & ChrW(1500) & ChrW(1497) & ChrW(1493) & ChrW(1503) & " " & ChrW(1491) & ChrW(1507) & " " & ChrW(1492) & ChrW(1489) & ChrW(1497) & ChrW(1514) & " " & ChrW(1492) & ChrW(1493) & ChrW(1511) & ChrW(1501) & " " & ChrW(1489) & ChrW(1492) & ChrW(1510) & ChrW(1500) & ChrW(1495) & ChrW(1492) & "!"
+[3862] 1910  wsTemp.Cells(13, 1).Value = "1" & "." & " " & ChrW(1492) & ChrW(1488) & ChrW(1501) & " " & ChrW(1492) & ChrW(1506) & ChrW(1500) & ChrW(1497) & ChrW(1514) & " " & ChrW(1511) & ChrW(1493) & ChrW(1489) & ChrW(1509) & " " & ChrW(1513) & ChrW(1500) & ChrW(1497) & ChrW(1508) & ChrW(1492) & " " & ChrW(1506) & ChrW(1491) & ChrW(1499) & ChrW(1504) & ChrW(1497) & "?"
+[3863] 1920  wsTemp.Cells(14, 1).Value = "2" & "." & " " & ChrW(1492) & ChrW(1488) & ChrW(1501) & " " & ChrW(1513) & ChrW(1502) & ChrW(1512) & ChrW(1514) & " " & ChrW(1488) & ChrW(1514) & " " & ChrW(1492) & ChrW(1506) & ChrW(1497) & ChrW(1489) & ChrW(1493) & ChrW(1491) & " " & ChrW(1492) & ChrW(1488) & ChrW(1495) & ChrW(1512) & ChrW(1493) & ChrW(1503) & " " & "(" & ChrW(1492) & ChrW(1504) & ChrW(1514) & ChrW(1493) & ChrW(1504) & ChrW(1497) & ChrW(1501) & " " & ChrW(1489) & ChrW(1495) & ChrW(1493) & ChrW(1489) & ChrW(1512) & ChrW(1514) & " " & ChrW(1494) & ChrW(1493) & " " & ChrW(1497) & ChrW(1502) & ChrW(1495) & ChrW(1511) & ChrW(1493) & " " & ChrW(1489) & ChrW(1514) & ChrW(1492) & ChrW(1500) & ChrW(1497) & ChrW(1498) & " " & ChrW(1492) & ChrW(1506) & ChrW(1497) & ChrW(1489) & ChrW(1493) & ChrW(1491) & ")"
+[3864] 1930  wsTemp.Cells(15, 1).Value = "3" & "." & " " & ChrW(1492) & ChrW(1488) & ChrW(1501) & " " & ChrW(1489) & ChrW(1495) & ChrW(1512) & ChrW(1514) & " " & ChrW(1488) & ChrW(1514) & " " & ChrW(1508) & ChrW(1512) & ChrW(1496) & ChrW(1497) & " " & ChrW(1492) & ChrW(1506) & ChrW(1497) & ChrW(1489) & ChrW(1493) & ChrW(1491) & " " & ChrW(1492) & ChrW(1504) & ChrW(1491) & ChrW(1512) & ChrW(1513) & " " & ChrW(1489) & ChrW(1490) & ChrW(1497) & ChrW(1500) & ChrW(1497) & ChrW(1493) & ChrW(1503) & " " & ChrW(1491) & ChrW(1507) & " " & ChrW(1492) & ChrW(1489) & ChrW(1497) & ChrW(1514) & "?"
+[3865] 1940  wsTemp.Cells(16, 1).Value = "4" & "." & " " & ChrW(1500) & ChrW(1495) & ChrW(1509) & " " & ChrW(1506) & ChrW(1500) & " " & "O" & "K" & " " & ChrW(1500) & ChrW(1492) & ChrW(1502) & ChrW(1513) & ChrW(1498)
+[3866] 1950  wsTemp.Cells(17, 1).Value = ChrW(1492) & ChrW(1488) & ChrW(1501) & " " & ChrW(1500) & ChrW(1492) & ChrW(1510) & ChrW(1497) & ChrW(1490) & " " & ChrW(1492) & ChrW(1493) & ChrW(1491) & ChrW(1506) & ChrW(1492) & " " & ChrW(1494) & ChrW(1493) & " " & ChrW(1513) & ChrW(1493) & ChrW(1489) & "?"
+[3867]       wsTemp.Cells(18, 1).Value = EOD_MARKER
+[3868] 
+[3869] Dim wsParams As Worksheet
+[3870] On Error Resume Next
+[3871] Set wsParams = ThisWorkbook.Worksheets(H_SET_PARAMS())
+[3872] On Error GoTo ERR_HANDLER
+[3873] If Not wsParams Is Nothing Then
+[3874]     ' ---- Set Error_Email parameter if not exists ----
+[3875] 1960  paramStartRow = 1 + 1
+[3876]     ' Find last param row (scan until EOD or empty)
+[3877] 1965  paramLastRow = paramStartRow
+[3878]       Do While UCase$(Trim$(CStr(wsParams.Cells(paramLastRow, COL_PARAM_NAME).Value2))) <> EOD_MARKER _
+[3879]              And Trim$(CStr(wsParams.Cells(paramLastRow, COL_PARAM_NAME).Value2)) <> ""
+[3880]           paramLastRow = paramLastRow + 1
+[3881]       Loop
+[3882]       paramLastRow = paramLastRow - 1  ' last actual data row
+[3883] 1970  foundEmail = False
+[3884] 1980  For pr = paramStartRow To paramLastRow
+[3885] 1990  If UCase$(Trim$(CStr(wsParams.Cells(pr, COL_PARAM_NAME).Value2))) = "ERROR_EMAIL" Then foundEmail = True: Exit For
+[3886] 2000  Next pr
+[3887] 2010  If Not foundEmail Then
+[3888] 2020  wsParams.Cells(paramLastRow + 1, COL_PARAM_NAME).Value = "ERROR_EMAIL"
+[3889] 2030  wsParams.Cells(paramLastRow + 1, COL_PARAM_VALUE).Value = "zvi@gorentech.co.il"
+[3890] 2040  paramLastRow = paramLastRow + 1
+[3891] 2050  End If
+[3892]       
+[3893]       Dim foundDemo As Boolean
+[3894]       foundDemo = False
+[3895]       For pr = paramStartRow To paramLastRow
+[3896]           If UCase$(Trim$(CStr(wsParams.Cells(pr, COL_PARAM_NAME).Value2))) = "DEMO_MODE" Then foundDemo = True: Exit For
+[3897]       Next pr
+[3898]       If Not foundDemo Then
+[3899]           wsParams.Cells(paramLastRow + 1, COL_PARAM_NAME).Value = "DEMO_MODE"
+[3900]           wsParams.Cells(paramLastRow + 1, COL_PARAM_VALUE).Value = ChrW(1500) & ChrW(1488) 'לא
+[3901]           paramLastRow = paramLastRow + 1
+[3902]       End If
+[3903] 
+[3904]     ' ---- Set BACKUP_PATH parameter if not exists ----
+[3905] 2060  foundBackup = False
+[3906] 2070  For pr = paramStartRow To paramLastRow
+[3907] 2080  If UCase$(Trim$(CStr(wsParams.Cells(pr, COL_PARAM_NAME).Value2))) = "BACKUP_PATH" Then foundBackup = True: Exit For
+[3908] 2090  Next pr
+[3909] 2100  If Not foundBackup Then
+[3910] 2110  wsParams.Cells(paramLastRow + 1, COL_PARAM_NAME).Value = "BACKUP_PATH"
+[3911] 2120  wsParams.Cells(paramLastRow + 1, COL_PARAM_VALUE).Value = "C:\LEVAV PROJECT\BACKUPS"
+[3912] 2130  End If
+[3913] End If ' End If Not wsParams Is Nothing
+[3914] 
+[3915]     ' ---- Set RTL and font size 14 for ALL sheets in workbook ----
+[3916] 3200  For Each wsLoop In ThisWorkbook.Worksheets
+[3917] 3210  wsLoop.DisplayRightToLeft = True
+[3918] 3220  If wsLoop.Name <> CONTROL_SHEET_NAME() Then wsLoop.Cells.Font.Size = 14
+[3919] 3230  Next wsLoop
+[3920] 
+[3921]     ' ---- Clean old versions formatting ----
+[3922]     On Error Resume Next
+[3923]     wsMain.Range("R1:T21").ClearContents
+[3924]     ' Removed ClearContents to protect credit text in A23
+[3925]     Err.Clear
+[3926]     On Error GoTo ERR_HANDLER
+[3927] 
+[3928]     ' ---- Set matach sheet tab color (brown) and hide it ----
+[3929] 3960  On Error Resume Next
+[3930] 3970  Set wsMatachSetup = ThisWorkbook.Worksheets(MATACH_SHEET_NAME())
+[3931] 3980  Err.Clear
+[3932] 3990  On Error GoTo ERR_HANDLER
+[3933] 4000  If Not wsMatachSetup Is Nothing Then
+[3934] 4010  wsMatachSetup.Tab.Color = RGB(139, 90, 43)
+[3935] 4020  wsMatachSetup.Visible = xlSheetVeryHidden
+[3936] 4030  End If
+[3937]     ' ---- Setup settings navigation menu ----
+[3938] 4040  SetupSettingsMenu
+[3939]     ' ---- Set tab colors for ALL sheets ----
+[3940] 4050  Call SetAllTabColors
+[3941]     ' ---- Navigate to A1 ----
+[3942] 4060  wsMain.Activate
+[3943] 4070  Application.Goto wsMain.Range("A1")
+[3944] 4080  ResetHomeDefaults
+[3945] 4085  Application.EnableEvents = True
+[3946] 4088  ApplyDemoLockOnOpen
+[3947] 4090  MsgBoxU ThisWorkbook.Worksheets(H_SET_MESSAGES()).Cells(12, 1).Value, vbInformation
+[3948] 4100  Exit Sub
+[3949] 4110 ERR_HANDLER:
+[3950] 4120  Application.EnableEvents = True
+[3951] 4130  If Err.Number <> 0 Then
+[3952]             On Error Resume Next
+[3953] 4140  MsgBoxU ThisWorkbook.Worksheets(H_SET_MESSAGES()).Cells(10, 1).Value & Err.Description & " (Line: " & Erl & ")", vbCritical
+[3954] 4150  End If
+[3955] 
+[3956]     CheckUserPermissions
+[3957] 
+[3958] End Sub

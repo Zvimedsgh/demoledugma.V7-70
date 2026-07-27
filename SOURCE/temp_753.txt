@@ -1,0 +1,195 @@
+﻿#Else
+    Private Declare Function MessageBoxW Lib "user32" (ByVal hWnd As Long, ByVal lpText As Long, ByVal lpCaption As Long, ByVal uType As Long) As Long
+#End If
+
+
+' --- General constants ---
+Private Const MANAGEMENT_START_ROW As Long = 2
+Private Const DATA_SHEET_NAME As String = "TmpClientPolicyListEx"
+
+' --- NIHUL field definition table ---
+Private Const COL_FIELD_NAME_HE As Long = 5
+Private Const COL_FIELD_COLUMN As Long = 6
+Private Const COL_FIELD_CHECKING As Long = 7
+Private Const COL_FIELD_KEY As Long = 8
+
+' --- NIHUL parameter table ---
+Private Const COL_PARAM_NAME As Long = 10
+Private Const COL_PARAM_VALUE As Long = 11
+
+' --- NIHUL helper translation table ---
+Private Const COL_HELPER_KEY As Long = 14
+Private Const COL_HELPER_VALUE As Long = 15
+
+Private Const PARAM_PREMIUM_THRESHOLD As String = "PREMIUM_THRESHOLD"
+Private Const PARAM_ERROR_EMAIL As String = "ERROR_EMAIL"
+Private Const KEY_BRANCH_NAME As String = "BRANCH_NAME"
+Private Const KEY_PREMIUM As String = "PREMIUM"
+Private Const HELPER_REVIEW_SOURCE_ROW_HEADER As String = "REVIEW_SOURCE_ROW_HEADER"
+Private Const HELPER_REVIEW_REASON_HEADER As String = "REVIEW_REASON_HEADER"
+Private Const HELPER_REVIEW_REASON_CODE_HEADER As String = "REVIEW_REASON_CODE_HEADER"
+
+' --- Output sheet names (Hebrew via functions below) ---
+
+' --- Raw source column mapping ---
+Private Const RAW_CUSTOMER As Long = 1
+Private Const RAW_CUSTNAME As Long = 2
+Private Const RAW_POLICY As Long = 11
+Private Const RAW_ADDENDUM As Long = 12
+Private Const RAW_COMPNUM As Long = 13
+Private Const RAW_COMPANY As Long = 14
+Private Const RAW_BRANCHNUM As Long = 15
+Private Const RAW_BRANCHNAME As Long = 16
+Private Const RAW_INSURANCE_START As Long = 17
+Private Const RAW_BORDEREU As Long = 19
+Private Const RAW_AGENTNUM As Long = 20
+Private Const RAW_AGENTNAME As Long = 21
+Private Const RAW_TELLERNUM As Long = 24
+Private Const RAW_TELLERNAME As Long = 25
+Private Const RAW_PREMIUM As Long = 28
+Private Const RAW_COMMISSION As Long = 32
+Private Const RAW_CURRENCY As Long = 27
+Private Const RAW_ACTIONCOL As Long = 39
+Private Const RAW_IDNUMBER As Long = 45
+
+' --- Base sheet columns ---
+Private Const BASE_COL_ID As Long = 1
+Private Const BASE_COL_YEAR As Long = 2
+Private Const BASE_COL_MONTH As Long = 3
+Private Const BASE_COL_IDENTITY As Long = 4
+Private Const BASE_COL_CUSTOMER As Long = 5
+Private Const BASE_COL_CUSTNAME As Long = 6
+Private Const BASE_COL_POLICY As Long = 7
+Private Const BASE_COL_ADDENDUM As Long = 8
+Private Const BASE_COL_COMPANY As Long = 9
+Private Const BASE_COL_COMPNUM As Long = 10
+Private Const BASE_COL_BRANCHNAME As Long = 11
+Private Const BASE_COL_BRANCHNUM As Long = 12
+Private Const BASE_COL_MAINBRANCH As Long = 13
+Private Const BASE_COL_AGENTNAME As Long = 14
+Private Const BASE_COL_AGENTNUM As Long = 15
+Private Const BASE_COL_TELLER As Long = 16
+Private Const BASE_COL_TELLERNUM As Long = 17
+Private Const BASE_COL_ACTION As Long = 18
+Private Const BASE_COL_PREMIUM As Long = 19
+Private Const BASE_COL_COMMISSION As Long = 20
+Private Const BASE_COL_ISSUE As Long = 21
+Private Const BASE_COL_TOFIX As Long = 22
+
+Private Const MB_RTLREADING As Long = &H100000
+Private Const MB_RIGHT As Long = &H80000
+Private Const MB_SYSTEMMODAL As Long = &H1000
+
+' --- CRITICAL:: Sheet name functions (Hebrew via ChrW - must be near top) ---
+Private Function CONTROL_SHEET_NAME() As String
+    ' daf habait
+    CONTROL_SHEET_NAME = ChrW(1491) & ChrW(1507) & " " & ChrW(1492) & ChrW(1489) & ChrW(1497) & ChrW(1514)
+End Function
+
+Private Function MANAGEMENT_SHEET_NAME() As String
+    ' hagdarot
+    MANAGEMENT_SHEET_NAME = ChrW(1492) & ChrW(1490) & ChrW(1491) & ChrW(1512) & ChrW(1493) & ChrW(1514)
+End Function
+
+Private Function REVIEW_SHEET_NAME() As String
+    ' letipul
+    REVIEW_SHEET_NAME = ChrW(1500) & ChrW(1496) & ChrW(1497) & ChrW(1508) & ChrW(1493) & ChrW(1500)
+End Function
+
+Private Function SOURCE_FOLDER() As String
+    ' Read from named range rngFILES_FOLDER (defined in NIHUL sheet)
+    ' Falls back to C:\?????? ???\SOURCE\ if named range not found
+    On Error Resume Next
+    SOURCE_FOLDER = Trim$(CStr(ThisWorkbook.Names("rngFILES_FOLDER").RefersToRange.Value2))
+    On Error GoTo 0
+    If SOURCE_FOLDER = "" Then
+        SOURCE_FOLDER = "C:\" & ChrW(1508) & ChrW(1512) & ChrW(1493) & ChrW(1497) & ChrW(1511) & ChrW(1496) & " " & ChrW(1500) & ChrW(1489) & ChrW(1489) & "\SOURCE\"
+    End If
+    ' Ensure trailing backslash
+    If Right$(SOURCE_FOLDER, 1) <> "\" Then SOURCE_FOLDER = SOURCE_FOLDER & "\"
+End Function
+
+Private Function SHEET_COMPANIES() As String
+    ' hevrot
+    SHEET_COMPANIES = ChrW(1495) & ChrW(1489) & ChrW(1512) & ChrW(1493) & ChrW(1514)
+End Function
+
+Private Function SHEET_BRANCH() As String
+    ' anafim
+    SHEET_BRANCH = ChrW(1506) & ChrW(1504) & ChrW(1508) & ChrW(1497) & ChrW(1501)
+End Function
+
+Private Function SHEET_MAINBRANCH() As String
+    ' anaf merkaz
+    SHEET_MAINBRANCH = ChrW(1506) & ChrW(1504) & ChrW(1507) & " " & ChrW(1502) & ChrW(1512) & ChrW(1499) & ChrW(1494)
+End Function
+
+Private Function SHEET_TELLERS() As String
+    ' tlerim
+    SHEET_TELLERS = ChrW(1496) & ChrW(1500) & ChrW(1512) & ChrW(1497) & ChrW(1501)
+End Function
+
+Private Function SHEET_AGENTS() As String
+    ' sochnim
+    SHEET_AGENTS = ChrW(1505) & ChrW(1493) & ChrW(1499) & ChrW(1504) & ChrW(1497) & ChrW(1501)
+End Function
+
+Private Function SHEET_MONTHS() As String
+    ' hodshim
+    SHEET_MONTHS = ChrW(1495) & ChrW(1493) & ChrW(1491) & ChrW(1513) & ChrW(1497) & ChrW(1501)
+End Function
+
+Private Function SHEET_SUMMARY() As String
+    ' sikum
+    SHEET_SUMMARY = ChrW(1505) & ChrW(1497) & ChrW(1499) & ChrW(1493) & ChrW(1501)
+End Function
+
+' ============================================================================
+' HELPER: Unicode MsgBox wrapper (uses Windows API MessageBoxW)
+' ============================================================================
+Private Function MsgBoxU(ByVal sText As String, Optional ByVal uType As Long = 0, Optional ByVal sCaption As String = "") As Long
+    MsgBoxU = MessageBoxW(0, StrPtr(sText), StrPtr(sCaption), uType Or MB_RTLREADING Or MB_RIGHT Or MB_SYSTEMMODAL)
+End Function
+
+
+' ============================================================================
+' HELPER: Find source file - supports both .xlsx and .xls
+' ============================================================================
+Private Function FindSourceFile(ByVal yearVal As String) As String
+10      Dim p As String
+20      Dim fso As Object
+30      Set fso = CreateObject("Scripting.FileSystemObject")
+40      p = SOURCE_FOLDER() & yearVal & ".xlsx"
+50      If fso.FileExists(p) Then
+60          FindSourceFile = p
+70          Exit Function
+80      End If
+90      p = SOURCE_FOLDER() & yearVal & ".xls"
+100     If fso.FileExists(p) Then
+110         FindSourceFile = p
+120         Exit Function
+130     End If
+140     FindSourceFile = ""
+End Function
+
+
+' ============================================================================
+' HELPER: Open data worksheet from source workbook
+' ============================================================================
+Private Function OpenDataSheet(ByVal wb As Workbook) As Worksheet
+10      On Error Resume Next
+20      Dim ws As Worksheet
+30      Set ws = wb.Worksheets(DATA_SHEET_NAME)
+40      On Error GoTo 0
+50      If ws Is Nothing Then
+60          Set ws = wb.Worksheets(1)
+70      End If
+80      Set OpenDataSheet = ws
+End Function
+
+
+' ============================================================================
+' HELPER: Get month range for comparison period from B4+C4
+' Returns minMonth and maxMonth via ByRef
+' ============================================================================
+Private Sub GetMonthRange(ByVal wsMain As Worksheet, ByRef minMonth As Long, ByRef maxMonth As Long)

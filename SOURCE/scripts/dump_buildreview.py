@@ -1,0 +1,19 @@
+﻿import sys
+
+filepath = r'c:\LEVAV PROJECT\SOURCE\Goren_Claude_V2.082.bas'
+
+with open(filepath, 'r', encoding='utf-8') as f:
+    lines = f.readlines()
+
+in_sub = False
+for i, line in enumerate(lines):
+    line_strip = line.strip()
+    if "Public Sub BuildReview()" in line_strip:
+        in_sub = True
+        print(f"[{i+1}] {line.strip()}")
+    elif in_sub and "End Sub" in line_strip:
+        print(f"[{i+1}] {line.strip()}")
+        break
+    elif in_sub:
+        print(f"[{i+1}] {line.strip()}")
+

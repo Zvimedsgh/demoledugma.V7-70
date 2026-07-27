@@ -1,0 +1,17 @@
+﻿import sys
+
+filepath = r'c:\LEVAV PROJECT\SOURCE\Goren_Claude_V2.036_20260702_1257.bas'
+
+with open(filepath, 'r', encoding='utf-8') as f:
+    lines = f.readlines()
+
+in_func = False
+for i, line in enumerate(lines):
+    if "Public Sub SetupMainSheet" in line:
+        in_func = True
+    if in_func and "End Sub" in line:
+        break
+    
+    if in_func:
+        if "AddShape" in line or ".Name =" in line or ".OnAction" in line or "Text =" in line:
+            print(f"[{i}] {lines[i].strip()}")

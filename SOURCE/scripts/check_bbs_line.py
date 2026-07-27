@@ -1,0 +1,12 @@
+﻿import sys
+
+filepath = r'c:\LEVAV PROJECT\SOURCE\Goren_Claude_V2.153.bas'
+
+with open(filepath, 'r', encoding='utf-8') as f:
+    lines = f.readlines()
+
+for i, line in enumerate(lines):
+    if "Private Sub BuildBaseSheet(" in line:
+        print(f"BuildBaseSheet is at line {i+1}")
+        break
+

@@ -1,0 +1,2 @@
+        2320 wsMain.Range("K4").Value = eurRate
+        2340 wsMain.Range("K4").Value = 3.9

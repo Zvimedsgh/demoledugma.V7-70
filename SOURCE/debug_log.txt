@@ -1,0 +1,584 @@
+2026-07-03 09:51:52 - BuildReview STARTED
+2026-07-03 09:51:57 - Sending API Request for USD 
+2026-07-03 10:11:25 - BuildReview STARTED
+2026-07-03 10:36:07 - BuildReview STARTED
+2026-07-03 10:45:25 - BuildReview STARTED
+2026-07-03 10:45:28 - Starting Demo Mode checks
+2026-07-03 10:45:28 - Starting main row loop (2 to 11129)
+2026-07-03 11:20:06 - BuildReview STARTED
+2026-07-03 11:20:12 - Starting Demo Mode checks
+2026-07-03 11:20:12 - Starting main row loop (2 to 11129)
+2026-07-03 11:20:12 - Finished main row loop. outIdx = 8
+2026-07-03 11:20:12 - Writing lists to reshimot...
+2026-07-03 11:20:12 - Adding Validation...
+2026-07-03 11:20:12 - Adding btnSendForReview...
+2026-07-03 11:20:12 - Calling UpdatePeriodDropdown
+2026-07-03 11:20:12 - Finished UpdatePeriodDropdown
+2026-07-03 11:20:20 - Calling UpdateClientList
+2026-07-03 11:20:20 - Finished UpdateClientList
+2026-07-03 11:20:20 - BuildReview ENDED SUCCESSFULLY
+2026-07-03 11:22:33 - BuildReview STARTED
+2026-07-03 11:22:40 - Starting Demo Mode checks
+2026-07-03 11:22:40 - Calling OpenDataSheet
+2026-07-03 11:22:40 - Finished OpenDataSheet
+2026-07-03 11:22:40 - Starting main row loop (2 to 18954)
+2026-07-03 11:22:41 - Finished main row loop. outIdx = 4
+2026-07-03 11:22:41 - Writing lists to reshimot...
+2026-07-03 11:22:41 - Adding Validation...
+2026-07-03 11:22:41 - Adding btnSendForReview...
+2026-07-03 11:22:41 - Calling UpdatePeriodDropdown
+2026-07-03 11:22:41 - Finished UpdatePeriodDropdown
+2026-07-03 11:22:44 - Calling UpdateClientList
+2026-07-03 11:22:44 - Finished UpdateClientList
+2026-07-03 11:22:44 - BuildReview ENDED SUCCESSFULLY
+2026-07-03 11:28:46 - BuildReview STARTED
+2026-07-03 11:28:51 - Starting Demo Mode checks
+2026-07-03 11:28:51 - Starting main row loop (2 to 11129)
+2026-07-03 11:28:51 - Finished main row loop. outIdx = 8
+2026-07-03 11:28:51 - Writing lists to reshimot...
+2026-07-03 11:28:51 - Adding Validation...
+2026-07-03 11:28:51 - Adding btnSendForReview...
+2026-07-03 11:28:51 - Calling UpdatePeriodDropdown
+2026-07-03 11:28:51 - Finished UpdatePeriodDropdown
+2026-07-03 11:28:53 - Calling UpdateClientList
+2026-07-03 11:28:53 - Finished UpdateClientList
+2026-07-03 11:28:53 - BuildReview ENDED SUCCESSFULLY
+2026-07-03 11:55:29 - BuildReview STARTED
+2026-07-03 12:20:19 - BuildReview STARTED
+2026-07-03 12:20:26 - Starting Demo Mode checks
+2026-07-03 12:20:26 - Calling OpenDataSheet
+2026-07-03 12:20:26 - Finished OpenDataSheet
+2026-07-03 12:20:26 - Starting main row loop (2 to 18954)
+2026-07-03 12:20:27 - Finished main row loop. outIdx = 4
+2026-07-03 12:20:27 - Writing lists to reshimot...
+2026-07-03 12:20:27 - Adding Validation...
+2026-07-03 12:20:27 - Adding btnSendForReview...
+2026-07-03 12:20:27 - Calling UpdatePeriodDropdown
+2026-07-03 12:20:27 - Finished UpdatePeriodDropdown
+2026-07-03 12:20:29 - Calling UpdateClientList
+2026-07-03 12:20:29 - Finished UpdateClientList
+2026-07-03 12:20:29 - BuildReview ENDED SUCCESSFULLY
+2026-07-03 12:22:44 - BuildReview STARTED
+2026-07-03 12:22:48 - Starting Demo Mode checks
+2026-07-03 12:22:48 - Starting main row loop (2 to 11129)
+2026-07-03 12:22:48 - Finished main row loop. outIdx = 8
+2026-07-03 12:22:48 - Writing lists to reshimot...
+2026-07-03 12:22:48 - Adding Validation...
+2026-07-03 12:22:48 - Adding btnSendForReview...
+2026-07-03 12:22:48 - Calling UpdatePeriodDropdown
+2026-07-03 12:22:48 - Finished UpdatePeriodDropdown
+2026-07-03 12:22:53 - Calling UpdateClientList
+2026-07-03 12:22:53 - Finished UpdateClientList
+2026-07-03 12:22:53 - BuildReview ENDED SUCCESSFULLY
+2026-07-03 12:23:33 - BuildReview STARTED
+2026-07-03 12:23:37 - Starting Demo Mode checks
+2026-07-03 12:23:38 - Calling OpenDataSheet
+2026-07-03 12:23:38 - Finished OpenDataSheet
+2026-07-03 12:23:38 - Starting main row loop (2 to 18954)
+2026-07-03 12:23:38 - Finished main row loop. outIdx = 4
+2026-07-03 12:23:38 - Writing lists to reshimot...
+2026-07-03 12:23:38 - Adding Validation...
+2026-07-03 12:23:38 - Adding btnSendForReview...
+2026-07-03 12:23:38 - Calling UpdatePeriodDropdown
+2026-07-03 12:23:38 - Finished UpdatePeriodDropdown
+2026-07-03 12:23:40 - Calling UpdateClientList
+2026-07-03 12:23:40 - Finished UpdateClientList
+2026-07-03 12:23:40 - BuildReview ENDED SUCCESSFULLY
+2026-07-03 12:38:54 - BuildReview STARTED
+2026-07-03 12:39:00 - Starting Demo Mode checks
+2026-07-03 12:39:00 - Starting main row loop (2 to 11129)
+2026-07-03 12:39:00 - Finished main row loop. outIdx = 9
+2026-07-03 12:39:00 - Writing lists to reshimot...
+2026-07-03 12:39:00 - Adding Validation...
+2026-07-03 12:39:00 - Adding btnSendForReview...
+2026-07-03 12:39:00 - Calling UpdatePeriodDropdown
+2026-07-03 12:39:00 - Finished UpdatePeriodDropdown
+2026-07-03 12:39:02 - Calling UpdateClientList
+2026-07-03 12:39:02 - Finished UpdateClientList
+2026-07-03 12:39:02 - BuildReview ENDED SUCCESSFULLY
+2026-07-03 12:41:43 - BuildReview STARTED
+2026-07-03 12:41:47 - Starting Demo Mode checks
+2026-07-03 12:41:47 - Starting main row loop (2 to 11129)
+2026-07-03 12:41:48 - Finished main row loop. outIdx = 9
+2026-07-03 12:41:48 - Writing lists to reshimot...
+2026-07-03 12:41:48 - Adding Validation...
+2026-07-03 12:41:48 - Adding btnSendForReview...
+2026-07-03 12:41:48 - Calling UpdatePeriodDropdown
+2026-07-03 12:41:48 - Finished UpdatePeriodDropdown
+2026-07-03 12:41:50 - Calling UpdateClientList
+2026-07-03 12:41:50 - Finished UpdateClientList
+2026-07-03 12:41:50 - BuildReview ENDED SUCCESSFULLY
+2026-07-03 12:47:19 - BuildReview STARTED
+2026-07-03 12:47:26 - Starting Demo Mode checks
+2026-07-03 12:47:27 - Calling OpenDataSheet
+2026-07-03 12:47:27 - Finished OpenDataSheet
+2026-07-03 12:47:27 - Starting main row loop (2 to 18954)
+2026-07-03 12:47:27 - Finished main row loop. outIdx = 4
+2026-07-03 12:47:27 - Writing lists to reshimot...
+2026-07-03 12:47:27 - Adding Validation...
+2026-07-03 12:47:27 - Adding btnSendForReview...
+2026-07-03 12:47:27 - Calling UpdatePeriodDropdown
+2026-07-03 12:47:27 - Finished UpdatePeriodDropdown
+2026-07-03 12:47:31 - Calling UpdateClientList
+2026-07-03 12:47:31 - Finished UpdateClientList
+2026-07-03 12:47:31 - BuildReview ENDED SUCCESSFULLY
+2026-07-03 12:49:50 - BuildReview STARTED
+2026-07-03 12:49:57 - Starting Demo Mode checks
+2026-07-03 12:49:58 - Calling OpenDataSheet
+2026-07-03 12:49:58 - Finished OpenDataSheet
+2026-07-03 12:49:58 - Starting main row loop (2 to 18954)
+2026-07-03 12:49:58 - Finished main row loop. outIdx = 4
+2026-07-03 12:49:58 - Writing lists to reshimot...
+2026-07-03 12:49:58 - Adding Validation...
+2026-07-03 12:49:58 - Adding btnSendForReview...
+2026-07-03 12:49:58 - Calling UpdatePeriodDropdown
+2026-07-03 12:49:58 - Finished UpdatePeriodDropdown
+2026-07-03 12:50:00 - Calling UpdateClientList
+2026-07-03 12:50:00 - Finished UpdateClientList
+2026-07-03 12:50:00 - BuildReview ENDED SUCCESSFULLY
+2026-07-04 08:18:07 - BuildReview STARTED
+2026-07-04 08:24:47 - BuildReview STARTED
+2026-07-04 08:24:53 - Starting Demo Mode checks
+2026-07-04 08:24:53 - Starting main row loop (2 to 11129)
+2026-07-04 08:24:54 - Finished main row loop. outIdx = 9
+2026-07-04 08:24:54 - Writing lists to reshimot...
+2026-07-04 08:24:54 - Adding Validation...
+2026-07-04 08:24:54 - Adding btnSendForReview...
+2026-07-04 08:24:54 - Calling UpdatePeriodDropdown
+2026-07-04 08:24:54 - Finished UpdatePeriodDropdown
+2026-07-04 08:24:57 - Calling UpdateClientList
+2026-07-04 08:24:57 - Finished UpdateClientList
+2026-07-04 08:24:57 - BuildReview ENDED SUCCESSFULLY
+2026-07-04 15:45:23 - BuildReview STARTED
+2026-07-04 15:45:29 - Starting Demo Mode checks
+2026-07-04 15:50:11 - BuildReview STARTED
+2026-07-04 15:50:15 - Starting Demo Mode checks
+2026-07-04 15:50:16 - Calling OpenDataSheet
+2026-07-04 15:50:16 - Finished OpenDataSheet
+2026-07-04 15:50:16 - Starting main row loop (2 to 5818)
+2026-07-04 15:50:16 - Finished main row loop. outIdx = 12
+2026-07-04 15:50:16 - Writing lists to reshimot...
+2026-07-04 15:50:16 - Adding Validation...
+2026-07-04 15:50:16 - Adding btnSendForReview...
+2026-07-04 15:50:16 - Calling UpdatePeriodDropdown
+2026-07-04 15:50:16 - Finished UpdatePeriodDropdown
+2026-07-04 15:50:18 - Calling UpdateClientList
+2026-07-04 15:50:18 - Finished UpdateClientList
+2026-07-04 15:50:18 - BuildReview ENDED SUCCESSFULLY
+2026-07-04 16:03:27 - BuildReview STARTED
+2026-07-04 16:03:31 - Starting Demo Mode checks
+2026-07-04 16:03:31 - Calling OpenDataSheet
+2026-07-04 16:03:31 - Finished OpenDataSheet
+2026-07-04 16:03:32 - Starting main row loop (2 to 18954)
+2026-07-04 16:03:32 - Finished main row loop. outIdx = 4
+2026-07-04 16:03:32 - Writing lists to reshimot...
+2026-07-04 16:03:32 - Adding Validation...
+2026-07-04 16:03:32 - Adding btnSendForReview...
+2026-07-04 16:03:32 - Calling UpdatePeriodDropdown
+2026-07-04 16:03:33 - Finished UpdatePeriodDropdown
+2026-07-04 16:03:35 - Calling UpdateClientList
+2026-07-04 16:03:35 - Finished UpdateClientList
+2026-07-04 16:03:35 - BuildReview ENDED SUCCESSFULLY
+2026-07-04 16:22:58 - BuildReview STARTED
+2026-07-04 16:23:02 - Starting Demo Mode checks
+2026-07-04 16:23:03 - Calling OpenDataSheet
+2026-07-04 16:23:03 - Finished OpenDataSheet
+2026-07-04 16:23:03 - Starting main row loop (2 to 5818)
+2026-07-04 16:23:03 - Finished main row loop. outIdx = 12
+2026-07-04 16:23:03 - Writing lists to reshimot...
+2026-07-04 16:23:03 - Adding Validation...
+2026-07-04 16:23:03 - Adding btnSendForReview...
+2026-07-04 16:23:03 - Calling UpdatePeriodDropdown
+2026-07-04 16:23:04 - Finished UpdatePeriodDropdown
+2026-07-04 16:23:05 - Calling UpdateClientList
+2026-07-04 16:23:05 - Finished UpdateClientList
+2026-07-04 16:23:05 - BuildReview ENDED SUCCESSFULLY
+2026-07-04 16:23:25 - BuildReview STARTED
+2026-07-04 16:23:29 - Starting Demo Mode checks
+2026-07-04 16:23:29 - Calling OpenDataSheet
+2026-07-04 16:23:29 - Finished OpenDataSheet
+2026-07-04 16:23:30 - Starting main row loop (2 to 5818)
+2026-07-04 16:23:30 - Finished main row loop. outIdx = 12
+2026-07-04 16:23:30 - Writing lists to reshimot...
+2026-07-04 16:23:30 - Adding Validation...
+2026-07-04 16:23:30 - Adding btnSendForReview...
+2026-07-04 16:23:30 - Calling UpdatePeriodDropdown
+2026-07-04 16:23:31 - Finished UpdatePeriodDropdown
+2026-07-04 16:23:33 - Calling UpdateClientList
+2026-07-04 16:23:33 - Finished UpdateClientList
+2026-07-04 16:23:33 - BuildReview ENDED SUCCESSFULLY
+2026-07-04 16:27:01 - BuildReview STARTED
+2026-07-04 16:27:04 - Starting Demo Mode checks
+2026-07-04 16:27:04 - Calling OpenDataSheet
+2026-07-04 16:27:04 - Finished OpenDataSheet
+2026-07-04 16:27:04 - Starting main row loop (2 to 18954)
+2026-07-04 16:27:05 - Finished main row loop. outIdx = 4
+2026-07-04 16:27:05 - Writing lists to reshimot...
+2026-07-04 16:27:06 - Adding Validation...
+2026-07-04 16:27:06 - Adding btnSendForReview...
+2026-07-04 16:27:06 - Calling UpdatePeriodDropdown
+2026-07-04 16:27:06 - Finished UpdatePeriodDropdown
+2026-07-04 16:27:08 - Calling UpdateClientList
+2026-07-04 16:27:08 - Finished UpdateClientList
+2026-07-04 16:27:08 - BuildReview ENDED SUCCESSFULLY
+2026-07-04 16:28:40 - BuildReview STARTED
+2026-07-04 16:28:46 - Starting Demo Mode checks
+2026-07-04 16:28:47 - Calling OpenDataSheet
+2026-07-04 16:28:47 - Finished OpenDataSheet
+2026-07-04 16:28:47 - Starting main row loop (2 to 18954)
+2026-07-04 16:28:48 - Finished main row loop. outIdx = 4
+2026-07-04 16:28:48 - Writing lists to reshimot...
+2026-07-04 16:28:48 - Adding Validation...
+2026-07-04 16:28:48 - Adding btnSendForReview...
+2026-07-04 16:28:48 - Calling UpdatePeriodDropdown
+2026-07-04 16:28:49 - Finished UpdatePeriodDropdown
+2026-07-04 16:28:50 - Calling UpdateClientList
+2026-07-04 16:28:50 - Finished UpdateClientList
+2026-07-04 16:28:50 - BuildReview ENDED SUCCESSFULLY
+2026-07-04 16:31:01 - BuildReview STARTED
+2026-07-04 16:31:05 - Starting Demo Mode checks
+2026-07-04 16:31:06 - Calling OpenDataSheet
+2026-07-04 16:31:06 - Finished OpenDataSheet
+2026-07-04 16:31:06 - Starting main row loop (2 to 5818)
+2026-07-04 16:31:06 - Finished main row loop. outIdx = 12
+2026-07-04 16:31:06 - Writing lists to reshimot...
+2026-07-04 16:31:07 - Adding Validation...
+2026-07-04 16:31:07 - Adding btnSendForReview...
+2026-07-04 16:31:07 - Calling UpdatePeriodDropdown
+2026-07-04 16:31:07 - Finished UpdatePeriodDropdown
+2026-07-04 16:31:08 - Calling UpdateClientList
+2026-07-04 16:31:08 - Finished UpdateClientList
+2026-07-04 16:31:09 - BuildReview ENDED SUCCESSFULLY
+2026-07-04 16:43:59 - BuildReview STARTED
+2026-07-04 16:44:07 - Starting Demo Mode checks
+2026-07-04 16:44:07 - Calling OpenDataSheet
+2026-07-04 16:44:07 - Finished OpenDataSheet
+2026-07-04 16:44:07 - Starting main row loop (2 to 5818)
+2026-07-04 16:44:07 - Finished main row loop. outIdx = 12
+2026-07-04 16:44:07 - Writing lists to reshimot...
+2026-07-04 16:44:07 - Adding Validation...
+2026-07-04 16:44:07 - Adding btnSendForReview...
+2026-07-04 16:44:07 - Calling UpdatePeriodDropdown
+2026-07-04 16:44:07 - Finished UpdatePeriodDropdown
+2026-07-04 16:44:10 - Calling UpdateClientList
+2026-07-04 16:44:10 - Finished UpdateClientList
+2026-07-04 16:44:10 - BuildReview ENDED SUCCESSFULLY
+2026-07-04 17:20:06 - BuildReview STARTED
+2026-07-04 17:20:11 - Starting Demo Mode checks
+2026-07-04 17:20:12 - Calling OpenDataSheet
+2026-07-04 17:20:12 - Finished OpenDataSheet
+2026-07-04 17:20:12 - Starting main row loop (2 to 5818)
+2026-07-04 17:20:12 - Finished main row loop. outIdx = 12
+2026-07-04 17:20:12 - Writing lists to reshimot...
+2026-07-04 17:20:12 - Adding Validation...
+2026-07-04 17:20:13 - Adding btnSendForReview...
+2026-07-04 17:20:13 - Calling UpdatePeriodDropdown
+2026-07-04 17:20:13 - Finished UpdatePeriodDropdown
+2026-07-04 17:20:14 - Calling UpdateClientList
+2026-07-04 17:20:14 - Finished UpdateClientList
+2026-07-04 17:20:14 - BuildReview ENDED SUCCESSFULLY
+2026-07-04 18:27:11 - BuildReview STARTED
+2026-07-04 18:27:15 - Starting Demo Mode checks
+2026-07-04 18:27:15 - Starting main row loop (2 to 11129)
+2026-07-04 18:27:15 - Finished main row loop. outIdx = 9
+2026-07-04 18:27:15 - Writing lists to reshimot...
+2026-07-04 18:27:15 - Adding Validation...
+2026-07-04 18:27:15 - Adding btnSendForReview...
+2026-07-04 18:27:15 - Calling UpdatePeriodDropdown
+2026-07-04 18:27:15 - Finished UpdatePeriodDropdown
+2026-07-04 18:27:16 - Calling UpdateClientList
+2026-07-04 18:27:16 - Finished UpdateClientList
+2026-07-04 18:27:16 - BuildReview ENDED SUCCESSFULLY
+2026-07-04 18:43:23 - BuildReview STARTED
+2026-07-04 18:43:28 - Starting Demo Mode checks
+2026-07-04 18:43:28 - Starting main row loop (2 to 11129)
+2026-07-04 18:43:28 - Finished main row loop. outIdx = 9
+2026-07-04 18:43:28 - Writing lists to reshimot...
+2026-07-04 18:43:28 - Adding Validation...
+2026-07-04 18:43:28 - Adding btnSendForReview...
+2026-07-04 18:43:28 - Calling UpdatePeriodDropdown
+2026-07-04 18:43:28 - Finished UpdatePeriodDropdown
+2026-07-04 18:43:30 - Calling UpdateClientList
+2026-07-04 18:43:30 - Finished UpdateClientList
+2026-07-04 18:43:30 - BuildReview ENDED SUCCESSFULLY
+2026-07-05 09:28:13 - BuildReview STARTED
+2026-07-05 14:07:21 - BuildReview STARTED
+2026-07-05 14:07:26 - Starting Demo Mode checks
+2026-07-05 14:07:26 - Starting main row loop (2 to 11129)
+2026-07-05 14:07:26 - Finished main row loop. outIdx = 9
+2026-07-05 14:07:26 - Writing lists to reshimot...
+2026-07-05 14:07:26 - Adding Validation...
+2026-07-05 14:07:26 - Adding btnSendForReview...
+2026-07-05 14:07:26 - Calling UpdatePeriodDropdown
+2026-07-05 14:07:26 - Finished UpdatePeriodDropdown
+2026-07-05 14:07:27 - Calling UpdateClientList
+2026-07-05 14:07:27 - Finished UpdateClientList
+2026-07-05 14:07:28 - BuildReview ENDED SUCCESSFULLY
+2026-07-05 15:08:16 - BuildReview STARTED
+2026-07-05 15:08:25 - Starting Demo Mode checks
+2026-07-05 15:08:25 - Starting main row loop (2 to 11129)
+2026-07-05 18:38:38 - BuildReview STARTED
+2026-07-05 18:38:47 - Starting Demo Mode checks
+2026-07-05 18:38:47 - Starting main row loop (2 to 11129)
+2026-07-05 18:38:47 - Finished main row loop. outIdx = 9
+2026-07-05 18:38:47 - Writing lists to reshimot...
+2026-07-05 18:38:47 - Adding Validation...
+2026-07-05 18:38:47 - Adding btnSendForReview...
+2026-07-05 18:38:47 - Calling UpdatePeriodDropdown
+2026-07-05 18:38:47 - Finished UpdatePeriodDropdown
+2026-07-05 18:38:49 - Calling UpdateClientList
+2026-07-05 18:38:49 - Finished UpdateClientList
+2026-07-05 18:38:49 - BuildReview ENDED SUCCESSFULLY
+2026-07-05 19:07:10 - BuildReview STARTED
+2026-07-05 19:07:15 - Starting Demo Mode checks
+2026-07-05 19:07:34 - BuildReview STARTED
+2026-07-05 19:07:37 - Starting Demo Mode checks
+2026-07-05 19:12:02 - BuildReview STARTED
+2026-07-05 19:12:05 - Starting Demo Mode checks
+2026-07-05 19:12:21 - BuildReview STARTED
+2026-07-05 19:12:28 - Starting Demo Mode checks
+2026-07-05 19:16:26 - BuildReview STARTED
+2026-07-05 19:16:29 - Starting Demo Mode checks
+2026-07-05 19:16:37 - BuildReview STARTED
+2026-07-05 19:16:40 - Starting Demo Mode checks
+2026-07-05 19:18:22 - BuildReview STARTED
+2026-07-05 19:18:25 - Starting Demo Mode checks
+2026-07-05 19:18:39 - BuildReview STARTED
+2026-07-05 19:18:42 - Starting Demo Mode checks
+2026-07-05 19:18:43 - Calling OpenDataSheet
+2026-07-05 19:18:43 - Finished OpenDataSheet
+2026-07-05 19:18:43 - Starting main row loop (2 to 11129)
+2026-07-05 19:18:44 - Finished main row loop. outIdx = 9
+2026-07-05 19:18:44 - Writing lists to reshimot...
+2026-07-05 19:18:44 - Adding Validation...
+2026-07-05 19:18:45 - Adding btnSendForReview...
+2026-07-05 19:18:45 - Calling UpdatePeriodDropdown
+2026-07-05 19:18:45 - Finished UpdatePeriodDropdown
+2026-07-05 19:18:46 - Calling UpdateClientList
+2026-07-05 19:18:46 - Finished UpdateClientList
+2026-07-05 19:18:46 - BuildReview ENDED SUCCESSFULLY
+2026-07-05 19:22:21 - BuildReview STARTED
+2026-07-05 19:22:25 - Starting Demo Mode checks
+2026-07-05 19:22:26 - Calling OpenDataSheet
+2026-07-05 19:22:26 - Finished OpenDataSheet
+2026-07-05 19:22:26 - Starting main row loop (2 to 11129)
+2026-07-05 19:22:27 - Finished main row loop. outIdx = 9
+2026-07-05 19:22:27 - Writing lists to reshimot...
+2026-07-05 19:22:27 - Adding Validation...
+2026-07-05 19:22:27 - Adding btnSendForReview...
+2026-07-05 19:22:27 - Calling UpdatePeriodDropdown
+2026-07-05 19:22:27 - Finished UpdatePeriodDropdown
+2026-07-05 19:22:29 - Calling UpdateClientList
+2026-07-05 19:22:29 - Finished UpdateClientList
+2026-07-05 19:22:29 - BuildReview ENDED SUCCESSFULLY
+2026-07-05 19:30:22 - BuildReview STARTED
+2026-07-05 19:34:55 - BuildReview STARTED
+2026-07-05 19:34:58 - Starting Demo Mode checks
+2026-07-05 19:34:58 - Calling OpenDataSheet
+2026-07-05 19:34:58 - Finished OpenDataSheet
+2026-07-05 19:34:59 - Starting main row loop (2 to 11129)
+2026-07-05 19:34:59 - Finished main row loop. outIdx = 9
+2026-07-05 19:34:59 - Writing lists to reshimot...
+2026-07-05 19:34:59 - Adding Validation...
+2026-07-05 19:35:00 - Adding btnSendForReview...
+2026-07-05 19:35:00 - Calling UpdatePeriodDropdown
+2026-07-05 19:35:00 - Finished UpdatePeriodDropdown
+2026-07-05 19:35:01 - Calling UpdateClientList
+2026-07-05 19:35:01 - Finished UpdateClientList
+2026-07-05 19:35:01 - BuildReview ENDED SUCCESSFULLY
+2026-07-05 19:42:25 - BuildReview STARTED
+2026-07-05 19:42:31 - Starting Demo Mode checks
+2026-07-05 19:42:31 - Calling OpenDataSheet
+2026-07-05 19:42:31 - Finished OpenDataSheet
+2026-07-05 19:42:32 - Starting main row loop (2 to 11129)
+2026-07-05 19:42:32 - Finished main row loop. outIdx = 9
+2026-07-05 19:42:32 - Writing lists to reshimot...
+2026-07-05 19:42:33 - Adding Validation...
+2026-07-05 19:42:33 - Adding btnSendForReview...
+2026-07-05 19:42:33 - Calling UpdatePeriodDropdown
+2026-07-05 19:42:33 - Finished UpdatePeriodDropdown
+2026-07-05 19:42:35 - Calling UpdateClientList
+2026-07-05 19:42:35 - Finished UpdateClientList
+2026-07-05 19:42:35 - BuildReview ENDED SUCCESSFULLY
+2026-07-06 10:23:19 - BuildReview STARTED
+2026-07-06 10:27:57 - Starting Demo Mode checks
+2026-07-06 10:27:57 - Starting main row loop (2 to 11129)
+2026-07-06 10:27:58 - Finished main row loop. outIdx = 9
+2026-07-06 10:27:58 - Writing lists to reshimot...
+2026-07-06 10:27:58 - Adding Validation...
+2026-07-06 10:27:58 - Adding btnSendForReview...
+2026-07-06 10:27:58 - Calling UpdatePeriodDropdown
+2026-07-06 10:27:58 - Finished UpdatePeriodDropdown
+2026-07-06 10:28:56 - Calling UpdateClientList
+2026-07-06 10:28:56 - Finished UpdateClientList
+2026-07-06 10:28:56 - BuildReview ENDED SUCCESSFULLY
+2026-07-06 12:46:29 - BuildReview STARTED
+2026-07-06 12:54:49 - Starting Demo Mode checks
+2026-07-06 12:58:49 - BuildReview STARTED
+2026-07-06 12:58:54 - Starting Demo Mode checks
+2026-07-06 12:58:54 - Starting main row loop (2 to 11129)
+2026-07-06 12:58:54 - Finished main row loop. outIdx = 9
+2026-07-06 12:58:54 - Writing lists to reshimot...
+2026-07-06 12:58:54 - Adding Validation...
+2026-07-06 12:58:55 - Adding btnSendForReview...
+2026-07-06 12:58:55 - Calling UpdatePeriodDropdown
+2026-07-06 12:58:55 - Finished UpdatePeriodDropdown
+2026-07-06 13:04:07 - Calling UpdateClientList
+2026-07-06 13:04:07 - Finished UpdateClientList
+2026-07-06 13:04:07 - BuildReview ENDED SUCCESSFULLY
+2026-07-09 09:41:05 - BuildReview STARTED
+2026-07-09 09:41:09 - Starting Demo Mode checks
+2026-07-09 09:44:02 - BuildReview STARTED
+2026-07-09 09:44:06 - Starting Demo Mode checks
+2026-07-09 09:44:06 - Calling OpenDataSheet
+2026-07-09 09:44:06 - Finished OpenDataSheet
+2026-07-09 09:44:06 - Starting main row loop (2 to 11129)
+2026-07-09 09:44:07 - Finished main row loop. outIdx = 9
+2026-07-09 09:44:07 - Writing lists to reshimot...
+2026-07-09 09:44:07 - Adding Validation...
+2026-07-09 09:44:07 - Adding btnSendForReview...
+2026-07-09 09:44:07 - Calling UpdatePeriodDropdown
+2026-07-09 09:44:07 - Finished UpdatePeriodDropdown
+2026-07-09 09:44:08 - Calling UpdateClientList
+2026-07-09 09:44:08 - Finished UpdateClientList
+2026-07-09 09:44:08 - BuildReview ENDED SUCCESSFULLY
+2026-07-09 10:33:42 - BuildReview STARTED
+2026-07-09 10:33:46 - Starting Demo Mode checks
+2026-07-09 10:33:46 - Starting main row loop (2 to 11129)
+2026-07-09 10:33:47 - Finished main row loop. outIdx = 9
+2026-07-09 10:33:47 - Writing lists to reshimot...
+2026-07-09 10:33:47 - Adding Validation...
+2026-07-09 10:33:47 - Adding btnSendForReview...
+2026-07-09 10:33:47 - Calling UpdatePeriodDropdown
+2026-07-09 10:33:47 - Finished UpdatePeriodDropdown
+2026-07-09 10:33:48 - Calling UpdateClientList
+2026-07-09 10:33:48 - Finished UpdateClientList
+2026-07-09 10:33:48 - BuildReview ENDED SUCCESSFULLY
+2026-07-09 10:49:06 - BuildReview STARTED
+2026-07-09 10:49:11 - Starting Demo Mode checks
+2026-07-09 10:49:12 - Calling OpenDataSheet
+2026-07-09 10:49:12 - Finished OpenDataSheet
+2026-07-09 10:49:12 - Starting main row loop (2 to 11129)
+2026-07-09 10:49:12 - Finished main row loop. outIdx = 9
+2026-07-09 10:49:12 - Writing lists to reshimot...
+2026-07-09 10:49:13 - Adding Validation...
+2026-07-09 10:49:13 - Adding btnSendForReview...
+2026-07-09 10:49:13 - Calling UpdatePeriodDropdown
+2026-07-09 10:49:13 - Finished UpdatePeriodDropdown
+2026-07-09 10:49:14 - Calling UpdateClientList
+2026-07-09 10:49:14 - Finished UpdateClientList
+2026-07-09 10:49:14 - BuildReview ENDED SUCCESSFULLY
+2026-07-12 10:28:43 - BuildReview STARTED
+2026-07-12 10:28:48 - Starting Demo Mode checks
+2026-07-12 10:28:48 - Starting main row loop (2 to 11129)
+2026-07-12 10:28:49 - Finished main row loop. outIdx = 9
+2026-07-12 10:28:49 - Writing lists to reshimot...
+2026-07-12 10:28:49 - Adding Validation...
+2026-07-12 10:28:49 - Adding btnSendForReview...
+2026-07-12 10:28:49 - Calling UpdatePeriodDropdown
+2026-07-12 10:28:49 - Finished UpdatePeriodDropdown
+2026-07-12 10:28:50 - Calling UpdateClientList
+2026-07-12 10:28:50 - Finished UpdateClientList
+2026-07-12 10:28:50 - BuildReview ENDED SUCCESSFULLY
+2026-07-13 11:27:56 - BuildReview STARTED
+2026-07-13 11:28:00 - Starting Demo Mode checks
+2026-07-13 11:28:00 - Starting main row loop (2 to 11129)
+2026-07-13 11:28:01 - Finished main row loop. outIdx = 9
+2026-07-13 11:28:01 - Writing lists to reshimot...
+2026-07-13 11:28:01 - Adding Validation...
+2026-07-13 11:28:01 - Adding btnSendForReview...
+2026-07-13 11:28:01 - Calling UpdatePeriodDropdown
+2026-07-13 11:28:01 - Finished UpdatePeriodDropdown
+2026-07-13 11:28:03 - Calling UpdateClientList
+2026-07-13 11:28:03 - Finished UpdateClientList
+2026-07-13 11:28:03 - BuildReview ENDED SUCCESSFULLY
+2026-07-13 11:34:41 - BuildReview STARTED
+2026-07-13 11:34:48 - Starting Demo Mode checks
+2026-07-13 11:34:49 - Calling OpenDataSheet
+2026-07-13 11:34:49 - Finished OpenDataSheet
+2026-07-13 11:34:49 - Starting main row loop (2 to 11129)
+2026-07-13 11:34:49 - Finished main row loop. outIdx = 9
+2026-07-13 11:34:49 - Writing lists to reshimot...
+2026-07-13 11:34:49 - Adding Validation...
+2026-07-13 11:34:50 - Adding btnSendForReview...
+2026-07-13 11:34:50 - Calling UpdatePeriodDropdown
+2026-07-13 11:34:50 - Finished UpdatePeriodDropdown
+2026-07-13 11:34:51 - Calling UpdateClientList
+2026-07-13 11:34:51 - Finished UpdateClientList
+2026-07-13 11:34:51 - BuildReview ENDED SUCCESSFULLY
+2026-07-22 13:24:24 - BuildReview STARTED
+2026-07-22 13:24:30 - Starting Demo Mode checks
+2026-07-22 13:24:30 - Starting main row loop (2 to 11129)
+2026-07-22 13:24:30 - Finished main row loop. outIdx = 9
+2026-07-22 13:24:30 - Writing lists to reshimot...
+2026-07-22 13:24:30 - Adding Validation...
+2026-07-22 13:24:30 - Adding btnSendForReview...
+2026-07-22 13:24:30 - Calling UpdatePeriodDropdown
+2026-07-22 13:24:30 - Finished UpdatePeriodDropdown
+2026-07-22 13:24:32 - Calling UpdateClientList
+2026-07-22 13:24:32 - Finished UpdateClientList
+2026-07-22 13:24:32 - BuildReview ENDED SUCCESSFULLY
+2026-07-23 10:31:21 - BuildReview STARTED
+2026-07-23 10:31:26 - Starting Demo Mode checks
+2026-07-23 10:31:26 - Calling OpenDataSheet
+2026-07-23 10:31:26 - Finished OpenDataSheet
+2026-07-23 10:31:27 - Starting main row loop (2 to 11129)
+2026-07-23 10:31:27 - Finished main row loop. outIdx = 9
+2026-07-23 10:31:27 - Writing lists to reshimot...
+2026-07-23 10:31:27 - Adding Validation...
+2026-07-23 10:31:27 - Adding btnSendForReview...
+2026-07-23 10:31:27 - Calling UpdatePeriodDropdown
+2026-07-23 10:31:27 - Finished UpdatePeriodDropdown
+2026-07-23 10:31:31 - Calling UpdateClientList
+2026-07-23 10:31:31 - Finished UpdateClientList
+2026-07-23 10:31:31 - BuildReview ENDED SUCCESSFULLY
+2026-07-23 10:43:09 - BuildReview STARTED
+2026-07-23 10:43:15 - Starting Demo Mode checks
+2026-07-23 10:43:16 - Calling OpenDataSheet
+2026-07-23 10:43:16 - Finished OpenDataSheet
+2026-07-23 10:43:16 - Starting main row loop (2 to 11129)
+2026-07-23 10:43:16 - Finished main row loop. outIdx = 9
+2026-07-23 10:43:16 - Writing lists to reshimot...
+2026-07-23 10:43:16 - Adding Validation...
+2026-07-23 10:43:16 - Adding btnSendForReview...
+2026-07-23 10:43:16 - Calling UpdatePeriodDropdown
+2026-07-23 10:43:16 - Finished UpdatePeriodDropdown
+2026-07-23 10:43:19 - Calling UpdateClientList
+2026-07-23 10:43:19 - Finished UpdateClientList
+2026-07-23 10:43:19 - BuildReview ENDED SUCCESSFULLY
+2026-07-23 11:46:38 - BuildReview STARTED
+2026-07-23 11:46:43 - Starting Demo Mode checks
+2026-07-23 11:46:43 - Starting main row loop (2 to 11129)
+2026-07-23 11:46:43 - Finished main row loop. outIdx = 9
+2026-07-23 11:46:43 - Writing lists to reshimot...
+2026-07-23 11:46:43 - Adding Validation...
+2026-07-23 11:46:43 - Adding btnSendForReview...
+2026-07-23 11:46:43 - Calling UpdatePeriodDropdown
+2026-07-23 11:46:43 - Finished UpdatePeriodDropdown
+2026-07-23 11:46:45 - Calling UpdateClientList
+2026-07-23 11:46:45 - Finished UpdateClientList
+2026-07-23 11:46:45 - BuildReview ENDED SUCCESSFULLY
+2026-07-24 15:13:14 - BuildReview STARTED
+2026-07-24 15:13:20 - Starting Demo Mode checks
+2026-07-24 15:13:20 - Starting main row loop (2 to 11129)
+2026-07-24 15:13:20 - Finished main row loop. outIdx = 9
+2026-07-24 15:13:20 - Writing lists to reshimot...
+2026-07-24 15:13:20 - Adding Validation...
+2026-07-24 15:13:20 - Adding btnSendForReview...
+2026-07-24 15:13:20 - Calling UpdatePeriodDropdown
+2026-07-24 15:13:20 - Finished UpdatePeriodDropdown
+2026-07-24 15:13:22 - Calling UpdateClientList
+2026-07-24 15:13:22 - Finished UpdateClientList
+2026-07-24 15:13:22 - BuildReview ENDED SUCCESSFULLY
+2026-07-26 11:27:53 - BuildReview STARTED
+2026-07-26 11:28:16 - Starting Demo Mode checks
+2026-07-26 11:28:16 - Starting main row loop (2 to 11129)
+2026-07-26 11:28:17 - Finished main row loop. outIdx = 9
+2026-07-26 11:28:17 - Writing lists to reshimot...
+2026-07-26 11:28:17 - Adding Validation...
+2026-07-26 11:28:17 - Adding btnSendForReview...
+2026-07-26 11:28:17 - Calling UpdatePeriodDropdown
+2026-07-26 11:28:17 - Finished UpdatePeriodDropdown
+2026-07-26 11:28:57 - Calling UpdateClientList
+2026-07-26 11:28:57 - Finished UpdateClientList
+2026-07-26 11:28:57 - BuildReview ENDED SUCCESSFULLY
