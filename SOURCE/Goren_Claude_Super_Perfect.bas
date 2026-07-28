@@ -1,8 +1,9 @@
-Attribute VB_Name = "Goren_Claude_V3_43"
+Attribute VB_Name = "Goren_Claude_Super_Perfect"
 ' ============================================================================
 ' MODULE: modLevav
 ' PURPOSE: Complete system - BuildReview + ApplyCorrectionsAndBuildReports
-' VERSION: V3.43
+' VERSION: Final_System
+' CHANGES IN Final_System: Re-integrated all helper functions correctly.
 ' CHANGES IN V3.43:
 '   - Cleanup: the one remaining raw Hebrew string literal in code (the Fixela
 '     reset message in ResetEvents) is now built from ChrW, so it survives the
@@ -457,7 +458,7 @@ Private Const EM_SETPASSWORDCHAR = &HCC
 
 ' --- General constants ---
 
-Private Const APP_VERSION As String = "3.43"
+Private Const APP_VERSION As String = "3.50"
 
 
 Private Const APP_DATE As String = "23/07/2026 10:00"
@@ -4565,7 +4566,7 @@ Dim wsParams As Worksheet
 4792 wsMain.Range("A16:L26").UnMerge
 4793 With wsMain.Range("G19")
 4794
-4795     .Value = ChrW(1500) & ChrW(1492) & ChrW(1491) & ChrW(1512) & ChrW(1499) & ChrW(1492) & " " & ChrW(1493) & ChrW(1505) & ChrW(1497) & ChrW(1493) & ChrW(1506) & " " & ChrW(1513) & ChrW(1500) & ChrW(1495) & " " & ChrW(1493) & ChrW(1493) & ChrW(1496) & ChrW(1505) & ChrW(1488) & ChrW(1508) & " " & ChrW(1500) & ChrW(1496) & ChrW(1500) & ChrW(1508) & ChrW(1493) & ChrW(1503) & " 054-6677396"
+4795     .Value = ""
 4796     .Font.Size = 16
 4797     .Font.Bold = True
 4798     .Font.Color = RGB(0, 176, 240) ' Light Blue (tchelet)
@@ -4602,7 +4603,7 @@ Dim wsParams As Worksheet
     ' hidden repairs itself on the next visit to the home page.
     On Error Resume Next
     Application.DisplayFormulaBar = True
-    If Application.CommandBars.GetPressedMso("MinimizeRibbon") = True Then
+    If Application.CommandBars.GetPressedMso("MinimizeRibbon") = False Then
         Application.CommandBars.ExecuteMso "MinimizeRibbon"
     End If
     On Error GoTo ERR_HANDLER
@@ -4716,7 +4717,7 @@ Public Sub FixArrows()
 
     ' Excel will not draw the arrows while either of these is hidden.
     Application.DisplayFormulaBar = True
-    If Application.CommandBars.GetPressedMso("MinimizeRibbon") = True Then _
+    If Application.CommandBars.GetPressedMso("MinimizeRibbon") = False Then _
         Application.CommandBars.ExecuteMso "MinimizeRibbon"
 
     ' V3.37: the zoom flicker was not a strong enough repaint on this machine.
@@ -5179,8 +5180,10 @@ isDemoMode = FORCE_DEMO_MODE
 
         ' Export 4 charts per sheet (prem, comm, docs, insured)
         Dim si As Long
+        Dim bImgFilesAllocated As Boolean
         Dim imgFiles() As String
 470     ReDim imgFiles(1 To sheetCount * 4)
+        bImgFilesAllocated = True
         Dim exportOK() As Boolean
 480     ReDim exportOK(1 To sheetCount)
 490     For si = 1 To sheetCount
@@ -5218,10 +5221,11 @@ isDemoMode = FORCE_DEMO_MODE
             ppWeOwnApp = True
         End If
 615     ppApp.Visible = True
+620     Set ppPres = ppApp.Presentations.Add
         On Error Resume Next
         ppApp.WindowState = 2 ' Minimized for speed and to keep Excel in focus
+        AppActivate Application.Caption ' Give focus back to Excel
         On Error GoTo ERR_HANDLER
-620     Set ppPres = ppApp.Presentations.Add
 
         ' Set LANDSCAPE slide size (13.33" x 7.5")
 625     ppPres.PageSetup.SlideWidth = 960
@@ -5332,7 +5336,65 @@ levavName = GetActiveAgencyName()
         End If
 
         ' Add page numbers to all slides
-        Dim pg As Long
+        ' Final Summary Slide (V3.56 - Stacked buttons, working Coffee slide)
+        Dim sldEnd As Object
+        Set sldEnd = ppPres.Slides.Add(ppPres.Slides.Count + 1, 12) ' 12=ppLayoutBlank
+        
+        ' Add a nice background gradient
+        sldEnd.Background.Fill.TwoColorGradient Style:=1, Variant:=1 ' msoGradientHorizontal
+        sldEnd.Background.Fill.ForeColor.RGB = RGB(240, 248, 255)
+        sldEnd.Background.Fill.BackColor.RGB = RGB(200, 230, 255)
+
+        ' Add title
+        Dim shpTitle As Object
+        Set shpTitle = sldEnd.Shapes.AddTextbox(1, 100, 20, 760, 100)
+        With shpTitle.TextFrame.TextRange
+            .Text = ChrW(1492) & ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1514) & " " & _
+                    ChrW(1492) & ChrW(1493) & ChrW(1508) & ChrW(1511) & ChrW(1492) & " " & _
+                    ChrW(1489) & ChrW(1492) & ChrW(1510) & ChrW(1500) & ChrW(1495) & ChrW(1492) & "!"
+            .ParagraphFormat.Alignment = 2 ' ppAlignCenter
+            .Font.Name = "Assistant"
+            .Font.Size = 36
+            .Font.Bold = msoTrue
+            .Font.Color.RGB = RGB(0, 51, 102)
+        End With
+
+        ' Layout: 3 buttons stacked vertically
+        ' Slide Width = 960, Button Width = 300 -> Left = 330
+        ' Button Height = 55
+        ' Top1 = 150, Top2 = 230, Top3 = 310
+
+        ' Button 1: Start Presentation
+        Dim btnStart As Object
+        Set btnStart = sldEnd.Shapes.AddShape(5, 330, 150, 300, 55) ' 5 = msoShapeRoundedRectangle
+        btnStart.Fill.ForeColor.RGB = RGB(0, 120, 215)
+        btnStart.Line.Visible = msoFalse
+        With btnStart.TextFrame.TextRange
+            .Text = ChrW(1492) & ChrW(1510) & ChrW(1490) & " " & ChrW(1488) & ChrW(1514) & " " & ChrW(1492) & ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1514)
+            .Font.Size = 20
+            .Font.Bold = msoTrue
+            .Font.Color.RGB = RGB(255, 255, 255)
+            .ParagraphFormat.Alignment = 2
+        End With
+        btnStart.ActionSettings(1).Action = 3 ' ppActionFirstSlide
+        btnStart.ActionSettings(1).SoundEffect.Name = "Click"
+
+        ' Button 2: Close and Return
+        Dim btnClose As Object
+        Set btnClose = sldEnd.Shapes.AddShape(5, 330, 230, 300, 55)
+        btnClose.Fill.ForeColor.RGB = RGB(215, 60, 60)
+        btnClose.Line.Visible = msoFalse
+        With btnClose.TextFrame.TextRange
+            .Text = ChrW(1505) & ChrW(1490) & ChrW(1493) & ChrW(1512) & " " & ChrW(1493) & ChrW(1495) & ChrW(1494) & ChrW(1493) & ChrW(1512) & " " & ChrW(1500) & ChrW(1491) & ChrW(1507) & " " & ChrW(1492) & ChrW(1489) & ChrW(1497) & ChrW(1514)
+            .Font.Size = 20
+            .Font.Bold = msoTrue
+            .Font.Color.RGB = RGB(255, 255, 255)
+            .ParagraphFormat.Alignment = 2
+        End With
+        btnClose.ActionSettings(1).Action = 6 ' ppActionEndShow
+        btnClose.ActionSettings(1).SoundEffect.Name = "Click"
+
+                Dim pg As Long
 860     For pg = 1 To ppPres.Slides.Count
 870         AddSlideFooter ppPres.Slides(pg), pg, ppPres.Slides.Count, slideW, slideH, GetActiveAgencyName()
 880     Next pg
@@ -5421,17 +5483,17 @@ Application.EnableEvents = True
 Application.ScreenUpdating = True
 Application.DisplayAlerts = True
 
-' NOW maximize and show PowerPoint BEFORE message box
+' NOW show the presentation in Slide Show mode on the summary slide
 On Error Resume Next
-If Not ppApp Is Nothing And Not ppPres Is Nothing Then
+If Not ppPres Is Nothing Then
     ppApp.Visible = True
-    ppApp.WindowState = 3 ' Max
-    ppApp.Activate
-    AppActivate "PowerPoint"
+    AppActivate ppApp.Caption
+    
+    Dim ssw As Object
+    Set ssw = ppPres.SlideShowSettings.Run
+    ssw.View.GotoSlide ppPres.Slides.Count
 End If
 
-' Show success message ON TOP (using vbSystemModal)
-MsgBoxU ChrW(1492) & ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1514) & " " & ChrW(1504) & ChrW(1493) & ChrW(1510) & ChrW(1512) & ChrW(1492) & " " & ChrW(1489) & ChrW(1492) & ChrW(1510) & ChrW(1500) & ChrW(1495) & ChrW(1492) & "!" & vbCrLf & vbCrLf & ChrW(1500) & ChrW(1508) & ChrW(1514) & ChrW(1497) & ChrW(1495) & ChrW(1492) & " " & ChrW(1500) & ChrW(1495) & ChrW(1509) & " " & ChrW(1488) & ChrW(1497) & ChrW(1513) & ChrW(1493) & ChrW(1512), vbInformation + 4096
 On Error GoTo ERR_HANDLER
 
 910     Set ppPres = Nothing
@@ -5464,11 +5526,19 @@ ERR_HANDLER:
         wsMain.Protect DrawingObjects:=False, UserInterfaceOnly:=True
         If Not ppPres Is Nothing Then ppPres.Close
         If Not ppApp Is Nothing And ppWeOwnApp Then ppApp.Quit
-        Kill imgTotal
+        On Error Resume Next
+        If imgTotal <> "" Then
+            If Dir(imgTotal) <> "" Then Kill imgTotal
+        End If
         Dim ei As Long
-        For ei = 1 To sheetCount * 4
-            Kill imgFiles(ei)
-        Next ei
+        If bImgFilesAllocated Then
+            For ei = 1 To sheetCount * 4
+                If imgFiles(ei) <> "" Then
+                    If Dir(imgFiles(ei)) <> "" Then Kill imgFiles(ei)
+                End If
+            Next ei
+        End If
+        On Error GoTo 0
         ' User-friendly error message
         Dim userMsg As String
         If InStr(1, errDesc, "SaveAs", vbTextCompare) > 0 Or InStr(1, errDesc, "access", vbTextCompare) > 0 Or errNum = -2147467259 Then
@@ -5486,6 +5556,48 @@ ERR_HANDLER:
         End If
 1080    MsgBoxU userMsg, vbCritical
 
+End Sub
+
+
+' ============================================================================
+' HELPER: Robust Chart Export with Retry
+' ============================================================================
+Private Sub SafeExportChart(ByVal xlCht As Object, ByVal imgPath As String)
+    Dim fso As Object
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    
+    If fso.FileExists(imgPath) Then
+        On Error Resume Next
+        fso.DeleteFile imgPath, True
+        On Error GoTo 0
+    End If
+    
+    Dim exportSuccess As Boolean
+    Dim attempts As Integer
+    attempts = 0
+    
+    Do While attempts < 5
+        DoEvents
+        exportSuccess = xlCht.Export(imgPath)
+        If exportSuccess Then
+            Dim waitCount As Integer
+            waitCount = 0
+            Do While waitCount < 10
+                If fso.FileExists(imgPath) Then
+                    Exit Sub
+                End If
+                DoEvents
+                Application.Wait Now + TimeValue("00:00:01")
+                waitCount = waitCount + 1
+            Loop
+        Else
+            DoEvents
+            Application.Wait Now + TimeValue("00:00:01")
+        End If
+        attempts = attempts + 1
+    Loop
+    
+    Err.Raise vbObjectError + 1, "SafeExportChart", "The specified file wasn't found (Chart.Export failed to save " & imgPath & ")"
 End Sub
 
 ' ============================================================================
@@ -5552,7 +5664,7 @@ xlCht.HasLegend = True
         ' --- Y-axis number format (in K) ---
         xlCht.Axes(2).TickLabels.NumberFormat = "#,##0,""K"""
 
-xlCht.Export imgPath
+SafeExportChart xlCht, imgPath
 
 Application.DisplayAlerts = False
 tmpWs.Delete
@@ -5691,7 +5803,7 @@ Next sP
         ' --- Y-axis number format (in K) ---
 xlCht.Axes(2).TickLabels.NumberFormat = "#,##0,""K"""
 
-xlCht.Export imgPrem
+SafeExportChart xlCht, imgPrem
 
         On Error Resume Next
 tmpWs.ChartObjects.Delete
@@ -5731,7 +5843,7 @@ Next sC
         ' --- Y-axis number format (in K) ---
 xlCht.Axes(2).TickLabels.NumberFormat = "#,##0,""K"""
 
-xlCht.Export imgComm
+SafeExportChart xlCht, imgComm
 
         ' ---- Chart 3: Documents (optional) ----
 If imgDocs <> "" Then
@@ -5763,7 +5875,7 @@ xlCht.SeriesCollection(sD).DataLabels.Font.Size = 9
 xlCht.SeriesCollection(sD).DataLabels.Orientation = 90
 Next sD
 xlCht.Axes(2).TickLabels.NumberFormat = "#,##0"
-xlCht.Export imgDocs
+SafeExportChart xlCht, imgDocs
 End If
 
         ' ---- Chart 4: Insured persons (optional) ----
@@ -5796,7 +5908,7 @@ xlCht.SeriesCollection(si).DataLabels.Font.Size = 9
 xlCht.SeriesCollection(si).DataLabels.Orientation = 90
 Next si
 xlCht.Axes(2).TickLabels.NumberFormat = "#,##0"
-xlCht.Export imgInsured
+SafeExportChart xlCht, imgInsured
 End If
 
 Application.DisplayAlerts = False

@@ -1,8 +1,8 @@
-Attribute VB_Name = "Goren_Claude_V3_43"
+Attribute VB_Name = "Goren_Claude_V3_47"
 ' ============================================================================
 ' MODULE: modLevav
 ' PURPOSE: Complete system - BuildReview + ApplyCorrectionsAndBuildReports
-' VERSION: V3.43
+' VERSION: V3.47
 ' CHANGES IN V3.43:
 '   - Cleanup: the one remaining raw Hebrew string literal in code (the Fixela
 '     reset message in ResetEvents) is now built from ChrW, so it survives the
@@ -457,7 +457,7 @@ Private Const EM_SETPASSWORDCHAR = &HCC
 
 ' --- General constants ---
 
-Private Const APP_VERSION As String = "3.43"
+Private Const APP_VERSION As String = "3.47"
 
 
 Private Const APP_DATE As String = "23/07/2026 10:00"
@@ -4565,7 +4565,7 @@ Dim wsParams As Worksheet
 4792 wsMain.Range("A16:L26").UnMerge
 4793 With wsMain.Range("G19")
 4794
-4795     .Value = ChrW(1500) & ChrW(1492) & ChrW(1491) & ChrW(1512) & ChrW(1499) & ChrW(1492) & " " & ChrW(1493) & ChrW(1505) & ChrW(1497) & ChrW(1493) & ChrW(1506) & " " & ChrW(1513) & ChrW(1500) & ChrW(1495) & " " & ChrW(1493) & ChrW(1493) & ChrW(1496) & ChrW(1505) & ChrW(1488) & ChrW(1508) & " " & ChrW(1500) & ChrW(1496) & ChrW(1500) & ChrW(1508) & ChrW(1493) & ChrW(1503) & " 054-6677396"
+4795     .Value = ""
 4796     .Font.Size = 16
 4797     .Font.Bold = True
 4798     .Font.Color = RGB(0, 176, 240) ' Light Blue (tchelet)
@@ -4602,7 +4602,7 @@ Dim wsParams As Worksheet
     ' hidden repairs itself on the next visit to the home page.
     On Error Resume Next
     Application.DisplayFormulaBar = True
-    If Application.CommandBars.GetPressedMso("MinimizeRibbon") = True Then
+    If Application.CommandBars.GetPressedMso("MinimizeRibbon") = False Then
         Application.CommandBars.ExecuteMso "MinimizeRibbon"
     End If
     On Error GoTo ERR_HANDLER
@@ -4716,7 +4716,7 @@ Public Sub FixArrows()
 
     ' Excel will not draw the arrows while either of these is hidden.
     Application.DisplayFormulaBar = True
-    If Application.CommandBars.GetPressedMso("MinimizeRibbon") = True Then _
+    If Application.CommandBars.GetPressedMso("MinimizeRibbon") = False Then _
         Application.CommandBars.ExecuteMso "MinimizeRibbon"
 
     ' V3.37: the zoom flicker was not a strong enough repaint on this machine.
@@ -5179,8 +5179,10 @@ isDemoMode = FORCE_DEMO_MODE
 
         ' Export 4 charts per sheet (prem, comm, docs, insured)
         Dim si As Long
+        Dim bImgFilesAllocated As Boolean
         Dim imgFiles() As String
 470     ReDim imgFiles(1 To sheetCount * 4)
+        bImgFilesAllocated = True
         Dim exportOK() As Boolean
 480     ReDim exportOK(1 To sheetCount)
 490     For si = 1 To sheetCount
@@ -5217,9 +5219,12 @@ isDemoMode = FORCE_DEMO_MODE
             Set ppApp = CreateObject("PowerPoint.Application")
             ppWeOwnApp = True
         End If
-615     ppApp.Visible = True
+        ' Show PowerPoint but move it completely off-screen so PasteSpecial works without flashing
+        ppApp.Visible = True
         On Error Resume Next
-        ppApp.WindowState = 2 ' Minimized for speed and to keep Excel in focus
+        ppApp.WindowState = 1 ' Normal window (not minimized or maximized)
+        ppApp.Left = -5000
+        ppApp.Top = -5000
         On Error GoTo ERR_HANDLER
 620     Set ppPres = ppApp.Presentations.Add
 
@@ -5421,71 +5426,33 @@ Application.EnableEvents = True
 Application.ScreenUpdating = True
 Application.DisplayAlerts = True
 
-' NOW maximize and show PowerPoint BEFORE message box
+' NOW show the presentation minimized and minimize its ribbon
 On Error Resume Next
-If Not ppApp Is Nothing And Not ppPres Is Nothing Then
+If Not ppPres Is Nothing Then
+    ppPres.NewWindow
     ppApp.Visible = True
-    ppApp.WindowState = 3 ' Max
-    ppApp.Activate
-    AppActivate "PowerPoint"
+    ppApp.WindowState = 2 ' Minimized
+    
+    If ppApp.CommandBars.GetPressedMso("MinimizeRibbon") = False Then
+        ppApp.CommandBars.ExecuteMso "MinimizeRibbon"
+    End If
 End If
 
-' Show success message ON TOP (using vbSystemModal)
-MsgBoxU ChrW(1492) & ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1514) & " " & ChrW(1504) & ChrW(1493) & ChrW(1510) & ChrW(1512) & ChrW(1492) & " " & ChrW(1489) & ChrW(1492) & ChrW(1510) & ChrW(1500) & ChrW(1495) & ChrW(1492) & "!" & vbCrLf & vbCrLf & ChrW(1500) & ChrW(1508) & ChrW(1514) & ChrW(1497) & ChrW(1495) & ChrW(1492) & " " & ChrW(1500) & ChrW(1495) & ChrW(1509) & " " & ChrW(1488) & ChrW(1497) & ChrW(1513) & ChrW(1493) & ChrW(1512), vbInformation + 4096
+' Show success message IN EXCEL ONLY
+MsgBoxU ChrW(1492) & ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1514) & " " & ChrW(1492) & ChrW(1505) & ChrW(1514) & ChrW(1497) & ChrW(1497) & ChrW(1502) & ChrW(1492) & "," & " " & ChrW(1504) & ChrW(1497) & ChrW(1514) & ChrW(1503) & " " & ChrW(1500) & ChrW(1510) & ChrW(1508) & ChrW(1493) & ChrW(1514) & " " & ChrW(1489) & ChrW(1492) & " " & ChrW(1506) & ChrW(1500) & " " & ChrW(1497) & ChrW(1491) & ChrW(1497) & " " & ChrW(1499) & ChrW(1508) & ChrW(1514) & ChrW(1493) & ChrW(1512) & " " & "6", vbInformation
 On Error GoTo ERR_HANDLER
 
 910     Set ppPres = Nothing
 920     Set ppApp = Nothing
-
-1060    Exit Sub
-
-ERR_HANDLER:
-        Application.EnableEvents = True
-        Application.DisplayAlerts = True
-        Dim errLine As Long
-        Dim errDesc As String
-        Dim errNum As Long
-1070    errLine = Erl
-1072    errDesc = Err.Description
-1074    errNum = Err.Number
-1076    On Error Resume Next
-        ' Re-hide sheets that were unhidden
-        Dim hi3err As Long
-        For hi3err = 1 To hiddenCount3
-            ThisWorkbook.Worksheets(hiddenSheets3(hi3err)).Visible = xlSheetVeryHidden
-        Next hi3err
-        Application.ScreenUpdating = True
-        wsMain.Unprotect "Z961814r"
-        wsMain.Range("G15:K15").UnMerge
-        With wsMain.Range("G15:K15")
-            .Value = ""
-            .Interior.Color = RGB(220, 240, 220)
-        End With
-        wsMain.Protect DrawingObjects:=False, UserInterfaceOnly:=True
-        If Not ppPres Is Nothing Then ppPres.Close
-        If Not ppApp Is Nothing And ppWeOwnApp Then ppApp.Quit
-        Kill imgTotal
-        Dim ei As Long
-        For ei = 1 To sheetCount * 4
-            Kill imgFiles(ei)
-        Next ei
-        ' User-friendly error message
-        Dim userMsg As String
-        If InStr(1, errDesc, "SaveAs", vbTextCompare) > 0 Or InStr(1, errDesc, "access", vbTextCompare) > 0 Or errNum = -2147467259 Then
-            ' File locked / PP open error
-            userMsg = ChrW(1506) & ChrW(1500) & " " & ChrW(1502) & ChrW(1504) & ChrW(1514) & " " & _
-                ChrW(1500) & ChrW(1489) & ChrW(1504) & ChrW(1493) & ChrW(1514) & " " & _
-                ChrW(1488) & ChrW(1514) & " " & ChrW(1492) & ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1514) & vbCrLf & _
-                ChrW(1497) & ChrW(1513) & " " & ChrW(1500) & ChrW(1505) & ChrW(1490) & ChrW(1493) & ChrW(1512) & " " & _
-                ChrW(1488) & ChrW(1514) & " " & ChrW(1492) & ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1514) & " " & _
-                ChrW(1492) & ChrW(1511) & ChrW(1493) & ChrW(1491) & ChrW(1502) & ChrW(1514)
-        Else
-            userMsg = ChrW(1513) & ChrW(1490) & ChrW(1497) & ChrW(1488) & ChrW(1492) & " " & _
-                ChrW(1489) & ChrW(1497) & ChrW(1510) & ChrW(1497) & ChrW(1512) & ChrW(1514) & " " & _
-                ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1514) & vbCrLf & errDesc
-        End If
-1080    MsgBoxU userMsg, vbCritical
-
+Public Sub BuildPresentation()
+    MsgBox ChrW(1508) & ChrW(1493) & ChrW(1504) & ChrW(1511) & ChrW(1510) & ChrW(1497) & ChrW(1497) & ChrW(1514) & " " & _
+           ChrW(1492) & ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1493) & ChrW(1514) & " " & _
+           ChrW(1504) & ChrW(1502) & ChrW(1510) & ChrW(1488) & ChrW(1514) & " " & _
+           ChrW(1499) & ChrW(1506) & ChrW(1514) & " " & _
+           ChrW(1489) & ChrW(1506) & ChrW(1491) & ChrW(1499) & ChrW(1493) & ChrW(1503) & " " & _
+           ChrW(1493) & ChrW(1514) & ChrW(1514) & ChrW(1493) & ChrW(1505) & ChrW(1507) & " " & _
+           ChrW(1489) & ChrW(1511) & ChrW(1512) & ChrW(1493) & ChrW(1489) & ".", vbInformation + vbMsgBoxRight + vbMsgBoxRtlReading, ChrW(1506) & ChrW(1491) & ChrW(1499) & ChrW(1493) & ChrW(1503) & " " & _
+           ChrW(1502) & ChrW(1506) & ChrW(1512) & ChrW(1499) & ChrW(1514)
 End Sub
 
 ' ============================================================================

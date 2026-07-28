@@ -1,8 +1,8 @@
-Attribute VB_Name = "Goren_Claude_V3_43"
+Attribute VB_Name = "Goren_Claude_V3_55"
 ' ============================================================================
 ' MODULE: modLevav
 ' PURPOSE: Complete system - BuildReview + ApplyCorrectionsAndBuildReports
-' VERSION: V3.43
+' VERSION: V3.50
 ' CHANGES IN V3.43:
 '   - Cleanup: the one remaining raw Hebrew string literal in code (the Fixela
 '     reset message in ResetEvents) is now built from ChrW, so it survives the
@@ -457,7 +457,7 @@ Private Const EM_SETPASSWORDCHAR = &HCC
 
 ' --- General constants ---
 
-Private Const APP_VERSION As String = "3.43"
+Private Const APP_VERSION As String = "3.50"
 
 
 Private Const APP_DATE As String = "23/07/2026 10:00"
@@ -4565,7 +4565,7 @@ Dim wsParams As Worksheet
 4792 wsMain.Range("A16:L26").UnMerge
 4793 With wsMain.Range("G19")
 4794
-4795     .Value = ChrW(1500) & ChrW(1492) & ChrW(1491) & ChrW(1512) & ChrW(1499) & ChrW(1492) & " " & ChrW(1493) & ChrW(1505) & ChrW(1497) & ChrW(1493) & ChrW(1506) & " " & ChrW(1513) & ChrW(1500) & ChrW(1495) & " " & ChrW(1493) & ChrW(1493) & ChrW(1496) & ChrW(1505) & ChrW(1488) & ChrW(1508) & " " & ChrW(1500) & ChrW(1496) & ChrW(1500) & ChrW(1508) & ChrW(1493) & ChrW(1503) & " 054-6677396"
+4795     .Value = ""
 4796     .Font.Size = 16
 4797     .Font.Bold = True
 4798     .Font.Color = RGB(0, 176, 240) ' Light Blue (tchelet)
@@ -4602,7 +4602,7 @@ Dim wsParams As Worksheet
     ' hidden repairs itself on the next visit to the home page.
     On Error Resume Next
     Application.DisplayFormulaBar = True
-    If Application.CommandBars.GetPressedMso("MinimizeRibbon") = True Then
+    If Application.CommandBars.GetPressedMso("MinimizeRibbon") = False Then
         Application.CommandBars.ExecuteMso "MinimizeRibbon"
     End If
     On Error GoTo ERR_HANDLER
@@ -4716,7 +4716,7 @@ Public Sub FixArrows()
 
     ' Excel will not draw the arrows while either of these is hidden.
     Application.DisplayFormulaBar = True
-    If Application.CommandBars.GetPressedMso("MinimizeRibbon") = True Then _
+    If Application.CommandBars.GetPressedMso("MinimizeRibbon") = False Then _
         Application.CommandBars.ExecuteMso "MinimizeRibbon"
 
     ' V3.37: the zoom flicker was not a strong enough repaint on this machine.
@@ -5127,9 +5127,8 @@ isDemoMode = FORCE_DEMO_MODE
 220     DoEvents
         Application.ScreenUpdating = False
 
-        ' ================================================================
-        ' PHASE 1: Create all chart images in Excel (NO PowerPoint yet)
-        ' ================================================================
+
+        
         ' Unhide all sheets before accessing data (in case some are VeryHidden)
         Dim wsTmp3 As Worksheet
         Dim hiddenSheets3() As String
@@ -5143,195 +5142,220 @@ isDemoMode = FORCE_DEMO_MODE
                 wsTmp3.Visible = xlSheetVisible
             End If
         Next wsTmp3
-        
-        Dim tmpPath As String
-230     tmpPath = Environ$("TEMP") & "\"
-
-        Dim imgTotal As String
-240     imgTotal = tmpPath & "levav_total.gif"
-250     ExportTotalChart imgTotal, yearVal, refYear
-
-        ' Build list of sheets to process
-        Dim sheetList(1 To 6) As String
-        Dim sheetCount As Long
-260     sheetCount = 0
-
-270     If SheetExists(SHEET_MONTHS()) Then
-280         sheetCount = sheetCount + 1
-290         sheetList(sheetCount) = SHEET_MONTHS()
-300     End If
-310     If SheetExists(SHEET_COMPANIES()) Then
-320         sheetCount = sheetCount + 1
-330         sheetList(sheetCount) = SHEET_COMPANIES()
-340     End If
-350     If SheetExists(SHEET_MAINBRANCH()) Then
-360         sheetCount = sheetCount + 1
-370         sheetList(sheetCount) = SHEET_MAINBRANCH()
-380     End If
-390     If SheetExists(SHEET_TELLERS()) Then
-400         sheetCount = sheetCount + 1
-410         sheetList(sheetCount) = SHEET_TELLERS()
-420     End If
-430     If SheetExists(SHEET_AGENTS()) Then
-440         sheetCount = sheetCount + 1
-450         sheetList(sheetCount) = SHEET_AGENTS()
-460     End If
-
-        ' Export 4 charts per sheet (prem, comm, docs, insured)
-        Dim si As Long
-        Dim imgFiles() As String
-470     ReDim imgFiles(1 To sheetCount * 4)
-        Dim exportOK() As Boolean
-480     ReDim exportOK(1 To sheetCount)
-490     For si = 1 To sheetCount
-500         imgFiles(si * 4 - 3) = tmpPath & "levav_prem_" & si & ".gif"
-510         imgFiles(si * 4 - 2) = tmpPath & "levav_comm_" & si & ".gif"
-            imgFiles(si * 4 - 1) = tmpPath & "levav_docs_" & si & ".gif"
-            imgFiles(si * 4) = tmpPath & "levav_ins_" & si & ".gif"
-520         On Error Resume Next
-530         ExportCompCharts sheetList(si), imgFiles(si * 4 - 3), imgFiles(si * 4 - 2), yearVal, refYear, "", imgFiles(si * 4 - 1), imgFiles(si * 4)
-540         If Err.Number = 0 Then
-550             exportOK(si) = True
-560         Else
-570             exportOK(si) = False
-572             Err.Clear
-580         End If
-590         On Error GoTo ERR_HANDLER
-600     Next si
-
-605     DoEvents
 
         ' ================================================================
-        ' PHASE 2: Open PowerPoint and build slides
+        ' PHASE 1 & 2: Open PowerPoint and Build Slides via Clipboard
+
         ' ================================================================
         Dim ppApp As Object
         Dim ppPres As Object
         Dim ppSlide As Object
         Dim ppWeOwnApp As Boolean
         ppWeOwnApp = False
-        ' Try to use existing PowerPoint instance first
-610     On Error Resume Next
+        On Error Resume Next
         Set ppApp = GetObject(, "PowerPoint.Application")
         On Error GoTo ERR_HANDLER
         If ppApp Is Nothing Then
             Set ppApp = CreateObject("PowerPoint.Application")
             ppWeOwnApp = True
         End If
-615     ppApp.Visible = True
+        ppApp.Visible = True
+        Set ppPres = ppApp.Presentations.Add
         On Error Resume Next
         ppApp.WindowState = 2 ' Minimized for speed and to keep Excel in focus
+        AppActivate Application.Caption ' Give focus back to Excel
         On Error GoTo ERR_HANDLER
-620     Set ppPres = ppApp.Presentations.Add
 
         ' Set LANDSCAPE slide size (13.33" x 7.5")
-625     ppPres.PageSetup.SlideWidth = 960
-630     ppPres.PageSetup.SlideHeight = 540
+        ppPres.PageSetup.SlideWidth = 960
+        ppPres.PageSetup.SlideHeight = 540
 
         Dim slideIdx As Long
         Dim slideW As Single
         Dim slideH As Single
-635     slideIdx = 0
-640     slideW = 960
-645     slideH = 540
+        slideIdx = 0
+        slideW = 960
+        slideH = 540
 
         ' Slide title names (Hebrew)
         Dim titleNames(1 To 6) As String
-650     titleNames(1) = ChrW(1495) & ChrW(1493) & ChrW(1491) & ChrW(1513) & ChrW(1497) & ChrW(1501)
-655     titleNames(2) = ChrW(1495) & ChrW(1489) & ChrW(1512) & ChrW(1493) & ChrW(1514)
-660     titleNames(3) = H_BRANCH() & " " & ChrW(1502) & ChrW(1512) & ChrW(1499) & ChrW(1494)
-665     titleNames(4) = H_TELLER() & ChrW(1497) & ChrW(1493) & ChrW(1514)
-670     titleNames(5) = ChrW(1505) & ChrW(1493) & ChrW(1499) & ChrW(1504) & ChrW(1497) & ChrW(1501)
+        titleNames(1) = ChrW(1495) & ChrW(1493) & ChrW(1491) & ChrW(1513) & ChrW(1497) & ChrW(1501)
+        titleNames(2) = ChrW(1495) & ChrW(1489) & ChrW(1512) & ChrW(1493) & ChrW(1514)
+        titleNames(3) = H_BRANCH() & " " & ChrW(1502) & ChrW(1512) & ChrW(1499) & ChrW(1494)
+        titleNames(4) = H_TELLER() & ChrW(1497) & ChrW(1493) & ChrW(1514)
+        titleNames(5) = ChrW(1505) & ChrW(1493) & ChrW(1499) & ChrW(1504) & ChrW(1497) & ChrW(1501)
 
         ' SLIDE 1: Title
-675     slideIdx = slideIdx + 1
-680     Set ppSlide = ppPres.Slides.Add(slideIdx, 12)
-685     BuildTitleSlide ppSlide, yearVal, refYear, periodDesc, slideW, slideH, paramsSubtitle
+        slideIdx = slideIdx + 1
+        Set ppSlide = ppPres.Slides.Add(slideIdx, 12)
+        BuildTitleSlide ppSlide, yearVal, refYear, periodDesc, slideW, slideH, paramsSubtitle
 
         ' SLIDE 2: Total Summary chart
-690     slideIdx = slideIdx + 1
-695     Set ppSlide = ppPres.Slides.Add(slideIdx, 12)
-700     BuildTotalSlideFromImage ppSlide, imgTotal, yearVal, refYear, slideW, paramsSubtitle
+        BuildTotalSlide ppPres, yearVal, refYear, slideW, paramsSubtitle
+        slideIdx = ppPres.Slides.Count ' Sync slide count
 
-        ' For each comparison sheet: 5 slides (prem, comm, docs, insured charts + table)
-730     For si = 1 To sheetCount
-740         If exportOK(si) Then
-                ' Slide: Premium chart
-750             slideIdx = slideIdx + 1
-760             Set ppSlide = ppPres.Slides.Add(slideIdx, 12)
-770             BuildChartSlide ppSlide, imgFiles(si * 4 - 3), ChrW(1508) & ChrW(1512) & ChrW(1502) & ChrW(1497) & _
-        ChrW(1493) & ChrW(1514) & " " & ChrW(1500) & ChrW(1508) & ChrW(1497) & " " & _
-        titleNames(si), yearVal, refYear, slideW, paramsSubtitle
-                ' Slide: Commission chart
-780             slideIdx = slideIdx + 1
-790             Set ppSlide = ppPres.Slides.Add(slideIdx, 12)
-800             BuildChartSlide ppSlide, imgFiles(si * 4 - 2), ChrW(1506) & ChrW(1502) & ChrW(1500) & ChrW(1493) & _
-        ChrW(1514) & " " & ChrW(1500) & ChrW(1508) & ChrW(1497) & " " & _
-        titleNames(si), yearVal, refYear, slideW, paramsSubtitle
-                ' Slide: Documents chart
-                slideIdx = slideIdx + 1
-                Set ppSlide = ppPres.Slides.Add(slideIdx, 12)
-                ' "mismachim lefi" = documents by
-                BuildChartSlide ppSlide, imgFiles(si * 4 - 1), ChrW(1502) & ChrW(1505) & ChrW(1502) & ChrW(1499) & _
-        ChrW(1497) & ChrW(1501) & " " & ChrW(1500) & ChrW(1508) & ChrW(1497) & " " & _
-        titleNames(si), yearVal, refYear, slideW, paramsSubtitle
-                ' Slide: Insured persons chart
-                slideIdx = slideIdx + 1
-                Set ppSlide = ppPres.Slides.Add(slideIdx, 12)
-                ' "mevutachim lefi" = insured by
-                BuildChartSlide ppSlide, imgFiles(si * 4), ChrW(1502) & ChrW(1489) & ChrW(1493) & ChrW(1496) & _
-        ChrW(1495) & ChrW(1497) & ChrW(1501) & " " & ChrW(1500) & ChrW(1508) & ChrW(1497) & " " & _
-        titleNames(si), yearVal, refYear, slideW, paramsSubtitle
-810         End If
-            ' Slide: Data table (always, even if charts failed)
-820         slideIdx = slideIdx + 1
-830         Set ppSlide = ppPres.Slides.Add(slideIdx, 12)
-840         BuildTableSlide ppSlide, sheetList(si), titleNames(si), yearVal, refYear, slideW, slideH, paramsSubtitle
-850     Next si
+        ' Build list of sheets to process
+        Dim sheetList(1 To 6) As String
+        Dim sheetCount As Long
+        sheetCount = 0
+
+        If SheetExists(SHEET_MONTHS()) Then
+            sheetCount = sheetCount + 1
+            sheetList(sheetCount) = SHEET_MONTHS()
+        End If
+        If SheetExists(SHEET_COMPANIES()) Then
+            sheetCount = sheetCount + 1
+            sheetList(sheetCount) = SHEET_COMPANIES()
+        End If
+        If SheetExists(SHEET_MAINBRANCH()) Then
+            sheetCount = sheetCount + 1
+            sheetList(sheetCount) = SHEET_MAINBRANCH()
+        End If
+        If SheetExists(SHEET_TELLERS()) Then
+            sheetCount = sheetCount + 1
+            sheetList(sheetCount) = SHEET_TELLERS()
+        End If
+        If SheetExists(SHEET_AGENTS()) Then
+            sheetCount = sheetCount + 1
+            sheetList(sheetCount) = SHEET_AGENTS()
+        End If
+
+        ' For each comparison sheet: build 4 chart slides + 1 table slide
+        Dim si As Long
+        For si = 1 To sheetCount
+            ' This generates 4 slides directly inside PowerPoint!
+            BuildCompSlides ppPres, sheetList(si), titleNames(si), yearVal, refYear, slideW, paramsSubtitle
+            
+            slideIdx = ppPres.Slides.Count
+            
+            ' Slide: Data table (always)
+            slideIdx = slideIdx + 1
+            Set ppSlide = ppPres.Slides.Add(slideIdx, 12)
+            BuildTableSlide ppSlide, sheetList(si), titleNames(si), yearVal, refYear, slideW, slideH, paramsSubtitle
+        Next si
 
         ' ================================================================
         ' PHASE 3: "Agents without Levav" variant slides (2 chart slides)
         ' ================================================================
         If SheetExists(SHEET_AGENTS()) Then
-            Dim imgNoLevavPrem As String
-            Dim imgNoLevavComm As String
-            Dim noLevavOK As Boolean
-            ' levav = ChrW(1500) & ChrW(1489) & ChrW(1489)
             Dim levavName As String
-levavName = GetActiveAgencyName()
-            imgNoLevavPrem = tmpPath & "levav_nolev_prem.gif"
-            imgNoLevavComm = tmpPath & "levav_nolev_comm.gif"
-            noLevavOK = False
-            On Error Resume Next
-            ExportCompCharts SHEET_AGENTS(), imgNoLevavPrem, imgNoLevavComm, yearVal, refYear, levavName
-            If Err.Number = 0 Then noLevavOK = True
-            Err.Clear
-            On Error GoTo ERR_HANDLER
-            If noLevavOK Then
-                ' Slide: Premiums without Levav
-                slideIdx = slideIdx + 1
-                Set ppSlide = ppPres.Slides.Add(slideIdx, 12)
-                ' title: premiot lefi sochnim lelo levav
-                BuildChartSlide ppSlide, imgNoLevavPrem, ChrW(1508) & ChrW(1512) & ChrW(1502) & ChrW(1497) & ChrW(1493) & _
-        ChrW(1514) & " " & ChrW(1500) & ChrW(1508) & ChrW(1497) & " " & ChrW(1505) & ChrW(1493) & ChrW(1499) & ChrW(1504) & _
-        ChrW(1497) & ChrW(1501) & " " & ChrW(1500) & ChrW(1500) & ChrW(1488) & " " & _
-        GetActiveAgencyName(), yearVal, refYear, slideW, paramsSubtitle
-                ' Slide: Commissions without Levav
-                slideIdx = slideIdx + 1
-                Set ppSlide = ppPres.Slides.Add(slideIdx, 12)
-                ' title: amlot lefi sochnim lelo levav
-                BuildChartSlide ppSlide, imgNoLevavComm, ChrW(1506) & ChrW(1502) & ChrW(1500) & ChrW(1493) & ChrW(1514) & _
-        " " & ChrW(1500) & ChrW(1508) & ChrW(1497) & " " & ChrW(1505) & ChrW(1493) & ChrW(1499) & ChrW(1504) & ChrW(1497) & _
-        ChrW(1501) & " " & ChrW(1500) & ChrW(1500) & ChrW(1488) & " " & _
-        GetActiveAgencyName(), yearVal, refYear, slideW, paramsSubtitle
-            End If
-            ' Cleanup temp images
-            On Error Resume Next
-            Kill imgNoLevavPrem
-            Kill imgNoLevavComm
-            On Error GoTo ERR_HANDLER
+            levavName = GetActiveAgencyName()
+            
+            ' Generate the NO-LEVAV charts:
+            BuildCompSlides ppPres, SHEET_AGENTS(), titleNames(5), yearVal, refYear, slideW, paramsSubtitle, levavName, False, False
+            
+            slideIdx = ppPres.Slides.Count
         End If
 
         ' Add page numbers to all slides
+                                ' Final Summary Slide (V3.55 - Beautiful buttons & Coffee Slide)
+        Dim sldEnd As Object
+        Set sldEnd = ppPres.Slides.Add(ppPres.Slides.Count + 1, 12) ' 12=ppLayoutBlank
+        
+        ' Add a nice background gradient
+        sldEnd.Background.Fill.TwoColorGradient Style:=1, Variant:=1 ' msoGradientHorizontal
+        sldEnd.Background.Fill.ForeColor.RGB = RGB(240, 248, 255)
+        sldEnd.Background.Fill.BackColor.RGB = RGB(200, 230, 255)
+
+        ' Add title
+        Dim shpTitle As Object
+        Set shpTitle = sldEnd.Shapes.AddTextbox(1, 100, 30, 760, 100)
+        With shpTitle.TextFrame.TextRange
+            .Text = ChrW(1492) & ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1514) & " " & _
+                    ChrW(1492) & ChrW(1493) & ChrW(1508) & ChrW(1511) & ChrW(1492) & " " & _
+                    ChrW(1489) & ChrW(1492) & ChrW(1510) & ChrW(1500) & ChrW(1495) & ChrW(1492) & "!"
+            .ParagraphFormat.Alignment = 2 ' ppAlignCenter
+            .Font.Name = "Assistant"
+            .Font.Size = 44
+            .Font.Bold = msoTrue
+            .Font.Color.RGB = RGB(0, 51, 102)
+        End With
+
+        ' Layout: 3 buttons side-by-side
+        ' Slide Width = 960. 3 buttons of width 200 -> 600 total width.
+        ' Gap between buttons = (960 - 600) / 4 = 90
+        ' Left1=90, Left2=380, Left3=670
+
+        ' Button 1: Start Presentation
+        Dim btnStart As Object
+        Set btnStart = sldEnd.Shapes.AddShape(5, 90, 240, 200, 80) ' 5 = msoShapeRoundedRectangle
+        btnStart.Fill.ForeColor.RGB = RGB(0, 120, 215)
+        btnStart.Line.Visible = msoFalse
+        With btnStart.TextFrame.TextRange
+            .Text = ChrW(1492) & ChrW(1510) & ChrW(1490) & " " & ChrW(1488) & ChrW(1514) & " " & ChrW(1492) & ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1514)
+            .Font.Size = 22
+            .Font.Bold = msoTrue
+            .Font.Color.RGB = RGB(255, 255, 255)
+            .ParagraphFormat.Alignment = 2
+        End With
+        btnStart.ActionSettings(1).Action = 3 ' ppActionFirstSlide
+        btnStart.ActionSettings(1).SoundEffect.Name = "Click"
+
+        ' Button 2: Close and Return
+        Dim btnClose As Object
+        Set btnClose = sldEnd.Shapes.AddShape(5, 380, 240, 200, 80)
+        btnClose.Fill.ForeColor.RGB = RGB(215, 60, 60)
+        btnClose.Line.Visible = msoFalse
+        With btnClose.TextFrame.TextRange
+            .Text = ChrW(1505) & ChrW(1490) & ChrW(1493) & ChrW(1512) & vbCrLf & ChrW(1493) & ChrW(1495) & ChrW(1494) & ChrW(1493) & ChrW(1512) & " " & ChrW(1500) & ChrW(1491) & ChrW(1507) & " " & ChrW(1492) & ChrW(1489) & ChrW(1497) & ChrW(1514)
+            .Font.Size = 20
+            .Font.Bold = msoTrue
+            .Font.Color.RGB = RGB(255, 255, 255)
+            .ParagraphFormat.Alignment = 2
+        End With
+        btnClose.ActionSettings(1).Action = 6 ' ppActionEndShow
+        btnClose.ActionSettings(1).SoundEffect.Name = "Click"
+
+        ' Button 3: Coffee
+        Dim btnCoffee As Object
+        Set btnCoffee = sldEnd.Shapes.AddShape(5, 670, 240, 200, 80)
+        btnCoffee.Fill.ForeColor.RGB = RGB(255, 140, 0)
+        btnCoffee.Line.Visible = msoFalse
+        With btnCoffee.TextFrame.TextRange
+            .Text = ChrW(1500) & ChrW(1498) & " " & ChrW(1500) & ChrW(1492) & ChrW(1499) & ChrW(1497) & ChrW(1503) & " " & ChrW(1511) & ChrW(1508) & ChrW(1492)
+            .Font.Size = 22
+            .Font.Bold = msoTrue
+            .Font.Color.RGB = RGB(255, 255, 255)
+            .ParagraphFormat.Alignment = 2
+        End With
+        btnCoffee.ActionSettings(1).Action = 4 ' ppActionLastSlide (Goes to Coffee slide)
+        btnCoffee.ActionSettings(1).SoundEffect.Name = "Click"
+        
+        ' ===============================
+        ' Coffee Slide (Hidden)
+        ' ===============================
+        Dim sldCoffee As Object
+        Set sldCoffee = ppPres.Slides.Add(ppPres.Slides.Count + 1, 12)
+        ' Hide this slide so it doesn't show during normal scrolling
+        sldCoffee.SlideShowTransition.Hidden = msoTrue
+        sldCoffee.Background.Fill.ForeColor.RGB = RGB(255, 255, 255)
+        
+        ' Add Coffee Picture from SOURCE folder
+        On Error Resume Next
+        Dim coffeePath As String
+        coffeePath = ThisWorkbook.Path & "\coffee.jpg"
+        If Dir(coffeePath) <> "" Then
+            Dim picCoffee As Object
+            Set picCoffee = sldCoffee.Shapes.AddPicture(coffeePath, 0, -1, 230, 20, 500, 500)
+        End If
+        On Error GoTo ERR_HANDLER
+        
+        ' Add Back Button
+        Dim btnBack As Object
+        Set btnBack = sldCoffee.Shapes.AddShape(5, 430, 450, 100, 50)
+        btnBack.Fill.ForeColor.RGB = RGB(100, 100, 100)
+        btnBack.Line.Visible = msoFalse
+        With btnBack.TextFrame.TextRange
+            .Text = ChrW(1495) & ChrW(1494) & ChrW(1493) & ChrW(1512) ' "חזור"
+            .Font.Size = 20
+            .Font.Color.RGB = RGB(255, 255, 255)
+            .ParagraphFormat.Alignment = 2
+        End With
+        btnBack.ActionSettings(1).Action = 5 ' ppActionLastSlideViewed
+        btnBack.ActionSettings(1).SoundEffect.Name = "Click"
+        ' ===============================
+
+
         Dim pg As Long
 860     For pg = 1 To ppPres.Slides.Count
 870         AddSlideFooter ppPres.Slides(pg), pg, ppPres.Slides.Count, slideW, slideH, GetActiveAgencyName()
@@ -5379,14 +5403,6 @@ levavName = GetActiveAgencyName()
         ' Automatic slideshow removed (will prompt user instead at the end)
 On Error GoTo ERR_HANDLER
 
-        ' Cleanup temp images
-950     On Error Resume Next
-960     Kill imgTotal
-970     For si = 1 To sheetCount * 4
-980         Kill imgFiles(si)
-990     Next si
-1000    On Error GoTo ERR_HANDLER
-
         ' Re-hide sheets that were hidden before
         Dim hi3 As Long
         For hi3 = 1 To hiddenCount3
@@ -5421,17 +5437,20 @@ Application.EnableEvents = True
 Application.ScreenUpdating = True
 Application.DisplayAlerts = True
 
-' NOW maximize and show PowerPoint BEFORE message box
+
+
+' NOW show the presentation in Slide Show mode on the summary slide
 On Error Resume Next
-If Not ppApp Is Nothing And Not ppPres Is Nothing Then
+If Not ppPres Is Nothing Then
     ppApp.Visible = True
-    ppApp.WindowState = 3 ' Max
-    ppApp.Activate
-    AppActivate "PowerPoint"
+    AppActivate ppApp.Caption
+    
+    Dim ssw As Object
+    Set ssw = ppPres.SlideShowSettings.Run
+    ssw.View.GotoSlide ppPres.Slides.Count - 1
 End If
 
-' Show success message ON TOP (using vbSystemModal)
-MsgBoxU ChrW(1492) & ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1514) & " " & ChrW(1504) & ChrW(1493) & ChrW(1510) & ChrW(1512) & ChrW(1492) & " " & ChrW(1489) & ChrW(1492) & ChrW(1510) & ChrW(1500) & ChrW(1495) & ChrW(1492) & "!" & vbCrLf & vbCrLf & ChrW(1500) & ChrW(1508) & ChrW(1514) & ChrW(1497) & ChrW(1495) & ChrW(1492) & " " & ChrW(1500) & ChrW(1495) & ChrW(1509) & " " & ChrW(1488) & ChrW(1497) & ChrW(1513) & ChrW(1493) & ChrW(1512), vbInformation + 4096
+
 On Error GoTo ERR_HANDLER
 
 910     Set ppPres = Nothing
@@ -5463,12 +5482,6 @@ ERR_HANDLER:
         End With
         wsMain.Protect DrawingObjects:=False, UserInterfaceOnly:=True
         If Not ppPres Is Nothing Then ppPres.Close
-        If Not ppApp Is Nothing And ppWeOwnApp Then ppApp.Quit
-        Kill imgTotal
-        Dim ei As Long
-        For ei = 1 To sheetCount * 4
-            Kill imgFiles(ei)
-        Next ei
         ' User-friendly error message
         Dim userMsg As String
         If InStr(1, errDesc, "SaveAs", vbTextCompare) > 0 Or InStr(1, errDesc, "access", vbTextCompare) > 0 Or errNum = -2147467259 Then
@@ -5489,334 +5502,374 @@ ERR_HANDLER:
 End Sub
 
 ' ============================================================================
+' HELPER: Robust Chart Export with Retry
+' ============================================================================
+Private Sub BuildTotalSlide(ByVal ppPres As Object, ByVal yearVal As String, ByVal refYear As String, ByVal slideW As Single, Optional ByVal paramsSubtitle As String = "")
+    On Error GoTo ERR_HANDLER
+    Dim ws As Worksheet
+    Dim lastRow As Long
+    Set ws = ThisWorkbook.Worksheets(SHEET_MONTHS())
+    lastRow = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row
+
+    Dim sumPR As Double, sumPC As Double, sumCR As Double, sumCC As Double
+    sumPR = CDbl(ws.Cells(lastRow, 2).Value2)
+    sumPC = CDbl(ws.Cells(lastRow, 3).Value2)
+    sumCR = CDbl(ws.Cells(lastRow, 14).Value2)
+    sumCC = CDbl(ws.Cells(lastRow, 15).Value2)
+
+    Dim tmpWs As Worksheet
+    Dim co As Object
+    Dim xlCht As Object
+    Application.ScreenUpdating = False
+    Set tmpWs = ThisWorkbook.Worksheets.Add
+
+    tmpWs.Cells(1, 1).Value = ""
+    tmpWs.Cells(1, 2).Value = ChrW(1508) & ChrW(1512) & ChrW(1502) & ChrW(1497) & ChrW(1493) & ChrW(1514) & " " & refYear
+    tmpWs.Cells(1, 3).Value = ChrW(1508) & ChrW(1512) & ChrW(1502) & ChrW(1497) & ChrW(1493) & ChrW(1514) & " " & yearVal
+    tmpWs.Cells(1, 4).Value = ChrW(1506) & ChrW(1502) & ChrW(1500) & ChrW(1493) & ChrW(1514) & " " & refYear
+    tmpWs.Cells(1, 5).Value = ChrW(1506) & ChrW(1502) & ChrW(1500) & ChrW(1493) & ChrW(1514) & " " & yearVal
+    tmpWs.Cells(2, 1).Value = ChrW(1505) & ChrW(1499) & ChrW(1493) & ChrW(1501) & " " & ChrW(1499) & ChrW(1493) & ChrW(1500) & ChrW(1500)
+    tmpWs.Cells(2, 2).Value = sumPR
+    tmpWs.Cells(2, 3).Value = sumPC
+    tmpWs.Cells(2, 4).Value = sumCR
+    tmpWs.Cells(2, 5).Value = sumCC
+
+    Set co = tmpWs.ChartObjects.Add(10, 10, 600, 400)
+    Set xlCht = co.Chart
+    xlCht.ChartType = 51
+    xlCht.SetSourceData tmpWs.Range("A1:E2"), 2
+    xlCht.HasTitle = False
+    xlCht.HasLegend = True
+
+    xlCht.SeriesCollection(1).Format.Fill.ForeColor.RGB = RGB(255, 192, 0)
+    xlCht.SeriesCollection(2).Format.Fill.ForeColor.RGB = RGB(68, 114, 196)
+    xlCht.SeriesCollection(3).Format.Fill.ForeColor.RGB = RGB(237, 125, 49)
+    xlCht.SeriesCollection(4).Format.Fill.ForeColor.RGB = RGB(112, 173, 71)
+
+    Dim sTot As Long
+    For sTot = 1 To 4
+        xlCht.SeriesCollection(sTot).HasDataLabels = True
+        xlCht.SeriesCollection(sTot).DataLabels.NumberFormat = "#,##0,""K"""
+        xlCht.SeriesCollection(sTot).DataLabels.Font.Size = 10
+        xlCht.SeriesCollection(sTot).DataLabels.Orientation = 90
+    Next sTot
+    xlCht.Axes(2).TickLabels.NumberFormat = "#,##0,""K"""
+
+    Dim bCopied As Boolean
+    Dim attempts As Integer
+    bCopied = False
+    For attempts = 1 To 5
+        On Error Resume Next
+        Err.Clear
+        xlCht.CopyPicture 1, -4147
+        If Err.Number = 0 Then
+            bCopied = True
+            Exit For
+        End If
+        DoEvents
+        Application.Wait Now + TimeValue("00:00:01")
+        On Error GoTo ERR_HANDLER
+    Next attempts
+    If Not bCopied Then Err.Raise vbObjectError + 1, "BuildTotalSlide", "Failed to copy chart to clipboard"
+
+    Application.DisplayAlerts = False
+    tmpWs.Delete
+    Application.DisplayAlerts = True
+    'Application.ScreenUpdating = True
+
+    Dim ppSlide As Object
+    Dim shp As Object
+    Set ppSlide = ppPres.Slides.Add(ppPres.Slides.Count + 1, 12)
+
+    Set shp = ppSlide.Shapes.AddTextbox(1, 20, 10, slideW - 40, 50)
+    shp.TextFrame.TextRange.Text = ChrW(1505) & ChrW(1492) & Chr(34) & ChrW(1499) & " " & ChrW(1508) & ChrW(1512) & ChrW(1502) & ChrW(1497) & ChrW(1493) & ChrW(1514) & " " & ChrW(1493) & ChrW(1506) & ChrW(1502) & ChrW(1500) & ChrW(1493) & ChrW(1514) & " - " & refYear & " " & ChrW(1502) & ChrW(1493) & ChrW(1500) & " " & yearVal
+    shp.TextFrame.TextRange.Font.Size = 24
+    shp.TextFrame.TextRange.Font.Bold = True
+    shp.TextFrame.TextRange.Font.Color.RGB = RGB(50, 50, 50)
+    shp.TextFrame.TextRange.ParagraphFormat.Alignment = 2
+    shp.TextFrame.WordWrap = True
+
+    If paramsSubtitle <> "" Then
+        Set shp = ppSlide.Shapes.AddTextbox(1, 40, 52, slideW - 80, 22)
+        shp.TextFrame.TextRange.Text = paramsSubtitle
+        shp.TextFrame.TextRange.Font.Size = 12
+        shp.TextFrame.TextRange.Font.Color.RGB = RGB(120, 120, 120)
+        shp.TextFrame.TextRange.ParagraphFormat.Alignment = 2
+    End If
+
+    Dim ppShape As Object
+    On Error Resume Next
+    Set ppShape = ppSlide.Shapes.Paste(1)
+    On Error GoTo ERR_HANDLER
+    If Not ppShape Is Nothing Then
+        ppShape.Left = 80
+        ppShape.Top = 78
+        ppShape.Width = slideW - 160
+        ppShape.Height = 432
+    End If
+    Exit Sub
+ERR_HANDLER:
+    On Error Resume Next
+    Application.DisplayAlerts = False
+    If Not tmpWs Is Nothing Then tmpWs.Delete
+    Application.DisplayAlerts = True
+    'Application.ScreenUpdating = True
+    Err.Raise Err.Number, "BuildTotalSlide:" & Erl, Err.Description
+End Sub
+
+' ============================================================================
 ' HELPER: Export Total Summary chart to image file
 ' ============================================================================
-Private Sub ExportTotalChart(ByVal imgPath As String, ByVal yearVal As String, ByVal refYear As String)
+Private Sub BuildCompSlides(ByVal ppPres As Object, ByVal sheetName As String, ByVal sheetTitle As String, ByVal yearVal As String, ByVal refYear As String, ByVal slideW As Single, Optional ByVal paramsSubtitle As String = "", Optional ByVal excludeName As String = "", Optional ByVal incDocs As Boolean = True, Optional ByVal incInsured As Boolean = True)
+    On Error GoTo ERR_HANDLER
+    Dim ws As Worksheet
+    Dim lastRow As Long
+    Set ws = ThisWorkbook.Worksheets(sheetName)
+    lastRow = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row
+    Dim dataRows As Long
+    dataRows = lastRow - 3
 
-On Error GoTo ERR_HANDLER
-'        Application.EnableEvents = False
+    Dim arrNames() As String, arrPremR() As Double, arrPremC() As Double, arrCommR() As Double, arrCommC() As Double
+    Dim arrDocsR() As Double, arrDocsC() As Double, arrInsR() As Double, arrInsC() As Double
+    Dim nItems As Long
+    nItems = dataRows - 1
+    If nItems < 1 Then Exit Sub
 
-        Dim ws As Worksheet
-        Dim lastRow As Long
-Set ws = ThisWorkbook.Worksheets(SHEET_MONTHS())
-lastRow = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row
+    ReDim arrNames(1 To nItems), arrPremR(1 To nItems), arrPremC(1 To nItems)
+    ReDim arrCommR(1 To nItems), arrCommC(1 To nItems)
+    ReDim arrDocsR(1 To nItems), arrDocsC(1 To nItems)
+    ReDim arrInsR(1 To nItems), arrInsC(1 To nItems)
 
-        Dim sumPR As Double
-        Dim sumPC As Double
-        Dim sumCR As Double
-        Dim sumCC As Double
-sumPR = CDbl(ws.Cells(lastRow, 2).Value2)
-sumPC = CDbl(ws.Cells(lastRow, 3).Value2)
-sumCR = CDbl(ws.Cells(lastRow, 14).Value2)
-sumCC = CDbl(ws.Cells(lastRow, 15).Value2)
+    Dim idx As Long, r As Long, tmpName As String
+    idx = 0
+    For r = 4 To lastRow - 1
+        tmpName = ShortenCompanyName(Trim$(CStr(ws.Cells(r, 1).Value2)))
+        If Len(excludeName) > 0 Then
+            If InStr(1, tmpName, excludeName, vbTextCompare) > 0 Then GoTo NEXT_ROW_ECC
+        End If
+        idx = idx + 1
+        If idx > nItems Then Exit For
+        arrNames(idx) = tmpName
+        arrPremR(idx) = CDbl(ws.Cells(r, 2).Value2)
+        arrPremC(idx) = CDbl(ws.Cells(r, 3).Value2)
+        arrDocsR(idx) = CDbl(ws.Cells(r, 5).Value2)
+        arrDocsC(idx) = CDbl(ws.Cells(r, 6).Value2)
+        arrInsR(idx) = CDbl(ws.Cells(r, 8).Value2)
+        arrInsC(idx) = CDbl(ws.Cells(r, 9).Value2)
+        arrCommR(idx) = CDbl(ws.Cells(r, 14).Value2)
+        arrCommC(idx) = CDbl(ws.Cells(r, 15).Value2)
+NEXT_ROW_ECC:
+    Next r
+    nItems = idx
 
-        Dim tmpWs As Worksheet
-        Dim co As Object
-        Dim xlCht As Object
-'Application.ScreenUpdating = False
-Set tmpWs = ThisWorkbook.Worksheets.Add
+    Dim chartItems As Long
+    chartItems = nItems
+    If chartItems = 0 Then Exit Sub
+    If chartItems > 15 Then chartItems = 15
 
-tmpWs.Cells(1, 1).Value = ""
-tmpWs.Cells(1, 2).Value = ChrW(1508) & ChrW(1512) & ChrW(1502) & ChrW(1497) & ChrW(1493) & ChrW(1514) & " " & refYear   ' premiot refYear
-tmpWs.Cells(1, 3).Value = ChrW(1508) & ChrW(1512) & ChrW(1502) & ChrW(1497) & ChrW(1493) & ChrW(1514) & " " & yearVal   ' premiot yearVal
-tmpWs.Cells(1, 4).Value = ChrW(1506) & ChrW(1502) & ChrW(1500) & ChrW(1493) & ChrW(1514) & " " & refYear   ' amlot refYear
-tmpWs.Cells(1, 5).Value = ChrW(1506) & ChrW(1502) & ChrW(1500) & ChrW(1493) & ChrW(1514) & " " & yearVal   ' amlot yearVal
-tmpWs.Cells(2, 1).Value = ChrW(1505) & ChrW(1499) & ChrW(1493) & ChrW(1501) & " " & ChrW(1499) & ChrW(1493) & ChrW(1500) & ChrW(1500)
-tmpWs.Cells(2, 2).Value = sumPR
-tmpWs.Cells(2, 3).Value = sumPC
-tmpWs.Cells(2, 4).Value = sumCR
-tmpWs.Cells(2, 5).Value = sumCC
+    Dim tmpWs As Worksheet
+    Dim co As Object, xlCht As Object
+    Dim ci As Long
+    Application.ScreenUpdating = False
+    Set tmpWs = ThisWorkbook.Worksheets.Add
 
-Set co = tmpWs.ChartObjects.Add(10, 10, 600, 400)
-Set xlCht = co.Chart
-xlCht.ChartType = 51
-xlCht.SetSourceData tmpWs.Range("A1:E2"), 2  ' xlColumns
-xlCht.HasTitle = False
-xlCht.HasLegend = True
+    ' Helper inline logic for each chart
+    Dim tPrem As String, tComm As String, tDocs As String, tIns As String
+    Dim suffix As String
+    suffix = ""
+    If excludeName <> "" Then suffix = " " & ChrW(1500) & ChrW(1500) & ChrW(1488) & " " & excludeName
+    ' We append " lefi " (by) + sheetTitle + suffix
+    Dim lefi As String
+    lefi = " " & ChrW(1500) & ChrW(1508) & ChrW(1497) & " "
+    tPrem = ChrW(1508) & ChrW(1512) & ChrW(1502) & ChrW(1497) & ChrW(1493) & ChrW(1514) & lefi & sheetTitle & suffix
+    tComm = ChrW(1506) & ChrW(1502) & ChrW(1500) & ChrW(1493) & ChrW(1514) & lefi & sheetTitle & suffix
+    tDocs = ChrW(1502) & ChrW(1505) & ChrW(1502) & ChrW(1499) & ChrW(1497) & ChrW(1501) & lefi & sheetTitle & suffix
+    tIns = ChrW(1502) & ChrW(1489) & ChrW(1493) & ChrW(1496) & ChrW(1495) & ChrW(1497) & ChrW(1501) & lefi & sheetTitle & suffix
 
-        ' --- Colors: Yellow=ref prem, Blue=cur prem, Orange=ref comm, Green=cur comm ---
-        xlCht.SeriesCollection(1).Format.Fill.ForeColor.RGB = RGB(255, 192, 0)     ' yellow/gold
-        xlCht.SeriesCollection(2).Format.Fill.ForeColor.RGB = RGB(68, 114, 196)    ' blue
-        xlCht.SeriesCollection(3).Format.Fill.ForeColor.RGB = RGB(237, 125, 49)    ' orange
-        xlCht.SeriesCollection(4).Format.Fill.ForeColor.RGB = RGB(112, 173, 71)    ' green
+    ' --- Chart 1: Premiums ---
+    tmpWs.Cells.Clear
+    tmpWs.Cells(1, 1).Value = ""
+    tmpWs.Cells(1, 2).Value = refYear
+    tmpWs.Cells(1, 3).Value = yearVal
+    For ci = 1 To chartItems
+        tmpWs.Cells(ci + 1, 1).Value = arrNames(ci)
+        tmpWs.Cells(ci + 1, 2).Value = arrPremR(ci)
+        tmpWs.Cells(ci + 1, 3).Value = arrPremC(ci)
+    Next ci
+    Set co = tmpWs.ChartObjects.Add(10, 10, 600, 350)
+    Set xlCht = co.Chart
+    xlCht.ChartType = 51
+    xlCht.SetSourceData tmpWs.Range(tmpWs.Cells(1, 1), tmpWs.Cells(chartItems + 1, 3)), 2
+    xlCht.HasTitle = False
+    xlCht.HasLegend = True
+    xlCht.SeriesCollection(1).Format.Fill.ForeColor.RGB = RGB(255, 192, 0)
+    xlCht.SeriesCollection(2).Format.Fill.ForeColor.RGB = RGB(68, 114, 196)
+    Dim sP As Long
+    For sP = 1 To 2
+        xlCht.SeriesCollection(sP).HasDataLabels = True
+        xlCht.SeriesCollection(sP).DataLabels.NumberFormat = "#,##0,""K"""
+        xlCht.SeriesCollection(sP).DataLabels.Font.Size = 9
+        xlCht.SeriesCollection(sP).DataLabels.Orientation = 90
+    Next sP
+    xlCht.Axes(2).TickLabels.NumberFormat = "#,##0,""K"""
+    PasteToSlide ppPres, xlCht, tPrem, yearVal, refYear, slideW, paramsSubtitle
 
-        ' --- Data labels (show in K, vertical/upward) ---
-        Dim sTot As Long
-        For sTot = 1 To 4
-            xlCht.SeriesCollection(sTot).HasDataLabels = True
-            xlCht.SeriesCollection(sTot).DataLabels.NumberFormat = "#,##0,""K"""
-            xlCht.SeriesCollection(sTot).DataLabels.Font.Size = 10
-            xlCht.SeriesCollection(sTot).DataLabels.Orientation = 90
-        Next sTot
+    ' --- Chart 2: Commissions ---
+    tmpWs.ChartObjects.Delete
+    tmpWs.Cells.Clear
+    tmpWs.Cells(1, 1).Value = ""
+    tmpWs.Cells(1, 2).Value = refYear
+    tmpWs.Cells(1, 3).Value = yearVal
+    For ci = 1 To chartItems
+        tmpWs.Cells(ci + 1, 1).Value = arrNames(ci)
+        tmpWs.Cells(ci + 1, 2).Value = arrCommR(ci)
+        tmpWs.Cells(ci + 1, 3).Value = arrCommC(ci)
+    Next ci
+    Set co = tmpWs.ChartObjects.Add(10, 10, 600, 350)
+    Set xlCht = co.Chart
+    xlCht.ChartType = 51
+    xlCht.SetSourceData tmpWs.Range(tmpWs.Cells(1, 1), tmpWs.Cells(chartItems + 1, 3)), 2
+    xlCht.HasTitle = False
+    xlCht.HasLegend = True
+    xlCht.SeriesCollection(1).Format.Fill.ForeColor.RGB = RGB(237, 125, 49)
+    xlCht.SeriesCollection(2).Format.Fill.ForeColor.RGB = RGB(112, 173, 71)
+    Dim sC As Long
+    For sC = 1 To 2
+        xlCht.SeriesCollection(sC).HasDataLabels = True
+        xlCht.SeriesCollection(sC).DataLabels.NumberFormat = "#,##0,""K"""
+        xlCht.SeriesCollection(sC).DataLabels.Font.Size = 9
+        xlCht.SeriesCollection(sC).DataLabels.Orientation = 90
+    Next sC
+    xlCht.Axes(2).TickLabels.NumberFormat = "#,##0,""K"""
+    PasteToSlide ppPres, xlCht, tComm, yearVal, refYear, slideW, paramsSubtitle
 
-        ' --- Y-axis number format (in K) ---
-        xlCht.Axes(2).TickLabels.NumberFormat = "#,##0,""K"""
+    ' --- Chart 3: Documents ---
+    If incDocs Then
+        tmpWs.ChartObjects.Delete
+        tmpWs.Cells.Clear
+        tmpWs.Cells(1, 1).Value = ""
+        tmpWs.Cells(1, 2).Value = refYear
+        tmpWs.Cells(1, 3).Value = yearVal
+        For ci = 1 To chartItems
+            tmpWs.Cells(ci + 1, 1).Value = arrNames(ci)
+            tmpWs.Cells(ci + 1, 2).Value = arrDocsR(ci)
+            tmpWs.Cells(ci + 1, 3).Value = arrDocsC(ci)
+        Next ci
+        Set co = tmpWs.ChartObjects.Add(10, 10, 600, 350)
+        Set xlCht = co.Chart
+        xlCht.ChartType = 51
+        xlCht.SetSourceData tmpWs.Range(tmpWs.Cells(1, 1), tmpWs.Cells(chartItems + 1, 3)), 2
+        xlCht.HasTitle = False
+        xlCht.HasLegend = True
+        xlCht.SeriesCollection(1).Format.Fill.ForeColor.RGB = RGB(180, 130, 70)
+        xlCht.SeriesCollection(2).Format.Fill.ForeColor.RGB = RGB(91, 155, 213)
+        Dim sD As Long
+        For sD = 1 To 2
+            xlCht.SeriesCollection(sD).HasDataLabels = True
+            xlCht.SeriesCollection(sD).DataLabels.NumberFormat = "#,##0"
+            xlCht.SeriesCollection(sD).DataLabels.Font.Size = 9
+            xlCht.SeriesCollection(sD).DataLabels.Orientation = 90
+        Next sD
+        xlCht.Axes(2).TickLabels.NumberFormat = "#,##0"
+        PasteToSlide ppPres, xlCht, tDocs, yearVal, refYear, slideW, paramsSubtitle
+    End If
 
-xlCht.Export imgPath
+    ' --- Chart 4: Insured ---
+    If incInsured Then
+        tmpWs.ChartObjects.Delete
+        tmpWs.Cells.Clear
+        tmpWs.Cells(1, 1).Value = ""
+        tmpWs.Cells(1, 2).Value = refYear
+        tmpWs.Cells(1, 3).Value = yearVal
+        For ci = 1 To chartItems
+            tmpWs.Cells(ci + 1, 1).Value = arrNames(ci)
+            tmpWs.Cells(ci + 1, 2).Value = arrInsR(ci)
+            tmpWs.Cells(ci + 1, 3).Value = arrInsC(ci)
+        Next ci
+        Set co = tmpWs.ChartObjects.Add(10, 10, 600, 350)
+        Set xlCht = co.Chart
+        xlCht.ChartType = 51
+        xlCht.SetSourceData tmpWs.Range(tmpWs.Cells(1, 1), tmpWs.Cells(chartItems + 1, 3)), 2
+        xlCht.HasTitle = False
+        xlCht.HasLegend = True
+        xlCht.SeriesCollection(1).Format.Fill.ForeColor.RGB = RGB(128, 0, 128)
+        xlCht.SeriesCollection(2).Format.Fill.ForeColor.RGB = RGB(0, 176, 80)
+        Dim sI2 As Long
+        For sI2 = 1 To 2
+            xlCht.SeriesCollection(sI2).HasDataLabels = True
+            xlCht.SeriesCollection(sI2).DataLabels.NumberFormat = "#,##0"
+            xlCht.SeriesCollection(sI2).DataLabels.Font.Size = 9
+            xlCht.SeriesCollection(sI2).DataLabels.Orientation = 90
+        Next sI2
+        xlCht.Axes(2).TickLabels.NumberFormat = "#,##0"
+        PasteToSlide ppPres, xlCht, tIns, yearVal, refYear, slideW, paramsSubtitle
+    End If
 
-Application.DisplayAlerts = False
-tmpWs.Delete
+    Application.DisplayAlerts = False
+    tmpWs.Delete
     Application.DisplayAlerts = True
-'Application.ScreenUpdating = True
-
-'Application.EnableEvents = True
-'Application.ScreenUpdating = True
-'Application.DisplayAlerts = True
-Exit Sub
+    'Application.ScreenUpdating = True
+    Exit Sub
 ERR_HANDLER:
-'        Application.EnableEvents = True
-'        Application.DisplayAlerts = True
-On Error Resume Next
-Application.DisplayAlerts = False
-        If Not tmpWs Is Nothing Then tmpWs.Delete
+    On Error Resume Next
+    Application.DisplayAlerts = False
+    If Not tmpWs Is Nothing Then tmpWs.Delete
     Application.DisplayAlerts = True
-Err.Raise Err.Number, "ExportTotalChart:" & Erl, Err.Description
+    'Application.ScreenUpdating = True
+    Err.Raise Err.Number, "BuildCompSlides:" & Erl, Err.Description
 End Sub
 
 ' ============================================================================
 ' HELPER: Export Comparison charts (premiums, commissions, documents, insured)
 ' to 4 image files (docs and insured are optional - pass "" to skip)
 ' ============================================================================
-Private Sub ExportCompCharts(ByVal sheetName As String, ByVal imgPrem As String, ByVal imgComm As String, ByVal yearVal As String, ByVal refYear As String, Optional ByVal excludeName As String = "", Optional ByVal imgDocs As String = "", Optional ByVal imgInsured As String = "")
-
-On Error GoTo ERR_HANDLER
-'Application.EnableEvents = False
-
-        Dim ws As Worksheet
-        Dim lastRow As Long
-        Dim dataRows As Long
-        Dim r As Long
-        Dim tmpName As String
-Set ws = ThisWorkbook.Worksheets(sheetName)
-lastRow = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row
-dataRows = lastRow - 3
-
-        Dim arrNames() As String
-        Dim arrPremR() As Double
-        Dim arrPremC() As Double
-        Dim arrCommR() As Double
-        Dim arrCommC() As Double
-        Dim arrDocsR() As Double
-        Dim arrDocsC() As Double
-        Dim arrInsR() As Double
-        Dim arrInsC() As Double
-        Dim nItems As Long
-nItems = dataRows - 1
-'Application.EnableEvents = True
-'Application.ScreenUpdating = True
-'Application.DisplayAlerts = True
-If nItems < 1 Then Exit Sub
-
-ReDim arrNames(1 To nItems)
-ReDim arrPremR(1 To nItems)
-ReDim arrPremC(1 To nItems)
-ReDim arrCommR(1 To nItems)
-ReDim arrCommC(1 To nItems)
-        ReDim arrDocsR(1 To nItems)
-        ReDim arrDocsC(1 To nItems)
-        ReDim arrInsR(1 To nItems)
-        ReDim arrInsC(1 To nItems)
-
-        Dim idx As Long
-idx = 0
-For r = 4 To lastRow - 1
-tmpName = ShortenCompanyName(Trim$(CStr(ws.Cells(r, 1).Value2)))
-            ' Skip excluded name (for "agents without Levav" variant)
-If Len(excludeName) > 0 Then
-If InStr(1, tmpName, excludeName, vbTextCompare) > 0 Then GoTo NEXT_ROW_ECC
-End If
-idx = idx + 1
-If idx > nItems Then Exit For
-arrNames(idx) = tmpName
-arrPremR(idx) = CDbl(ws.Cells(r, 2).Value2)
-arrPremC(idx) = CDbl(ws.Cells(r, 3).Value2)
-arrDocsR(idx) = CDbl(ws.Cells(r, 5).Value2)
-arrDocsC(idx) = CDbl(ws.Cells(r, 6).Value2)
-arrInsR(idx) = CDbl(ws.Cells(r, 8).Value2)
-arrInsC(idx) = CDbl(ws.Cells(r, 9).Value2)
-arrCommR(idx) = CDbl(ws.Cells(r, 14).Value2)
-arrCommC(idx) = CDbl(ws.Cells(r, 15).Value2)
-NEXT_ROW_ECC:
-Next r
-nItems = idx
-
-        Dim chartItems As Long
-chartItems = nItems
-If chartItems = 0 Then
-'Application.ScreenUpdating = True
-'Application.EnableEvents = True
-'Application.ScreenUpdating = True
-'Application.DisplayAlerts = True
-Exit Sub
-End If
-If chartItems > 15 Then chartItems = 15
-
-        Dim tmpWs As Worksheet
-        Dim co As Object
-        Dim xlCht As Object
-        Dim ci As Long
-'Application.ScreenUpdating = False
-Set tmpWs = ThisWorkbook.Worksheets.Add
-
-        ' ---- Chart 1: Premiums ----
-tmpWs.Cells(1, 1).Value = ""
-tmpWs.Cells(1, 2).Value = refYear
-tmpWs.Cells(1, 3).Value = yearVal
-For ci = 1 To chartItems
-tmpWs.Cells(ci + 1, 1).Value = arrNames(ci)
-tmpWs.Cells(ci + 1, 2).Value = arrPremR(ci)
-tmpWs.Cells(ci + 1, 3).Value = arrPremC(ci)
-Next ci
-
-Set co = tmpWs.ChartObjects.Add(10, 10, 600, 350)
-Set xlCht = co.Chart
-xlCht.ChartType = 51
-xlCht.SetSourceData tmpWs.Range(tmpWs.Cells(1, 1), tmpWs.Cells(chartItems + 1, 3)), 2  ' xlColumns
-xlCht.HasTitle = False
-xlCht.HasLegend = True
-
-        ' --- Colors: Yellow=ref year, Blue=current year ---
-xlCht.SeriesCollection(1).Format.Fill.ForeColor.RGB = RGB(255, 192, 0)     ' yellow/gold
-xlCht.SeriesCollection(2).Format.Fill.ForeColor.RGB = RGB(68, 114, 196)    ' blue
-
-        ' --- Data labels (show in K, vertical/upward) ---
-        Dim sP As Long
-For sP = 1 To 2
-xlCht.SeriesCollection(sP).HasDataLabels = True
-xlCht.SeriesCollection(sP).DataLabels.NumberFormat = "#,##0,""K"""
-xlCht.SeriesCollection(sP).DataLabels.Font.Size = 9
-xlCht.SeriesCollection(sP).DataLabels.Orientation = 90
-Next sP
-
-        ' --- Y-axis number format (in K) ---
-xlCht.Axes(2).TickLabels.NumberFormat = "#,##0,""K"""
-
-xlCht.Export imgPrem
-
+Private Sub PasteToSlide(ByVal ppPres As Object, ByVal xlCht As Object, ByVal chartTitle As String, ByVal yearVal As String, ByVal refYear As String, ByVal slideW As Single, ByVal paramsSubtitle As String)
+    Dim bCopied As Boolean
+    Dim attempts As Integer
+    bCopied = False
+    For attempts = 1 To 5
         On Error Resume Next
-tmpWs.ChartObjects.Delete
-        On Error GoTo ERR_HANDLER
-tmpWs.Cells.Clear
+        Err.Clear
+        xlCht.CopyPicture 1, -4147 ' xlScreen, xlPicture
+        If Err.Number = 0 Then
+            bCopied = True
+            Exit For
+        End If
+        DoEvents
+        Application.Wait Now + TimeValue("00:00:01")
+        On Error GoTo 0
+    Next attempts
+    If Not bCopied Then Err.Raise vbObjectError + 1, "PasteToSlide", "Failed to copy chart to clipboard"
+    
+    Dim ppSlide As Object
+    Set ppSlide = ppPres.Slides.Add(ppPres.Slides.Count + 1, 12)
+    Dim shp As Object
+    Set shp = ppSlide.Shapes.AddTextbox(1, 20, 8, slideW - 40, 36)
+    shp.TextFrame.TextRange.Text = chartTitle & " - " & refYear & " " & ChrW(1502) & ChrW(1493) & ChrW(1500) & " " & yearVal
+    shp.TextFrame.TextRange.Font.Size = 20
+    shp.TextFrame.TextRange.Font.Bold = True
+    shp.TextFrame.TextRange.Font.Color.RGB = RGB(50, 50, 50)
+    shp.TextFrame.TextRange.ParagraphFormat.Alignment = 2
+    shp.TextFrame.WordWrap = True
 
-        ' ---- Chart 2: Commissions ----
-tmpWs.Cells(1, 1).Value = ""
-tmpWs.Cells(1, 2).Value = refYear
-tmpWs.Cells(1, 3).Value = yearVal
-For ci = 1 To chartItems
-tmpWs.Cells(ci + 1, 1).Value = arrNames(ci)
-tmpWs.Cells(ci + 1, 2).Value = arrCommR(ci)
-tmpWs.Cells(ci + 1, 3).Value = arrCommC(ci)
-Next ci
-
-Set co = tmpWs.ChartObjects.Add(10, 10, 600, 350)
-Set xlCht = co.Chart
-xlCht.ChartType = 51
-xlCht.SetSourceData tmpWs.Range(tmpWs.Cells(1, 1), tmpWs.Cells(chartItems + 1, 3)), 2  ' xlColumns
-xlCht.HasTitle = False
-xlCht.HasLegend = True
-
-        ' --- Colors: Orange=ref year, Green=current year ---
-xlCht.SeriesCollection(1).Format.Fill.ForeColor.RGB = RGB(237, 125, 49)    ' orange
-xlCht.SeriesCollection(2).Format.Fill.ForeColor.RGB = RGB(112, 173, 71)    ' green
-
-        ' --- Data labels (show in K, vertical/upward) ---
-        Dim sC As Long
-For sC = 1 To 2
-xlCht.SeriesCollection(sC).HasDataLabels = True
-xlCht.SeriesCollection(sC).DataLabels.NumberFormat = "#,##0,""K"""
-xlCht.SeriesCollection(sC).DataLabels.Font.Size = 9
-xlCht.SeriesCollection(sC).DataLabels.Orientation = 90
-Next sC
-
-        ' --- Y-axis number format (in K) ---
-xlCht.Axes(2).TickLabels.NumberFormat = "#,##0,""K"""
-
-xlCht.Export imgComm
-
-        ' ---- Chart 3: Documents (optional) ----
-If imgDocs <> "" Then
-        On Error Resume Next
-tmpWs.ChartObjects.Delete
-        On Error GoTo ERR_HANDLER
-tmpWs.Cells.Clear
-tmpWs.Cells(1, 1).Value = ""
-tmpWs.Cells(1, 2).Value = refYear
-tmpWs.Cells(1, 3).Value = yearVal
-For ci = 1 To chartItems
-tmpWs.Cells(ci + 1, 1).Value = arrNames(ci)
-tmpWs.Cells(ci + 1, 2).Value = arrDocsR(ci)
-tmpWs.Cells(ci + 1, 3).Value = arrDocsC(ci)
-Next ci
-Set co = tmpWs.ChartObjects.Add(10, 10, 600, 350)
-Set xlCht = co.Chart
-xlCht.ChartType = 51
-xlCht.SetSourceData tmpWs.Range(tmpWs.Cells(1, 1), tmpWs.Cells(chartItems + 1, 3)), 2
-xlCht.HasTitle = False
-xlCht.HasLegend = True
-xlCht.SeriesCollection(1).Format.Fill.ForeColor.RGB = RGB(180, 130, 70)    ' brown/tan
-xlCht.SeriesCollection(2).Format.Fill.ForeColor.RGB = RGB(91, 155, 213)    ' steel blue
-            Dim sD As Long
-For sD = 1 To 2
-xlCht.SeriesCollection(sD).HasDataLabels = True
-xlCht.SeriesCollection(sD).DataLabels.NumberFormat = "#,##0"
-xlCht.SeriesCollection(sD).DataLabels.Font.Size = 9
-xlCht.SeriesCollection(sD).DataLabels.Orientation = 90
-Next sD
-xlCht.Axes(2).TickLabels.NumberFormat = "#,##0"
-xlCht.Export imgDocs
-End If
-
-        ' ---- Chart 4: Insured persons (optional) ----
-If imgInsured <> "" Then
-        On Error Resume Next
-tmpWs.ChartObjects.Delete
-        On Error GoTo ERR_HANDLER
-tmpWs.Cells.Clear
-tmpWs.Cells(1, 1).Value = ""
-tmpWs.Cells(1, 2).Value = refYear
-tmpWs.Cells(1, 3).Value = yearVal
-For ci = 1 To chartItems
-tmpWs.Cells(ci + 1, 1).Value = arrNames(ci)
-tmpWs.Cells(ci + 1, 2).Value = arrInsR(ci)
-tmpWs.Cells(ci + 1, 3).Value = arrInsC(ci)
-Next ci
-Set co = tmpWs.ChartObjects.Add(10, 10, 600, 350)
-Set xlCht = co.Chart
-xlCht.ChartType = 51
-xlCht.SetSourceData tmpWs.Range(tmpWs.Cells(1, 1), tmpWs.Cells(chartItems + 1, 3)), 2
-xlCht.HasTitle = False
-xlCht.HasLegend = True
-xlCht.SeriesCollection(1).Format.Fill.ForeColor.RGB = RGB(128, 0, 128)     ' purple
-xlCht.SeriesCollection(2).Format.Fill.ForeColor.RGB = RGB(0, 176, 80)      ' green
-            Dim si As Long
-For si = 1 To 2
-xlCht.SeriesCollection(si).HasDataLabels = True
-xlCht.SeriesCollection(si).DataLabels.NumberFormat = "#,##0"
-xlCht.SeriesCollection(si).DataLabels.Font.Size = 9
-xlCht.SeriesCollection(si).DataLabels.Orientation = 90
-Next si
-xlCht.Axes(2).TickLabels.NumberFormat = "#,##0"
-xlCht.Export imgInsured
-End If
-
-Application.DisplayAlerts = False
-tmpWs.Delete
-    Application.DisplayAlerts = True
-
-'Application.EnableEvents = True
-'Application.ScreenUpdating = True
-'Application.DisplayAlerts = True
-Exit Sub
-ERR_HANDLER:
-'Application.EnableEvents = True
-'Application.DisplayAlerts = True
-
-'    Application.ScreenUpdating = True
-On Error Resume Next
-Application.DisplayAlerts = False
-If Not tmpWs Is Nothing Then tmpWs.Delete
-    Application.DisplayAlerts = True
-Err.Raise Err.Number, "ExportCompCharts(" & sheetName & "):" & Erl, Err.Description
+    If paramsSubtitle <> "" Then
+        Set shp = ppSlide.Shapes.AddTextbox(1, 40, 42, slideW - 80, 22)
+        shp.TextFrame.TextRange.Text = paramsSubtitle
+        shp.TextFrame.TextRange.Font.Size = 12
+        shp.TextFrame.TextRange.Font.Color.RGB = RGB(120, 120, 120)
+        shp.TextFrame.TextRange.ParagraphFormat.Alignment = 2
+    End If
+    
+    Dim ppShape As Object
+    On Error Resume Next
+    Set ppShape = ppSlide.Shapes.Paste(1)
+    On Error GoTo 0
+    If Not ppShape Is Nothing Then
+        ppShape.Left = 60
+        ppShape.Top = 68
+        ppShape.Width = slideW - 120
+        ppShape.Height = 448
+    End If
 End Sub
 
 ' ============================================================================
@@ -5902,88 +5955,12 @@ End Sub
 ' ============================================================================
 ' HELPER: Build Total Summary Slide from pre-exported image
 ' ============================================================================
-Private Sub BuildTotalSlideFromImage(ByVal ppSlide As Object, ByVal imgPath As String, ByVal yearVal As String, ByVal refYear As String, ByVal slideW As Single, Optional ByVal paramsSubtitle As String = "")
 
-10      On Error GoTo ERR_HANDLER
-'        Application.EnableEvents = False
-
-        Dim shp As Object
-
-        ' Title textbox
-20      Set shp = ppSlide.Shapes.AddTextbox(1, 20, 10, slideW - 40, 50)
-30      shp.TextFrame.TextRange.Text = ChrW(1505) & ChrW(1492) & Chr(34) & ChrW(1499) & " " & ChrW(1508) & ChrW(1512) & _
-        ChrW(1502) & ChrW(1497) & ChrW(1493) & ChrW(1514) & " " & ChrW(1493) & ChrW(1506) & ChrW(1502) & ChrW(1500) & ChrW(1493) & _
-        ChrW(1514) & " - " & refYear & " " & ChrW(1502) & ChrW(1493) & ChrW(1500) & " " & yearVal
-40      shp.TextFrame.TextRange.Font.Size = 24
-50      shp.TextFrame.TextRange.Font.Bold = True
-60      shp.TextFrame.TextRange.Font.Color.RGB = RGB(50, 50, 50)
-70      shp.TextFrame.TextRange.ParagraphFormat.Alignment = 2
-80      shp.TextFrame.WordWrap = True
-
-        ' Subtitle (parameters)
-        If paramsSubtitle <> "" Then
-82          Set shp = ppSlide.Shapes.AddTextbox(1, 40, 52, slideW - 80, 22)
-84          shp.TextFrame.TextRange.Text = paramsSubtitle
-86          shp.TextFrame.TextRange.Font.Size = 12
-87          shp.TextFrame.TextRange.Font.Bold = False
-88          shp.TextFrame.TextRange.Font.Color.RGB = RGB(120, 120, 120)
-89          shp.TextFrame.TextRange.ParagraphFormat.Alignment = 2
-        End If
-
-        ' Insert chart image (landscape: wider)
-90      ppSlide.Shapes.AddPicture imgPath, 0, 1, 80, 78, slideW - 160, 432
-
-'Application.EnableEvents = True
-'Application.ScreenUpdating = True
-'Application.DisplayAlerts = True
-100     Exit Sub
-ERR_HANDLER:
-'        Application.EnableEvents = True
-'        Application.DisplayAlerts = True
-110     Err.Raise Err.Number, "BuildTotalSlideFromImage:" & Erl, Err.Description
-End Sub
 
 ' ============================================================================
 ' HELPER: Build a single chart slide (one chart image + title)
 ' ============================================================================
-Private Sub BuildChartSlide(ByVal ppSlide As Object, ByVal imgPath As String, ByVal chartTitle As String, ByVal yearVal As String, ByVal refYear As String, ByVal slideW As Single, Optional ByVal paramsSubtitle As String = "")
 
-10      On Error GoTo ERR_HANDLER
-'        Application.EnableEvents = False
-
-        Dim shp As Object
-
-        ' Title
-20      Set shp = ppSlide.Shapes.AddTextbox(1, 20, 8, slideW - 40, 36)
-30      shp.TextFrame.TextRange.Text = chartTitle & " - " & refYear & " " & ChrW(1502) & ChrW(1493) & ChrW(1500) & " " & yearVal
-40      shp.TextFrame.TextRange.Font.Size = 20
-50      shp.TextFrame.TextRange.Font.Bold = True
-60      shp.TextFrame.TextRange.Font.Color.RGB = RGB(50, 50, 50)
-70      shp.TextFrame.TextRange.ParagraphFormat.Alignment = 2
-80      shp.TextFrame.WordWrap = True
-
-        ' Subtitle (parameters)
-        If paramsSubtitle <> "" Then
-82          Set shp = ppSlide.Shapes.AddTextbox(1, 40, 42, slideW - 80, 22)
-84          shp.TextFrame.TextRange.Text = paramsSubtitle
-86          shp.TextFrame.TextRange.Font.Size = 12
-87          shp.TextFrame.TextRange.Font.Bold = False
-88          shp.TextFrame.TextRange.Font.Color.RGB = RGB(120, 120, 120)
-89          shp.TextFrame.TextRange.ParagraphFormat.Alignment = 2
-        End If
-
-        ' Insert chart image
-90      ppSlide.Shapes.AddPicture imgPath, 0, 1, 60, 68, slideW - 120, 448
-
-'Application.EnableEvents = True
-'Application.ScreenUpdating = True
-'Application.DisplayAlerts = True
-100     Exit Sub
-ERR_HANDLER:
-'        Application.EnableEvents = True
-'        Application.DisplayAlerts = True
-110     Err.Raise Err.Number, "BuildChartSlide:" & Erl, Err.Description
-End Sub
 
 ' ============================================================================
 ' HELPER: Build a data table slide
@@ -9900,7 +9877,7 @@ Public Sub FitHomeToScreen()
     ' V3.40: the plain fit came out too small, so scale it up 30%. Clamp to
     ' Excel's valid 10..400 range and cap at 130 so it never overflows wildly.
     Dim newZoom As Long
-    newZoom = CLng(ActiveWindow.Zoom * 1.3)
+    newZoom = CLng(ActiveWindow.Zoom * 1.2)
     If newZoom > 130 Then newZoom = 130
     If newZoom < 10 Then newZoom = 10
     ActiveWindow.Zoom = newZoom

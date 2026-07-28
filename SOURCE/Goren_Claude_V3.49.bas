@@ -1,8 +1,8 @@
-Attribute VB_Name = "Goren_Claude_V3_43"
+Attribute VB_Name = "Goren_Claude_V3_49"
 ' ============================================================================
 ' MODULE: modLevav
 ' PURPOSE: Complete system - BuildReview + ApplyCorrectionsAndBuildReports
-' VERSION: V3.43
+' VERSION: V3.49
 ' CHANGES IN V3.43:
 '   - Cleanup: the one remaining raw Hebrew string literal in code (the Fixela
 '     reset message in ResetEvents) is now built from ChrW, so it survives the
@@ -457,7 +457,7 @@ Private Const EM_SETPASSWORDCHAR = &HCC
 
 ' --- General constants ---
 
-Private Const APP_VERSION As String = "3.43"
+Private Const APP_VERSION As String = "3.49"
 
 
 Private Const APP_DATE As String = "23/07/2026 10:00"
@@ -4565,7 +4565,7 @@ Dim wsParams As Worksheet
 4792 wsMain.Range("A16:L26").UnMerge
 4793 With wsMain.Range("G19")
 4794
-4795     .Value = ChrW(1500) & ChrW(1492) & ChrW(1491) & ChrW(1512) & ChrW(1499) & ChrW(1492) & " " & ChrW(1493) & ChrW(1505) & ChrW(1497) & ChrW(1493) & ChrW(1506) & " " & ChrW(1513) & ChrW(1500) & ChrW(1495) & " " & ChrW(1493) & ChrW(1493) & ChrW(1496) & ChrW(1505) & ChrW(1488) & ChrW(1508) & " " & ChrW(1500) & ChrW(1496) & ChrW(1500) & ChrW(1508) & ChrW(1493) & ChrW(1503) & " 054-6677396"
+4795     .Value = ""
 4796     .Font.Size = 16
 4797     .Font.Bold = True
 4798     .Font.Color = RGB(0, 176, 240) ' Light Blue (tchelet)
@@ -4602,7 +4602,7 @@ Dim wsParams As Worksheet
     ' hidden repairs itself on the next visit to the home page.
     On Error Resume Next
     Application.DisplayFormulaBar = True
-    If Application.CommandBars.GetPressedMso("MinimizeRibbon") = True Then
+    If Application.CommandBars.GetPressedMso("MinimizeRibbon") = False Then
         Application.CommandBars.ExecuteMso "MinimizeRibbon"
     End If
     On Error GoTo ERR_HANDLER
@@ -4716,7 +4716,7 @@ Public Sub FixArrows()
 
     ' Excel will not draw the arrows while either of these is hidden.
     Application.DisplayFormulaBar = True
-    If Application.CommandBars.GetPressedMso("MinimizeRibbon") = True Then _
+    If Application.CommandBars.GetPressedMso("MinimizeRibbon") = False Then _
         Application.CommandBars.ExecuteMso "MinimizeRibbon"
 
     ' V3.37: the zoom flicker was not a strong enough repaint on this machine.
@@ -5179,8 +5179,10 @@ isDemoMode = FORCE_DEMO_MODE
 
         ' Export 4 charts per sheet (prem, comm, docs, insured)
         Dim si As Long
+        Dim bImgFilesAllocated As Boolean
         Dim imgFiles() As String
 470     ReDim imgFiles(1 To sheetCount * 4)
+        bImgFilesAllocated = True
         Dim exportOK() As Boolean
 480     ReDim exportOK(1 To sheetCount)
 490     For si = 1 To sheetCount
@@ -5218,10 +5220,11 @@ isDemoMode = FORCE_DEMO_MODE
             ppWeOwnApp = True
         End If
 615     ppApp.Visible = True
+620     Set ppPres = ppApp.Presentations.Add
         On Error Resume Next
         ppApp.WindowState = 2 ' Minimized for speed and to keep Excel in focus
+        AppActivate Application.Caption ' Give focus back to Excel
         On Error GoTo ERR_HANDLER
-620     Set ppPres = ppApp.Presentations.Add
 
         ' Set LANDSCAPE slide size (13.33" x 7.5")
 625     ppPres.PageSetup.SlideWidth = 960
@@ -5332,6 +5335,40 @@ levavName = GetActiveAgencyName()
         End If
 
         ' Add page numbers to all slides
+        ' Final Summary Slide
+        Dim sldEnd As Object
+        Set sldEnd = ppPres.Slides.Add(slideNum, 12) ' 12=ppLayoutBlank
+        Dim shpText As Object
+        Set shpText = sldEnd.Shapes.AddTextbox(1, 100, 150, 760, 200) ' 1=msoTextOrientationHorizontal
+        With shpText.TextFrame.TextRange
+            .Text = ChrW(1492) & ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1514) & " " & _
+                    ChrW(1492) & ChrW(1493) & ChrW(1508) & ChrW(1511) & ChrW(1492) & " " & _
+                    ChrW(1489) & ChrW(1492) & ChrW(1510) & ChrW(1500) & ChrW(1495) & ChrW(1492) & "!" & vbCrLf & vbCrLf & ChrW(1488) & ChrW(1504) & ChrW(1488) & " " & _
+                    ChrW(1489) & ChrW(1495) & ChrW(1512) & "/" & ChrW(1497) & " " & _
+                    ChrW(1502) & ChrW(1492) & ChrW(1514) & ChrW(1508) & ChrW(1512) & ChrW(1497) & ChrW(1496) & " " & _
+                    ChrW(1492) & ChrW(1506) & ChrW(1500) & ChrW(1497) & ChrW(1493) & ChrW(1503) & " " & _
+                    "(" & ChrW(1488) & ChrW(1493) & " " & _
+                    ChrW(1492) & ChrW(1511) & ChrW(1497) & ChrW(1510) & ChrW(1493) & ChrW(1512) & ChrW(1497) & ChrW(1501) & ")" & ":" & vbCrLf & "1" & "." & " " & _
+                    ChrW(1500) & ChrW(1492) & ChrW(1508) & ChrW(1506) & ChrW(1497) & ChrW(1500) & " " & _
+                    ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1514) & " " & _
+                    ChrW(1489) & ChrW(1502) & ChrW(1505) & ChrW(1498) & " " & _
+                    ChrW(1502) & ChrW(1500) & ChrW(1488) & " " & _
+                    "(" & "F" & "5" & ")" & vbCrLf & "2" & "." & " " & _
+                    ChrW(1500) & ChrW(1505) & ChrW(1490) & ChrW(1493) & ChrW(1512) & " " & _
+                    ChrW(1493) & ChrW(1500) & ChrW(1495) & ChrW(1494) & ChrW(1493) & ChrW(1512) & " " & _
+                    ChrW(1500) & ChrW(1502) & ChrW(1506) & ChrW(1512) & ChrW(1499) & ChrW(1514) & " " & _
+                    ChrW(1492) & ChrW(1491) & ChrW(1493) & ChrW(1495) & ChrW(1493) & ChrW(1514) & vbCrLf & "3" & "." & " " & _
+                    ChrW(1500) & ChrW(1500) & ChrW(1499) & ChrW(1514) & " " & _
+                    ChrW(1500) & ChrW(1513) & ChrW(1514) & ChrW(1493) & ChrW(1514) & " " & _
+                    ChrW(1511) & ChrW(1508) & ChrW(1492) & " " & _
+                    ":" & ")"
+            .ParagraphFormat.Alignment = 3 ' ppAlignRight
+            .Font.Name = "Assistant"
+            .Font.Size = 28
+            .Font.Bold = msoTrue
+            .Font.Color.RGB = RGB(0, 51, 102)
+        End With
+        
         Dim pg As Long
 860     For pg = 1 To ppPres.Slides.Count
 870         AddSlideFooter ppPres.Slides(pg), pg, ppPres.Slides.Count, slideW, slideH, GetActiveAgencyName()
@@ -5421,17 +5458,19 @@ Application.EnableEvents = True
 Application.ScreenUpdating = True
 Application.DisplayAlerts = True
 
-' NOW maximize and show PowerPoint BEFORE message box
+' NOW show the presentation maximized and minimize its ribbon
 On Error Resume Next
-If Not ppApp Is Nothing And Not ppPres Is Nothing Then
+If Not ppPres Is Nothing Then
     ppApp.Visible = True
-    ppApp.WindowState = 3 ' Max
-    ppApp.Activate
-    AppActivate "PowerPoint"
+    ppApp.WindowState = 3 ' Maximized
+    ppPres.Slides(ppPres.Slides.Count).Select
+    AppActivate ppApp.Caption
+    
+    If ppApp.CommandBars.GetPressedMso("MinimizeRibbon") = False Then
+        ppApp.CommandBars.ExecuteMso "MinimizeRibbon"
+    End If
 End If
 
-' Show success message ON TOP (using vbSystemModal)
-MsgBoxU ChrW(1492) & ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1514) & " " & ChrW(1504) & ChrW(1493) & ChrW(1510) & ChrW(1512) & ChrW(1492) & " " & ChrW(1489) & ChrW(1492) & ChrW(1510) & ChrW(1500) & ChrW(1495) & ChrW(1492) & "!" & vbCrLf & vbCrLf & ChrW(1500) & ChrW(1508) & ChrW(1514) & ChrW(1497) & ChrW(1495) & ChrW(1492) & " " & ChrW(1500) & ChrW(1495) & ChrW(1509) & " " & ChrW(1488) & ChrW(1497) & ChrW(1513) & ChrW(1493) & ChrW(1512), vbInformation + 4096
 On Error GoTo ERR_HANDLER
 
 910     Set ppPres = Nothing
@@ -5464,11 +5503,19 @@ ERR_HANDLER:
         wsMain.Protect DrawingObjects:=False, UserInterfaceOnly:=True
         If Not ppPres Is Nothing Then ppPres.Close
         If Not ppApp Is Nothing And ppWeOwnApp Then ppApp.Quit
-        Kill imgTotal
+        On Error Resume Next
+        If imgTotal <> "" Then
+            If Dir(imgTotal) <> "" Then Kill imgTotal
+        End If
         Dim ei As Long
-        For ei = 1 To sheetCount * 4
-            Kill imgFiles(ei)
-        Next ei
+        If bImgFilesAllocated Then
+            For ei = 1 To sheetCount * 4
+                If imgFiles(ei) <> "" Then
+                    If Dir(imgFiles(ei)) <> "" Then Kill imgFiles(ei)
+                End If
+            Next ei
+        End If
+        On Error GoTo 0
         ' User-friendly error message
         Dim userMsg As String
         If InStr(1, errDesc, "SaveAs", vbTextCompare) > 0 Or InStr(1, errDesc, "access", vbTextCompare) > 0 Or errNum = -2147467259 Then

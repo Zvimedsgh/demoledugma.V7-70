@@ -1,0 +1,398 @@
+Public Sub BuildPresentation()
+
+10      On Error GoTo ERR_HANDLER
+        Application.EnableEvents = False
+
+        ' Remove any leftover sheet protection
+        Dim wsUp3 As Worksheet
+        For Each wsUp3 In ThisWorkbook.Worksheets
+            On Error Resume Next
+            wsUp3.Unprotect "Z961814r"
+            On Error GoTo ERR_HANDLER
+        Next wsUp3
+
+        Dim wsMain As Worksheet
+20      Set wsMain = ThisWorkbook.Worksheets(CONTROL_SHEET_NAME())
+
+        Dim isDemoMode As Boolean
+        Dim demoParam As String
+isDemoMode = FORCE_DEMO_MODE
+        On Error Resume Next
+        demoParam = UCase$(Trim$(GetStringParameter(ThisWorkbook.Worksheets(H_SET_PARAMS()), "DEMO_MODE")))
+        If Not FORCE_DEMO_MODE Then
+            If demoParam = ChrW(1499) & ChrW(1503) Or demoParam = "YES" Or demoParam = "" Then isDemoMode = True
+            If demoParam = ChrW(1500) & ChrW(1488) Or demoParam = "NO" Then isDemoMode = False
+        End If
+        On Error GoTo ERR_HANDLER
+
+        Dim yearVal As String
+        Dim refYear As String
+        Dim periodType As String
+        Dim periodDetail As String
+        Dim periodDesc As String
+40      yearVal = Trim$(CStr(wsMain.Range("rngCurrentYear").Value2))
+50      refYear = Trim$(CStr(wsMain.Range("rngBaseYear").Value2))
+        
+        If isDemoMode Then
+            refYear = "2024"
+        End If
+60      periodType = Trim$(CStr(wsMain.Range("rngPeriodType").Value2))
+70      periodDetail = Trim$(CStr(wsMain.Range("rngPeriodValue").Value2))
+80      periodDesc = periodType
+90      If periodDetail <> "" Then periodDesc = periodDetail
+
+        ' Build parameters subtitle for all slides
+        Dim dateType As String
+        Dim detailBy As String
+        Dim clientName As String
+        Dim paramsSubtitle As String
+        dateType = Trim$(CStr(wsMain.Range("G7").Value2))
+        detailBy = Trim$(CStr(wsMain.Range("rngFilterValue").Value2))
+    If isDemoMode Then
+        clientName = ChrW(1505) & ChrW(1493) & ChrW(1499) & ChrW(1504) & ChrW(1493) & ChrW(1514) & " " & ChrW(1491) & _
+        ChrW(1502) & ChrW(1493) & " " & ChrW(1500) & ChrW(1489) & ChrW(1491) & ChrW(1497) & ChrW(1511) & ChrW(1492)
+    Else
+        clientName = Trim$(CStr(wsMain.Range("rngClientName").Value2))
+    End If
+        ' Build subtitle: periodDesc | dateType | detailBy | clientName (no years - already in chart)
+        Dim bacharI As String
+        bacharI = ChrW(1489) & ChrW(1495) & ChrW(1512) & ChrW(47) & ChrW(1497)  ' "???/?"
+        paramsSubtitle = ""
+        If periodDesc <> "" And periodDesc <> bacharI Then paramsSubtitle = periodDesc
+        If dateType <> "" And dateType <> bacharI Then paramsSubtitle = paramsSubtitle & " | " & dateType
+        If detailBy <> "" And detailBy <> bacharI Then paramsSubtitle = paramsSubtitle & " | " & detailBy
+        If clientName <> "" And clientName <> bacharI Then paramsSubtitle = paramsSubtitle & " | " & clientName
+        ' Remove leading " | " if first param was empty
+        If Left$(paramsSubtitle, 3) = " | " Then paramsSubtitle = Mid$(paramsSubtitle, 4)
+
+        ' --- Check if presentation already exists ---
+        Dim reportsPath3 As String
+        reportsPath3 = Trim$(CStr(Range("rngREPORTS_FOLDER").Value2))
+        If Len(Dir(reportsPath3 & "\*" & yearVal & "*.pptx")) > 0 Then
+            Dim alreadyMsg3 As String
+            ' "hamitzget kvar keiyemet. nitan litzpot ba bekaftor 6. ha'im leharitz shuv?"
+            alreadyMsg3 = ChrW(1492) & ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1514) & " " & ChrW(1499) & ChrW(1489) & _
+        ChrW(1512) & " " & ChrW(1511) & ChrW(1497) & ChrW(1497) & ChrW(1502) & ChrW(1514) & "." & vbCrLf & _
+                ChrW(1504) & ChrW(1497) & ChrW(1514) & ChrW(1503) & " " & ChrW(1500) & ChrW(1510) & ChrW(1508) & _
+        ChrW(1493) & ChrW(1514) & " " & ChrW(1489) & ChrW(1492) & " " & ChrW(1489) & ChrW(1499) & ChrW(1508) & ChrW(1514) & _
+        ChrW(1493) & ChrW(1512) & " 6." & vbCrLf & vbCrLf & _
+                ChrW(1492) & ChrW(1488) & ChrW(1501) & " " & ChrW(1500) & ChrW(1492) & ChrW(1512) & ChrW(1497) & ChrW(1509) & " " & ChrW(1513) & ChrW(1493) & ChrW(1489) & "?"
+            If MsgBoxU(alreadyMsg3, vbYesNo + vbQuestion) <> vbYes Then
+        Application.EnableEvents = True
+        Application.ScreenUpdating = True
+        Application.DisplayAlerts = True
+        Application.EnableEvents = True: Exit Sub
+            End If
+        End If
+
+        ' Validate that comparison sheets exist
+100     If Not SheetExists(SHEET_COMPANIES()) Then
+110         MsgBoxU ChrW(1497) & ChrW(1513) & " " & ChrW(1500) & ChrW(1492) & ChrW(1512) & ChrW(1497) & ChrW(1509) & " " & _
+        ChrW(1511) & ChrW(1493) & ChrW(1491) & ChrW(1501) & " " & ChrW(1499) & ChrW(1508) & ChrW(1514) & ChrW(1493) & ChrW(1512) & _
+        " 2", vbCritical
+    Application.EnableEvents = True
+    Application.ScreenUpdating = True
+    Application.DisplayAlerts = True
+120             Application.EnableEvents = True: Exit Sub
+130     End If
+
+        ' Show processing message (below currency area)
+        wsMain.Unprotect "Z961814r"
+        wsMain.Range("G15:K15").UnMerge
+        wsMain.Range("G15:K15").Merge
+140     With wsMain.Range("G15")
+150         .Value = ChrW(1502) & ChrW(1497) & ChrW(1497) & ChrW(1510) & ChrW(1512) & " " & ChrW(1502) & ChrW(1510) & _
+        ChrW(1490) & ChrW(1514) & " " & ChrW(1488) & ChrW(1504) & ChrW(1488) & " " & ChrW(1492) & ChrW(1502) & ChrW(1514) & _
+        ChrW(1497) & ChrW(1504) & ChrW(1493) & "..."
+160         .Font.Size = 18
+170         .Font.Bold = True
+180         .Font.Color = RGB(200, 0, 0)
+190         .Interior.Color = RGB(255, 255, 200)
+            .HorizontalAlignment = -4108
+200     End With
+210     Application.ScreenUpdating = True
+220     DoEvents
+        Application.ScreenUpdating = False
+
+
+        ' ================================================================
+        ' PHASE 1 & 2: Open PowerPoint and Build Slides via Clipboard
+        ' ================================================================
+        Dim ppApp As Object
+        Dim ppPres As Object
+        Dim ppSlide As Object
+        Dim ppWeOwnApp As Boolean
+        ppWeOwnApp = False
+        On Error Resume Next
+        Set ppApp = GetObject(, "PowerPoint.Application")
+        On Error GoTo ERR_HANDLER
+        If ppApp Is Nothing Then
+            Set ppApp = CreateObject("PowerPoint.Application")
+            ppWeOwnApp = True
+        End If
+        ppApp.Visible = True
+        Set ppPres = ppApp.Presentations.Add
+        On Error Resume Next
+        ppApp.WindowState = 2 ' Minimized for speed and to keep Excel in focus
+        AppActivate Application.Caption ' Give focus back to Excel
+        On Error GoTo ERR_HANDLER
+
+        ' Set LANDSCAPE slide size (13.33" x 7.5")
+        ppPres.PageSetup.SlideWidth = 960
+        ppPres.PageSetup.SlideHeight = 540
+
+        Dim slideIdx As Long
+        Dim slideW As Single
+        Dim slideH As Single
+        slideIdx = 0
+        slideW = 960
+        slideH = 540
+
+        ' Slide title names (Hebrew)
+        Dim titleNames(1 To 6) As String
+        titleNames(1) = ChrW(1495) & ChrW(1493) & ChrW(1491) & ChrW(1513) & ChrW(1497) & ChrW(1501)
+        titleNames(2) = ChrW(1495) & ChrW(1489) & ChrW(1512) & ChrW(1493) & ChrW(1514)
+        titleNames(3) = H_BRANCH() & " " & ChrW(1502) & ChrW(1512) & ChrW(1499) & ChrW(1494)
+        titleNames(4) = H_TELLER() & ChrW(1497) & ChrW(1493) & ChrW(1514)
+        titleNames(5) = ChrW(1505) & ChrW(1493) & ChrW(1499) & ChrW(1504) & ChrW(1497) & ChrW(1501)
+
+        ' SLIDE 1: Title
+        slideIdx = slideIdx + 1
+        Set ppSlide = ppPres.Slides.Add(slideIdx, 12)
+        BuildTitleSlide ppSlide, yearVal, refYear, periodDesc, slideW, slideH, paramsSubtitle
+
+        ' SLIDE 2: Total Summary chart
+        BuildTotalSlide ppPres, yearVal, refYear, slideW, paramsSubtitle
+        slideIdx = ppPres.Slides.Count ' Sync slide count
+
+        ' Build list of sheets to process
+        Dim sheetList(1 To 6) As String
+        Dim sheetCount As Long
+        sheetCount = 0
+
+        If SheetExists(SHEET_MONTHS()) Then
+            sheetCount = sheetCount + 1
+            sheetList(sheetCount) = SHEET_MONTHS()
+        End If
+        If SheetExists(SHEET_COMPANIES()) Then
+            sheetCount = sheetCount + 1
+            sheetList(sheetCount) = SHEET_COMPANIES()
+        End If
+        If SheetExists(SHEET_MAINBRANCH()) Then
+            sheetCount = sheetCount + 1
+            sheetList(sheetCount) = SHEET_MAINBRANCH()
+        End If
+        If SheetExists(SHEET_TELLERS()) Then
+            sheetCount = sheetCount + 1
+            sheetList(sheetCount) = SHEET_TELLERS()
+        End If
+        If SheetExists(SHEET_AGENTS()) Then
+            sheetCount = sheetCount + 1
+            sheetList(sheetCount) = SHEET_AGENTS()
+        End If
+
+        ' For each comparison sheet: build 4 chart slides + 1 table slide
+        Dim si As Long
+        For si = 1 To sheetCount
+            ' This generates 4 slides directly inside PowerPoint!
+            BuildCompSlides ppPres, sheetList(si), titleNames(si), yearVal, refYear, slideW, paramsSubtitle
+            
+            slideIdx = ppPres.Slides.Count
+            
+            ' Slide: Data table (always)
+            slideIdx = slideIdx + 1
+            Set ppSlide = ppPres.Slides.Add(slideIdx, 12)
+            BuildTableSlide ppSlide, sheetList(si), titleNames(si), yearVal, refYear, slideW, slideH, paramsSubtitle
+        Next si
+
+        ' ================================================================
+        ' PHASE 3: "Agents without Levav" variant slides (2 chart slides)
+        ' ================================================================
+        If SheetExists(SHEET_AGENTS()) Then
+            Dim levavName As String
+            levavName = GetActiveAgencyName()
+            
+            ' Generate the NO-LEVAV charts:
+            BuildCompSlides ppPres, SHEET_AGENTS(), titleNames(5), yearVal, refYear, slideW, paramsSubtitle, levavName, False, False
+            
+            slideIdx = ppPres.Slides.Count
+        End If
+
+        ' Add page numbers to all slides
+        ' Final Summary Slide
+        Dim sldEnd As Object
+        Set sldEnd = ppPres.Slides.Add(slideNum, 12) ' 12=ppLayoutBlank
+        Dim shpText As Object
+        Set shpText = sldEnd.Shapes.AddTextbox(1, 100, 150, 760, 200) ' 1=msoTextOrientationHorizontal
+        With shpText.TextFrame.TextRange
+            .Text = ChrW(1492) & ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1514) & " " & _
+                    ChrW(1492) & ChrW(1493) & ChrW(1508) & ChrW(1511) & ChrW(1492) & " " & _
+                    ChrW(1489) & ChrW(1492) & ChrW(1510) & ChrW(1500) & ChrW(1495) & ChrW(1492) & "!" & vbCrLf & vbCrLf & ChrW(1488) & ChrW(1504) & ChrW(1488) & " " & _
+                    ChrW(1489) & ChrW(1495) & ChrW(1512) & "/" & ChrW(1497) & " " & _
+                    ChrW(1502) & ChrW(1492) & ChrW(1514) & ChrW(1508) & ChrW(1512) & ChrW(1497) & ChrW(1496) & " " & _
+                    ChrW(1492) & ChrW(1506) & ChrW(1500) & ChrW(1497) & ChrW(1493) & ChrW(1503) & " " & _
+                    "(" & ChrW(1488) & ChrW(1493) & " " & _
+                    ChrW(1492) & ChrW(1511) & ChrW(1497) & ChrW(1510) & ChrW(1493) & ChrW(1512) & ChrW(1497) & ChrW(1501) & ")" & ":" & vbCrLf & "1" & "." & " " & _
+                    ChrW(1500) & ChrW(1492) & ChrW(1508) & ChrW(1506) & ChrW(1497) & ChrW(1500) & " " & _
+                    ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1514) & " " & _
+                    ChrW(1489) & ChrW(1502) & ChrW(1505) & ChrW(1498) & " " & _
+                    ChrW(1502) & ChrW(1500) & ChrW(1488) & " " & _
+                    "(" & "F" & "5" & ")" & vbCrLf & "2" & "." & " " & _
+                    ChrW(1500) & ChrW(1505) & ChrW(1490) & ChrW(1493) & ChrW(1512) & " " & _
+                    ChrW(1493) & ChrW(1500) & ChrW(1495) & ChrW(1494) & ChrW(1493) & ChrW(1512) & " " & _
+                    ChrW(1500) & ChrW(1502) & ChrW(1506) & ChrW(1512) & ChrW(1499) & ChrW(1514) & " " & _
+                    ChrW(1492) & ChrW(1491) & ChrW(1493) & ChrW(1495) & ChrW(1493) & ChrW(1514) & vbCrLf & "3" & "." & " " & _
+                    ChrW(1500) & ChrW(1500) & ChrW(1499) & ChrW(1514) & " " & _
+                    ChrW(1500) & ChrW(1513) & ChrW(1514) & ChrW(1493) & ChrW(1514) & " " & _
+                    ChrW(1511) & ChrW(1508) & ChrW(1492) & " " & _
+                    ":" & ")"
+            .ParagraphFormat.Alignment = 3 ' ppAlignRight
+            .Font.Name = "Assistant"
+            .Font.Size = 28
+            .Font.Bold = msoTrue
+            .Font.Color.RGB = RGB(0, 51, 102)
+        End With
+        
+        Dim pg As Long
+860     For pg = 1 To ppPres.Slides.Count
+870         AddSlideFooter ppPres.Slides(pg), pg, ppPres.Slides.Count, slideW, slideH, GetActiveAgencyName()
+880     Next pg
+
+        ' Save presentation to Reports folder
+        Dim reportsFolder As String
+        Dim fsoRpt As Object
+        Set fsoRpt = CreateObject("Scripting.FileSystemObject")
+        reportsFolder = REPORTS_FOLDER()
+        If Not fsoRpt.FolderExists(reportsFolder) Then fsoRpt.CreateFolder reportsFolder
+        
+        Dim tmpSavePath As String
+        Dim finalPptxPath As String
+        Dim finalPdfPath As String
+        Dim presFileName As String
+        Dim bSaved As Boolean
+        presFileName = ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1514) & " " & ChrW(1492) & ChrW(1504) & ChrW(1492) & ChrW(1500) & ChrW(1492) & " " & yearVal
+        finalPptxPath = reportsFolder & "\" & presFileName & ".pptx"
+        finalPdfPath = reportsFolder & "\" & presFileName & ".pdf"
+        bSaved = False
+        ' --- Attempt 1: Save directly to Reports folder ---
+890     On Error Resume Next
+        Err.Clear
+900     ppPres.SaveAs finalPptxPath
+        If Err.Number = 0 Then
+            Err.Clear
+906         ppPres.SaveAs finalPdfPath, 32
+            bSaved = True
+        End If
+        ' --- Attempt 2: Save via TEMP if direct save failed ---
+        If Not bSaved Then
+            Err.Clear
+            tmpSavePath = Environ$("TEMP") & "\" & "LevavTemp_" & yearVal & ".pptx"
+            Kill tmpSavePath
+            Err.Clear
+            ppPres.SaveAs tmpSavePath
+            If Err.Number = 0 Then
+                Err.Clear
+                FileCopy tmpSavePath, finalPptxPath
+                If Err.Number = 0 Then bSaved = True
+                Kill tmpSavePath
+            End If
+        End If
+        ' Automatic slideshow removed (will prompt user instead at the end)
+On Error GoTo ERR_HANDLER
+
+        ' Re-hide sheets that were hidden before
+        Dim hi3 As Long
+        For hi3 = 1 To hiddenCount3
+            ThisWorkbook.Worksheets(hiddenSheets3(hi3)).Visible = xlSheetVeryHidden
+        Next hi3
+        
+        ' Restore screen updating
+        Application.ScreenUpdating = True
+
+        ' Clear processing message and restore green background
+        wsMain.Unprotect "Z961814r"
+        wsMain.Range("G15:K15").UnMerge
+1010    With wsMain.Range("G15:K15")
+1020        .Value = ""
+1030        .Interior.Color = RGB(220, 240, 220)
+1040    End With
+        wsMain.Protect DrawingObjects:=False, UserInterfaceOnly:=True
+
+        ' Bring Excel back to home silently (no AppActivate so PP stays in front)
+        On Error Resume Next
+        wsMain.Activate
+        Application.GoTo wsMain.Range("G10")
+        On Error GoTo ERR_HANDLER
+        
+
+' Clean up presentation sheets automatically
+Application.DisplayAlerts = False
+' (REMOVED: User requested that result sheets are NOT deleted after presentation)
+Application.DisplayAlerts = True
+
+Application.EnableEvents = True
+Application.ScreenUpdating = True
+Application.DisplayAlerts = True
+
+' NOW show the presentation maximized and minimize its ribbon
+On Error Resume Next
+If Not ppPres Is Nothing Then
+    ppApp.Visible = True
+    ppApp.WindowState = 3 ' Maximized
+    ppPres.Slides(ppPres.Slides.Count).Select
+    AppActivate ppApp.Caption
+    
+    If ppApp.CommandBars.GetPressedMso("MinimizeRibbon") = False Then
+        ppApp.CommandBars.ExecuteMso "MinimizeRibbon"
+    End If
+End If
+
+On Error GoTo ERR_HANDLER
+
+910     Set ppPres = Nothing
+920     Set ppApp = Nothing
+
+1060    Exit Sub
+
+ERR_HANDLER:
+        Application.EnableEvents = True
+        Application.DisplayAlerts = True
+        Dim errLine As Long
+        Dim errDesc As String
+        Dim errNum As Long
+1070    errLine = Erl
+1072    errDesc = Err.Description
+1074    errNum = Err.Number
+1076    On Error Resume Next
+        ' Re-hide sheets that were unhidden
+        Dim hi3err As Long
+        For hi3err = 1 To hiddenCount3
+            ThisWorkbook.Worksheets(hiddenSheets3(hi3err)).Visible = xlSheetVeryHidden
+        Next hi3err
+        Application.ScreenUpdating = True
+        wsMain.Unprotect "Z961814r"
+        wsMain.Range("G15:K15").UnMerge
+        With wsMain.Range("G15:K15")
+            .Value = ""
+            .Interior.Color = RGB(220, 240, 220)
+        End With
+        wsMain.Protect DrawingObjects:=False, UserInterfaceOnly:=True
+        If Not ppPres Is Nothing Then ppPres.Close
+        ' User-friendly error message
+        Dim userMsg As String
+        If InStr(1, errDesc, "SaveAs", vbTextCompare) > 0 Or InStr(1, errDesc, "access", vbTextCompare) > 0 Or errNum = -2147467259 Then
+            ' File locked / PP open error
+            userMsg = ChrW(1506) & ChrW(1500) & " " & ChrW(1502) & ChrW(1504) & ChrW(1514) & " " & _
+                ChrW(1500) & ChrW(1489) & ChrW(1504) & ChrW(1493) & ChrW(1514) & " " & _
+                ChrW(1488) & ChrW(1514) & " " & ChrW(1492) & ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1514) & vbCrLf & _
+                ChrW(1497) & ChrW(1513) & " " & ChrW(1500) & ChrW(1505) & ChrW(1490) & ChrW(1493) & ChrW(1512) & " " & _
+                ChrW(1488) & ChrW(1514) & " " & ChrW(1492) & ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1514) & " " & _
+                ChrW(1492) & ChrW(1511) & ChrW(1493) & ChrW(1491) & ChrW(1502) & ChrW(1514)
+        Else
+            userMsg = ChrW(1513) & ChrW(1490) & ChrW(1497) & ChrW(1488) & ChrW(1492) & " " & _
+                ChrW(1489) & ChrW(1497) & ChrW(1510) & ChrW(1497) & ChrW(1512) & ChrW(1514) & " " & _
+                ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1514) & vbCrLf & errDesc
+        End If
+1080    MsgBoxU userMsg, vbCritical
+
+End Sub
