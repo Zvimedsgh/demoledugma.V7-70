@@ -1,0 +1,277 @@
+x=416.0, text=לדוגמא סוכנות לביטוח
+x=500.4, text=חברות 
+x=495.7, text=-
+x=418.4, text=טבלת נתונים
+x=476.2, text=רבעון שני 
+x=471.4, text=|
+x=448.2, text=בורדרו
+x=82.8, text=עמלות
+x=0.0, text=פוליסות 
+x=427.1, text=מבוטחים
+x=0.0, text=מסמכים 
+x=780.4, text=פרמיות
+x=23.9, text=שינוי
+x=0.0, text=2020
+x=0.0, text= 2019
+x=0.0, text=שינוי
+x=0.0, text=2020
+x=0.0, text= 2019
+x=0.0, text=שינוי
+x=0.0, text=2020
+x=0.0, text= 2019
+x=0.0, text=שינוי
+x=0.0, text=2020
+x=0.0, text= 2019
+x=0.0, text=שינוי
+x=0.0, text=2020
+x=0.0, text= 2019
+x=23.1, text=7.9
+x=35.7, text=%
+x=0.0, text= 183,255
+x=0.0, text= 169,905
+x=0.0, text= 0.8
+x=210.6, text=%
+x=0.0, text= 527
+x=0.0, text= 523
+x=0.0, text= 0.7
+x=385.5, text=%
+x=0.0, text= 407
+x=0.0, text= 404
+x=0.0, text= 3.3
+x=560.3, text=%
+x=0.0, text= 624
+x=0.0, text= 604
+x=0.0, text= 5.9
+x=735.2, text=%
+x=0.0, text= 1,070,789
+x=0.0, text= 1,011,571
+x=0.0, text=כלל
+x=21.7, text=-
+x=24.7, text=5.9
+x=37.3, text=%
+x=0.0, text= 49,122
+x=0.0, text= 52,183
+x=0.0, text= 0.0
+x=210.6, text=%
+x=0.0, text= 181
+x=0.0, text= 181
+x=0.0, text= 2.0
+x=385.5, text=%
+x=0.0, text= 156
+x=0.0, text= 153
+x=0.0, text= -
+x=549.3, text=5.4
+x=561.9, text=%
+x=0.0, text= 228
+x=0.0, text= 241
+x=0.0, text= 0.0
+x=735.2, text=%
+x=0.0, text= 386,420
+x=0.0, text= 386,323
+x=0.0, text=הראל
+x=23.1, text=0.4
+x=35.7, text=%
+x=0.0, text= 157,379
+x=0.0, text= 156,690
+x=0.0, text= 0.0
+x=210.6, text=%
+x=0.0, text= 304
+x=0.0, text= 304
+x=0.0, text= 0.7
+x=385.5, text=%
+x=0.0, text= 277
+x=0.0, text= 275
+x=0.0, text= -
+x=549.3, text=3.0
+x=561.9, text=%
+x=0.0, text= 356
+x=0.0, text= 367
+x=0.0, text= -
+x=724.1, text=2.2
+x=736.8, text=%
+x=0.0, text= 1,029,499
+x=0.0, text= 1,052,270
+x=0.0, text=איילון
+x=19.2, text=-
+x=22.2, text=21.3
+x=39.8, text=%
+x=0.0, text= 36,418
+x=0.0, text= 46,277
+x=0.0, text= -
+x=197.0, text=25.5
+x=214.7, text=%
+x=0.0, text= 82
+x=0.0, text= 110
+x=0.0, text= -
+x=371.9, text=28.9
+x=389.5, text=%
+x=0.0, text= 69
+x=0.0, text= 97
+x=0.0, text= -
+x=546.8, text=19.5
+x=564.4, text=%
+x=0.0, text= 107
+x=0.0, text= 133
+x=0.0, text= -
+x=721.6, text=23.4
+x=739.3, text=%
+x=0.0, text= 246,219
+x=0.0, text= 321,236
+x=0.0, text=מגדל
+x=915.3, text=(
+x=898.6, text=המגן
+x=893.2, text=)  
+x=893.5, text=חברה לביטוח
+x=20.6, text=21.5
+x=38.3, text=%
+x=0.0, text= 124,188
+x=0.0, text= 102,179
+x=0.0, text= 31.4
+x=213.1, text=%
+x=0.0, text= 473
+x=0.0, text= 360
+x=0.0, text= 29.6
+x=388.0, text=%
+x=0.0, text= 390
+x=0.0, text= 301
+x=0.0, text= 55.4
+x=562.9, text=%
+x=0.0, text= 749
+x=0.0, text= 482
+x=0.0, text= 23.2
+x=737.7, text=%
+x=0.0, text= 925,854
+x=0.0, text= 751,205
+x=0.0, text=הפניקס
+x=32.0, text=-
+x=18.1, text=100.0
+x=40.8, text=%
+x=86.4, text=0
+x=0.0, text= 11,246
+x=0.0, text= -
+x=197.0, text=55.3
+x=214.7, text=%
+x=0.0, text= 17
+x=0.0, text= 38
+x=0.0, text= -
+x=371.9, text=57.1
+x=389.5, text=%
+x=0.0, text= 15
+x=0.0, text= 35
+x=0.0, text= -
+x=546.8, text=61.2
+x=564.4, text=%
+x=0.0, text= 19
+x=0.0, text= 49
+x=0.0, text= -
+x=721.6, text=64.7
+x=739.3, text=%
+x=0.0, text= 32,046
+x=0.0, text= 90,727
+x=0.0, text=הכשרה
+x=32.0, text=-
+x=0.0, text=10,986
+x=0.0, text= 0
+x=0.0, text= -
+x=0.0, text= 42
+x=0.0, text= 0
+x=0.0, text= -
+x=0.0, text= 38
+x=0.0, text= 0
+x=0.0, text= -
+x=0.0, text= 45
+x=0.0, text= 0
+x=0.0, text= -
+x=0.0, text= 92,499
+x=0.0, text= 0
+x=0.0, text=הכשרה
+x=21.7, text=-
+x=24.7, text=1.4
+x=37.3, text=%
+x=0.0, text= 11,748
+x=0.0, text= 11,915
+x=0.0, text= -
+x=197.0, text=20.0
+x=214.7, text=%
+x=0.0, text= 56
+x=0.0, text= 70
+x=0.0, text= -
+x=371.9, text=22.2
+x=389.5, text=%
+x=0.0, text= 49
+x=0.0, text= 63
+x=0.0, text= -
+x=546.8, text=20.0
+x=564.4, text=%
+x=0.0, text= 56
+x=0.0, text= 70
+x=0.0, text= -
+x=724.1, text=8.5
+x=736.8, text=%
+x=0.0, text= 24,639
+x=0.0, text= 26,930
+x=0.0, text=דרכים
+x=32.0, text=-
+x=0.0, text=959
+x=0.0, text= 0
+x=0.0, text= -
+x=0.0, text= 5
+x=0.0, text= 0
+x=0.0, text= -
+x=0.0, text= 3
+x=0.0, text= 0
+x=0.0, text= -
+x=0.0, text= 7
+x=0.0, text= 0
+x=0.0, text= -
+x=0.0, text= 4,839
+x=0.0, text= 0
+x=0.0, text=קש חתמים
+x=898.5, text=בינלאומיים
+x=32.0, text=-
+x=0.0, text=0
+x=0.0, text= 0
+x=0.0, text= 0.0
+x=210.6, text=%
+x=0.0, text= 2
+x=0.0, text= 2
+x=0.0, text= 0.0
+x=385.5, text=%
+x=0.0, text= 2
+x=0.0, text= 2
+x=0.0, text= 0.0
+x=560.3, text=%
+x=0.0, text= 2
+x=0.0, text= 2
+x=0.0, text= -
+x=717.5, text=100.0
+x=740.2, text=%
+x=785.9, text=0
+x=0.0, text= 54,271
+x=0.0, text=קופרנינוה
+x=22.2, text=4.3
+x=36.0, text=%
+x=0.0, text= 574,055
+x=0.0, text= 550,396
+x=0.0, text= 6.2
+x=210.8, text=%
+x=0.0, text= 1,686
+x=0.0, text= 1,588
+x=0.0, text= 5.9
+x=385.7, text=%
+x=0.0, text= 1,174
+x=0.0, text= 1,109
+x=0.0, text= 12.6
+x=563.3, text=%
+x=0.0, text= 2,193
+x=0.0, text= 1,948
+x=0.0, text= 3.2
+x=735.4, text=%
+x=0.0, text= 3,812,804
+x=0.0, text= 3,694,533
+x=0.0, text=סה
+x=911.1, text="
+x=906.2, text=כ
+x=879.9, text=14 
+x=893.7, text=/ 
+x=899.1, text=34

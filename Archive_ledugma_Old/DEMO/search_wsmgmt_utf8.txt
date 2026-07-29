@@ -1,0 +1,89 @@
+﻿404 Dim wsMgmt As Worksheet
+419 90              Set wsMgmt = ThisWorkbook.Worksheets(MANAGEMENT_SHEET_NAME())
+421 110                 monthName = Trim$(CStr(wsMgmt.Cells(9 + monthIdx, 18).Value2))
+478 10      Dim wsMgmt As Worksheet
+570 382     Set wsMgmt = ThisWorkbook.Worksheets(MANAGEMENT_SHEET_NAME())
+571 390     Set dictHelper = LoadHelperDictionary(wsMgmt)
+581 470     LoadCheckedFields wsMgmt, dictFieldCol, dictFieldDisp
+587 495     Set dictBranch = LoadBranchMapping(wsMgmt)
+607 500     threshold = GetNumericParameter(wsMgmt, PARAM_PREMIUM_THRESHOLD)
+881 20      Dim wsMgmt As Worksheet
+1054 580     Set wsMgmt = ThisWorkbook.Worksheets(MANAGEMENT_SHEET_NAME())
+1064 640     Set dictHelper = LoadHelperDictionary(wsMgmt)
+1067 660     Set dictBranch = LoadBranchMapping(wsMgmt)
+1070 680     threshold = GetNumericParameter(wsMgmt, PARAM_PREMIUM_THRESHOLD)
+2639 20      Dim wsMgmt As Worksheet
+2672 57      Set wsMgmt = ThisWorkbook.Worksheets(MANAGEMENT_SHEET_NAME())
+2673 58      If wsMgmt Is Nothing Then Set wsMgmt = ThisWorkbook.Worksheets("NIHUL")
+2675 60      If wsMgmt Is Nothing Then Err.Raise vbObjectError + 9002, "SetupMainSheet", "Cannot find NIHUL/hagdarot sheet"
+2677 62      If wsMgmt.Name <> MANAGEMENT_SHEET_NAME() Then wsMgmt.Name = MANAGEMENT_SHEET_NAME()
+2729 250     wsMgmt.Cells(1, 17).Value = "PERIOD_TYPE"
+2732 260     wsMgmt.Cells(2, 17).Value = ChrW(1513) & ChrW(1504) & ChrW(1514) & ChrW(1497)
+2734 270     wsMgmt.Cells(3, 17).Value = ChrW(1495) & ChrW(1510) & ChrW(1497) & " " & ChrW(1513) & ChrW(1504) & ChrW(1514) & ChrW(1497)
+2736 280     wsMgmt.Cells(4, 17).Value = ChrW(1512) & ChrW(1489) & ChrW(1506) & ChrW(1493) & ChrW(1504) & ChrW(1497)
+2738 290     wsMgmt.Cells(5, 17).Value = ChrW(1495) & ChrW(1493) & ChrW(1491) & ChrW(1513) & ChrW(1497)
+2741 300     wsMgmt.Cells(1, 18).Value = "HALF_YEAR"
+2743 310     wsMgmt.Cells(2, 18).Value = ChrW(1502) & ChrW(1495) & ChrW(1510) & ChrW(1497) & ChrW(1514) & " " & ChrW(1512) & ChrW(1488) & ChrW(1513) & ChrW(1493) & ChrW(1504) & ChrW(1492)
+2745 320     wsMgmt.Cells(3, 18).Value = ChrW(1502) & ChrW(1495) & ChrW(1510) & ChrW(1497) & ChrW(1514) & " " & ChrW(1513) & ChrW(1504) & ChrW(1497) & ChrW(1492)
+2761 410     wsMgmt.Cells(5, 18).Value = ChrW(1512) & ChrW(1489) & ChrW(1506) & ChrW(1493) & ChrW(1503) & " " & ChrW(1512) & ChrW(1488) & ChrW(1513) & ChrW(1493) & ChrW(1503)
+2763 420     wsMgmt.Cells(6, 18).Value = ChrW(1512) & ChrW(1489) & ChrW(1506) & ChrW(1493) & ChrW(1503) & " " & ChrW(1513) & ChrW(1504) & ChrW(1497)
+2765 430     wsMgmt.Cells(7, 18).Value = ChrW(1512) & ChrW(1489) & ChrW(1506) & ChrW(1493) & ChrW(1503) & " " & ChrW(1513) & ChrW(1500) & ChrW(1497) & ChrW(1513) & ChrW(1497)
+2767 440     wsMgmt.Cells(8, 18).Value = ChrW(1512) & ChrW(1489) & ChrW(1506) & ChrW(1493) & ChrW(1503) & " " & ChrW(1512) & ChrW(1489) & ChrW(1497) & ChrW(1506) & ChrW(1497)
+2771 460     wsMgmt.Cells(10, 18).Value = ChrW(1497) & ChrW(1504) & ChrW(1493) & ChrW(1488) & ChrW(1512)
+2772 470     wsMgmt.Cells(11, 18).Value = ChrW(1508) & ChrW(1489) & ChrW(1512) & ChrW(1493) & ChrW(1488) & ChrW(1512)
+2773 480     wsMgmt.Cells(12, 18).Value = ChrW(1502) & ChrW(1512) & ChrW(1509)
+2774 490     wsMgmt.Cells(13, 18).Value = ChrW(1488) & ChrW(1508) & ChrW(1512) & ChrW(1497) & ChrW(1500)
+2775 500     wsMgmt.Cells(14, 18).Value = ChrW(1502) & ChrW(1488) & ChrW(1497)
+2776 510     wsMgmt.Cells(15, 18).Value = ChrW(1497) & ChrW(1493) & ChrW(1504) & ChrW(1497)
+2777 520     wsMgmt.Cells(16, 18).Value = ChrW(1497) & ChrW(1493) & ChrW(1500) & ChrW(1497)
+2778 530     wsMgmt.Cells(17, 18).Value = ChrW(1488) & ChrW(1493) & ChrW(1490) & ChrW(1493) & ChrW(1505) & ChrW(1496)
+2779 540     wsMgmt.Cells(18, 18).Value = ChrW(1505) & ChrW(1508) & ChrW(1496) & ChrW(1502) & ChrW(1489) & ChrW(1512)
+2780 550     wsMgmt.Cells(19, 18).Value = ChrW(1488) & ChrW(1493) & ChrW(1511) & ChrW(1496) & ChrW(1493) & ChrW(1489) & ChrW(1512)
+2781 560     wsMgmt.Cells(20, 18).Value = ChrW(1504) & ChrW(1493) & ChrW(1489) & ChrW(1502) & ChrW(1489) & ChrW(1512)
+2782 570     wsMgmt.Cells(21, 18).Value = ChrW(1491) & ChrW(1510) & ChrW(1502) & ChrW(1489) & ChrW(1512)
+2935 865     wsMgmt.Cells(1, 19).Value = ChrW(1492) & ChrW(1493) & ChrW(1491) & ChrW(1506) & ChrW(1493) & ChrW(1514) & " " & ChrW(1502) & ChrW(1506) & ChrW(1512) & ChrW(1499) & ChrW(1514)
+2936 866     wsMgmt.Cells(2, 19).Value = ChrW(1492) & ChrW(1505) & ChrW(1514) & ChrW(1497) & ChrW(1497) & ChrW(1501) & " " & "-" & " " & ChrW(1504) & ChrW(1502) & ChrW(1510) & ChrW(1488) & ChrW(1493) & " "
+2937 867     wsMgmt.Cells(3, 19).Value = " " & ChrW(1495) & ChrW(1512) & ChrW(1497) & ChrW(1490) & ChrW(1493) & ChrW(1514)
+2938 868     wsMgmt.Cells(4, 19).Value = ChrW(1492) & ChrW(1505) & ChrW(1514) & ChrW(1497) & ChrW(1497) & ChrW(1501) & " " & ChrW(1489) & ChrW(1492) & ChrW(1510) & ChrW(1500) & ChrW(1495) & ChrW(1492)
+2939 869     wsMgmt.Cells(5, 19).Value = ChrW(1513) & ChrW(1493) & ChrW(1512) & ChrW(1492) & " "
+2940 wsMgmt.Cells(6, 19).Value = ChrW(1513) & ChrW(1490) & ChrW(1497) & ChrW(1488) & ChrW(1492) & " "
+2941 wsMgmt.Cells(7, 19).Value = ChrW(1513) & ChrW(1500) & ChrW(1489) & ":" & " "
+2942 wsMgmt.Cells(8, 19).Value = ChrW(1488) & ChrW(1497) & ChrW(1513) & ChrW(1493) & ChrW(1512) & " " & ChrW(1500) & ChrW(1508) & ChrW(1504) & ChrW(1497) & " " & ChrW(1506) & ChrW(1497) & ChrW(1489) & ChrW(1493) & ChrW(1491)
+2943 wsMgmt.Cells(9, 19).Value = ChrW(1492) & ChrW(1488) & ChrW(1501) & " " & ChrW(1500) & ChrW(1497) & ChrW(1497) & ChrW(1513) & ChrW(1501) & " " & ChrW(1514) & ChrW(1497) & ChrW(1511) & ChrW(1493) & ChrW(1504) & ChrW(1497) & ChrW(1501) & " " & ChrW(1493) & ChrW(1500) & ChrW(1497) & ChrW(1497) & ChrW(1510) & ChrW(1512) & " " & ChrW(1491) & ChrW(1493) & ChrW(1495) & ChrW(1493) & ChrW(1514) & "?"
+2944 wsMgmt.Cells(10, 19).Value = ChrW(1513) & ChrW(1490) & ChrW(1497) & ChrW(1488) & ChrW(1492) & " " & ChrW(1489) & ChrW(1492) & ChrW(1490) & ChrW(1491) & ChrW(1512) & ChrW(1514) & " " & ChrW(1491) & ChrW(1507) & " " & ChrW(1492) & ChrW(1489) & ChrW(1497) & ChrW(1514) & ":" & " "
+2945 wsMgmt.Cells(11, 19).Value = ChrW(1513) & ChrW(1490) & ChrW(1497) & ChrW(1488) & ChrW(1492) & " " & ChrW(1489) & ChrW(1506) & ChrW(1491) & ChrW(1499) & ChrW(1493) & ChrW(1503) & " " & ChrW(1514) & ChrW(1511) & ChrW(1493) & ChrW(1508) & ChrW(1492) & ":" & " "
+2946 wsMgmt.Cells(12, 19).Value = ChrW(1490) & ChrW(1497) & ChrW(1500) & ChrW(1497) & ChrW(1493) & ChrW(1503) & " " & ChrW(1491) & ChrW(1507) & " " & ChrW(1492) & ChrW(1489) & ChrW(1497) & ChrW(1514) & " " & ChrW(1492) & ChrW(1493) & ChrW(1511) & ChrW(1501) & " " & ChrW(1489) & ChrW(1492) & ChrW(1510) & ChrW(1500) & ChrW(1495) & ChrW(1492) & "!"
+2947 wsMgmt.Cells(13, 19).Value = "1" & "." & " " & ChrW(1492) & ChrW(1488) & ChrW(1501) & " " & ChrW(1492) & ChrW(1506) & ChrW(1500) & ChrW(1497) & ChrW(1514) & " " & ChrW(1511) & ChrW(1493) & ChrW(1489) & ChrW(1509) & " " & ChrW(1513) & ChrW(1500) & ChrW(1497) & ChrW(1508) & ChrW(1492) & " " & ChrW(1506) & ChrW(1491) & ChrW(1499) & ChrW(1504) & ChrW(1497) & "?"
+2948 wsMgmt.Cells(14, 19).Value = "2" & "." & " " & ChrW(1492) & ChrW(1488) & ChrW(1501) & " " & ChrW(1513) & ChrW(1502) & ChrW(1512) & ChrW(1514) & " " & ChrW(1488) & ChrW(1514) & " " & _
+2952 wsMgmt.Cells(15, 19).Value = "3" & "." & " " & ChrW(1492) & ChrW(1488) & ChrW(1501) & " " & ChrW(1489) & ChrW(1495) & ChrW(1512) & ChrW(1514) & " " & ChrW(1488) & ChrW(1514) & " " & ChrW(1508) & ChrW(1512) & ChrW(1496) & ChrW(1497) & " " & ChrW(1492) & ChrW(1506) & ChrW(1497) & ChrW(1489) & ChrW(1493) & ChrW(1491) & " " & ChrW(1492) & ChrW(1504) & ChrW(1491) & ChrW(1512) & ChrW(1513) & " " & ChrW(1489) & ChrW(1490) & ChrW(1497) & ChrW(1500) & ChrW(1497) & ChrW(1493) & ChrW(1503) & " " & ChrW(1491) & ChrW(1507) & " " & ChrW(1492) & ChrW(1489) & ChrW(1497) & ChrW(1514) & "?"
+2953 wsMgmt.Cells(16, 19).Value = "4" & "." & " " & ChrW(1500) & ChrW(1495) & ChrW(1509) & " " & ChrW(1506) & ChrW(1500) & " " & "O" & "K" & " " & ChrW(1500) & ChrW(1492) & ChrW(1502) & ChrW(1513) & ChrW(1498)
+2955 wsMgmt.Cells(17, 19).Value = ChrW(1492) & ChrW(1488) & ChrW(1501) & " " & ChrW(1500) & ChrW(1492) & ChrW(1510) & ChrW(1497) & ChrW(1490) & " " & ChrW(1492) & ChrW(1493) & ChrW(1491) & ChrW(1506) & ChrW(1492) & " " & ChrW(1494) & ChrW(1493) & " " & ChrW(1513) & ChrW(1493) & ChrW(1489) & "?"
+2961 896     paramLastRow = wsMgmt.Cells(wsMgmt.Rows.count, COL_PARAM_NAME).End(xlUp).Row
+2966 If UCase$(Trim$(CStr(wsMgmt.Cells(pr, COL_PARAM_NAME).Value2))) = "ERROR_EMAIL" Then foundEmail = True: Exit For
+2969 wsMgmt.Cells(paramLastRow + 1, COL_PARAM_NAME).Value = "ERROR_EMAIL"
+2970 wsMgmt.Cells(paramLastRow + 1, COL_PARAM_VALUE).Value = "zvi@gorentech.co.il"
+2978 If UCase$(Trim$(CStr(wsMgmt.Cells(pr, COL_PARAM_NAME).Value2))) = "BACKUP_PATH" Then foundBackup = True: Exit For
+2981 wsMgmt.Cells(paramLastRow + 1, COL_PARAM_NAME).Value = "BACKUP_PATH"
+2982 wsMgmt.Cells(paramLastRow + 1, COL_PARAM_VALUE).Value = "C:\DEMO PROJECT\BACKUPS"
+3197 910     MsgBoxU wsMgmt.Cells(12, 19).Value, vbInformation
+3203 wsMgmt.Range("Z1").Value = ChrW(1513) & ChrW(1504) & ChrW(1514) & ChrW(1497)
+3204 wsMgmt.Range("Z2").Value = ChrW(1489) & ChrW(1495) & ChrW(1512) & ChrW(47) & ChrW(1497)
+3244 930     MsgBoxU wsMgmt.Cells(10, 19).Value & Err.Description, vbCritical
+4591 380     Dim wsMgmt As Worksheet
+4592 390     Set wsMgmt = ThisWorkbook.Worksheets(MANAGEMENT_SHEET_NAME())
+4594 410     emailAddr = GetStringParameter(wsMgmt, PARAM_ERROR_EMAIL)
+4782 Dim wsMgmt As Worksheet
+4783 Set wsMgmt = ThisWorkbook.Worksheets(MANAGEMENT_SHEET_NAME())
+4788 For Each s In wsMgmt.Shapes
+4797 Set rng = wsMgmt.Range("A2:H3")
+4798 Set shp = wsMgmt.Shapes.AddShape(msoShapeRoundedRectangle, rng.Left, rng.Top, rng.Width, rng.Height)
+4810 Set rng = wsMgmt.Range("A5:D7")
+4811 Set shp = wsMgmt.Shapes.AddShape(msoShapeRoundedRectangle, rng.Left, rng.Top, rng.Width, rng.Height)
+4823 Set rng = wsMgmt.Range("A9:D11")
+4824 Set shp = wsMgmt.Shapes.AddShape(msoShapeRoundedRectangle, rng.Left, rng.Top, rng.Width, rng.Height)
+4836 Set rng = wsMgmt.Range("A13:D15")
+4837 Set shp = wsMgmt.Shapes.AddShape(msoShapeRoundedRectangle, rng.Left, rng.Top, rng.Width, rng.Height)
+4849 Set rng = wsMgmt.Range("A17:D19")
+4850 Set shp = wsMgmt.Shapes.AddShape(msoShapeRoundedRectangle, rng.Left, rng.Top, rng.Width, rng.Height)
+4862 Set rng = wsMgmt.Range("A21:D23")
+4863 Set shp = wsMgmt.Shapes.AddShape(msoShapeRoundedRectangle, rng.Left, rng.Top, rng.Width, rng.Height)

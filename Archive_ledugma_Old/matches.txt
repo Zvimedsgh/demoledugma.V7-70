@@ -1,0 +1,57 @@
+<USER_REQUEST>
+מצאתי את גיליון הוראות התקנה אבל האופציה להעתיק טותו גם כן לא אפשרית (אפור) וכן כלום לא מוגן. מה הסיבה לכל זה?
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-08T13:52:41+03:00.
+</ADDITIONAL_METADATA>
+---
+<USER_REQUEST>
+רציתי לעשות הפוך, למלןק את דף הבית והשאר רק עם ההוראות לקרוא לו אחרת אבל גם זה לא זמין. שחרר אותי מהכלא הזה
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-08T13:59:31+03:00.
+</ADDITIONAL_METADATA>
+---
+<USER_REQUEST>
+https://gorentec-my.sharepoint.com/:x:/g/personal/zvi_gorentech_co_il/IQBnB0klIujxR4O5fALynO8EAWddhgVppMJI7THxhW3R6fo?e=Z8iVEV
+הקישור להוראות התקנה
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-08T14:08:06+03:00.
+</ADDITIONAL_METADATA>
+---
+<USER_REQUEST>
+לא טוב. שום אינטרנולא צריך לכתוב שלא ייכנסו לפאניקה. הקש כאן לפתיחת הוראות התקנה. ניתן לשלוח WhatsApp לטלפון 054-6677396 לקבלצ עזרה בהתקנה.
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-08T14:49:18+03:00.
+</ADDITIONAL_METADATA>
+---
+<USER_REQUEST>
+ההודעה הוורודה צריכה להיות כמו בצילום המסך וחוץ מזה אני חושב שאחרי שהלקוח מגיע לWEB ופותח את הוראות ההתקנה ומתקין הוא כבר נמצא באקסל ולא ב WEB אז אין צורך בכפתור הבנתי כי גם בקובץ ההוראות יש הבנתי. מה שכן כשנפתח האקסל ההודעה צריכה להיות החל מהשורה השניה ולמחוק את המילה בהתקנה בסוף המלל. נתחיל בכך ונראה איך זה נראה
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-08T15:35:32+03:00.
+</ADDITIONAL_METADATA>
+---
+<USER_REQUEST>
+אולי תדלג על שגיאה או שתיים מדי פעם? הוורודה פותחת את הוראות התפעול ולא את הוראות ההתקנה
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-08T16:39:20+03:00.
+</ADDITIONAL_METADATA>
+---
+<USER_REQUEST>
+שוה נעלם הכפתור עם מדריך התפעול
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-09T09:49:53+03:00.
+</ADDITIONAL_METADATA>
+---
+<USER_REQUEST>
+אחד משנינו שיכור. בצד ימין למעילה יש כפתור מקושקש שאמור היה להביא את הוראות ההפעלה. במקום זה הוא מביא את הוראות התפעול. בצד שמאל למעלה היה כפתור מעויין שאמור להביא את מדריך התפעול. בגיליון תאים לבנים. לא בדקתי כרגע את הכפתורים תתקן ורז נמשיך. יש לך עוד שעה וחצי לשרוף עם כל מיני תעלולים. אני מהמר שלא הצליח לסיים.
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-07-09T10:13:07+03:00.
+</ADDITIONAL_METADATA>
+---

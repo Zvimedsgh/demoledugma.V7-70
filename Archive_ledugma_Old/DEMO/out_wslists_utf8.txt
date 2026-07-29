@@ -1,0 +1,5 @@
+﻿Col 1 max row: 11
+Col 2 max row: 13
+Col 3 max row: 20
+Col 4 max row: 71
+Col 5 max row: 12

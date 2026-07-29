@@ -1,0 +1,5 @@
+﻿943 Dim dictHasUnhandled As Object
+1118 Set dictHasUnhandled = CreateObject("Scripting.Dictionary")
+1145 1010                    dictHasUnhandled(CStr(srcRowNum)) = True
+1154 1195            For Each srcKey In dictHasUnhandled.keys: allKeys(srcKey) = True: Next
+1159 1199                ElseIf dictHasUnhandled.Exists(srcKey) Then

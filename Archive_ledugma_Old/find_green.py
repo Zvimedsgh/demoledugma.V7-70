@@ -1,0 +1,7 @@
+﻿with open(r'c:\LEVAV PROJECT\SOURCE\Goren_Claude_V2.222.bas', 'r', encoding='utf-8') as f:
+    text = f.read()
+
+import re
+for i, line in enumerate(text.split('\n')):
+    if 'Interior.Color' in line and 'wsMain' in text.split('\n')[max(0, i-20):i+5].__str__():
+        print(f"{i+1}: {line.strip()}")

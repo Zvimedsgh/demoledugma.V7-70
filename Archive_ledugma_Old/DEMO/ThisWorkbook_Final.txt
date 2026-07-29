@@ -1,0 +1,117 @@
+' ============================================================================
+' PASTE THIS CODE IN: ThisWorkbook module
+' ============================================================================
+
+Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As Range)
+    On Error Resume Next
+    If (Sh.Name = ChrW(1491) & ChrW(1507) & " " & ChrW(1492) & ChrW(1489) & ChrW(1497) & ChrW(1514) Or _
+        Sh.Name = ChrW(1512) & ChrW(1488) & ChrW(1513) & ChrW(1497) Or _
+        Sh.Name = "Main") Then
+        
+        If Not Intersect(Target, Sh.Range("G6")) Is Nothing Then
+            Application.EnableEvents = False
+            UpdatePeriodDropdown
+            Application.EnableEvents = True
+        End If
+        If Not Intersect(Target, Sh.Range("G9")) Is Nothing Then
+            Application.EnableEvents = False
+            UpdateFilterValueDropdown
+            Application.EnableEvents = True
+        End If
+    End If
+End Sub
+
+Private Sub Workbook_BeforeClose(Cancel As Boolean)
+    On Error GoTo SKIP_CLOSE_ACTIONS
+    
+    Dim backupPath As String, wsMgmt As Worksheet, r As Long, lastRow As Long
+    On Error Resume Next
+    Set wsMgmt = ThisWorkbook.Worksheets(ChrW(1492) & ChrW(1490) & ChrW(1491) & ChrW(1512) & ChrW(1493) & ChrW(1514))
+    On Error GoTo SKIP_CLOSE_ACTIONS
+    If Not wsMgmt Is Nothing Then
+        backupPath = ""
+        lastRow = wsMgmt.Cells(wsMgmt.Rows.count, 10).End(xlUp).Row
+        For r = 1 To lastRow
+            If UCase$(Trim$(CStr(wsMgmt.Cells(r, 10).Value2))) = "BACKUP_PATH" Then
+                backupPath = Trim$(CStr(wsMgmt.Cells(r, 11).Value2))
+                Exit For
+            End If
+        Next r
+        If backupPath <> "" Then
+            If Right$(backupPath, 1) <> "\" Then backupPath = backupPath & "\"
+            On Error Resume Next
+            MkDir backupPath
+            On Error GoTo SKIP_CLOSE_ACTIONS
+            Dim backupFile As String
+            backupFile = backupPath & "Levav_backup_" & Format$(Now, "YYYYMMDD_HHMM") & ".xlsm"
+            ThisWorkbook.SaveCopyAs backupFile
+            
+            Dim fso As Object, folder As Object, file As Object
+            Dim fileCount As Long, oldestFile As Object, oldestDate As Date
+            Set fso = CreateObject("Scripting.FileSystemObject")
+            If fso.FolderExists(backupPath) Then
+                Set folder = fso.GetFolder(backupPath)
+                fileCount = 0
+                For Each file In folder.Files
+                    If Left$(file.Name, 13) = "Levav_backup_" And Right$(file.Name, 5) = ".xlsm" Then fileCount = fileCount + 1
+                Next file
+                Do While fileCount > 10
+                    Set oldestFile = Nothing
+                    oldestDate = Now + 1
+                    For Each file In folder.Files
+                        If Left$(file.Name, 13) = "Levav_backup_" And Right$(file.Name, 5) = ".xlsm" Then
+                            If file.DateLastModified < oldestDate Then
+                                oldestDate = file.DateLastModified
+                                Set oldestFile = file
+                            End If
+                        End If
+                    Next file
+                    If Not oldestFile Is Nothing Then
+                        oldestFile.Delete
+                        fileCount = fileCount - 1
+                    Else
+                        Exit Do
+                    End If
+                Loop
+            End If
+            Set fso = Nothing
+        End If
+    End If
+    
+    ' ---- מסתיר הכל חוץ ממסך הפתיחה בעת סגירה ----
+    Dim ws As Worksheet
+    Dim splashName As String
+    splashName = ChrW(1508) & ChrW(1514) & ChrW(1497) & ChrW(1495) ' פתיח
+
+    On Error Resume Next
+    ThisWorkbook.Worksheets(splashName).Visible = xlSheetVisible
+    For Each ws In ThisWorkbook.Worksheets
+        If StrComp(ws.Name, splashName, vbTextCompare) <> 0 Then
+            ws.Visible = xlSheetVeryHidden
+        End If
+    Next ws
+    ThisWorkbook.Worksheets(splashName).Activate
+    On Error GoTo 0
+    ThisWorkbook.Save
+    Exit Sub
+
+SKIP_CLOSE_ACTIONS:
+    Resume Next
+End Sub
+
+Private Sub Workbook_Open()
+    On Error Resume Next
+    Application.EnableEvents = True 
+    
+    ' ---- חושף את המערכת ברגע שלוחצים הפעל תוכן ----
+    Dim ctrlName As String
+    Dim splashName As String
+    ctrlName = ChrW(1491) & ChrW(1507) & " " & ChrW(1492) & ChrW(1489) & ChrW(1497) & ChrW(1514) ' דף הבית
+    splashName = ChrW(1508) & ChrW(1514) & ChrW(1497) & ChrW(1495) ' פתיח
+
+    ThisWorkbook.Worksheets(ctrlName).Visible = xlSheetVisible
+    ThisWorkbook.Worksheets(ctrlName).Activate
+    ThisWorkbook.Worksheets(splashName).Visible = xlSheetVeryHidden
+    
+    AutoFitHomeToScreen
+End Sub

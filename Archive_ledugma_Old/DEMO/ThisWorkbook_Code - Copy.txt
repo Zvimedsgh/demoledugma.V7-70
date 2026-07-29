@@ -1,0 +1,19 @@
+Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As Range)
+    On Error Resume Next
+    ' Only act if we are on the Main sheet
+    If Sh.Name <> "ראשי" And Sh.Name <> "Main" Then Exit Sub
+    
+    ' If Period Type (G6) changed
+    If Not Intersect(Target, Sh.Range("G6")) Is Nothing Then
+        Application.EnableEvents = False
+        UpdatePeriodDropdown
+        Application.EnableEvents = True
+    End If
+    
+    ' If Filter Type (G10) changed
+    If Not Intersect(Target, Sh.Range("G10")) Is Nothing Then
+        Application.EnableEvents = False
+        UpdateFilterValueDropdown
+        Application.EnableEvents = True
+    End If
+End Sub

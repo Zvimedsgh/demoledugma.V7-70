@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מנהל המיילים החכם</title>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --bg-gradient: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --text-dark: #1f2937;
+            --text-light: #4b5563;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --success: #10b981;
+        }
+
+        body {
+            font-family: 'Assistant', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        p.subtitle {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+        }
+        
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            background: white;
+            border: 1px solid #d1d5db;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            font-family: 'Assistant', sans-serif;
+            font-weight: 600;
+            color: var(--text-dark);
+            transition: all 0.2s ease;
+        }
+        
+        .filter-btn:hover {
+            background: #f3f4f6;
+        }
+        
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .email-list {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .email-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            gap: 1.5rem;
+        }
+
+        .email-item:last-child {
+            border-bottom: none;
+        }
+
+        .email-item:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateX(-5px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .email-content {
+            flex: 1;
+        }
+
+        .email-sender {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin: 0 0 0.25rem 0;
+        }
+
+        .email-subject {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-dark);
+            margin: 0 0 0.5rem 0;
+        }
+
+        .email-snippet {
+            font-size: 0.95rem;
+            color: var(--text-light);
+            margin: 0;
+            line-height: 1.5;
+            background: rgba(255,255,255,0.5);
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(0,0,0,0.03);
+            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .action-wrapper {
+            min-width: 170px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        select.action-select {
+            width: 100%;
+            padding: 0.5rem;
+            font-family: 'Assistant', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            background-color: white;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        select.action-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        /* Color coding for select based on value */
+        select.action-select.val-delete { color: var(--danger); border-color: var(--danger); background: #fef2f2; }
+        select.action-select.val-unsubscribe { color: #7f1d1d; border-color: #7f1d1d; background: #fee2e2; }
+        select.action-select.val-handle { color: var(--warning); border-color: var(--warning); background: #fffbeb; }
+        select.action-select.val-wait { color: var(--info); border-color: var(--info); background: #eff6ff; }
+        select.action-select.val-archive { color: var(--success); border-color: var(--success); background: #ecfdf5; }
+        select.action-select.val-keep { color: var(--text-light); }
+        
+        .rule-checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+        
+        .rule-checkbox-wrapper input {
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .floating-actions {
+            position: fixed !important;
+            bottom: 40px !important;
+            left: 40px !important;
+            z-index: 9999 !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .btn-submit {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1.2rem 2.5rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 9999px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.5);
+            transition: all 0.3s ease;
+            font-family: 'Assistant', sans-serif;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-hover);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(79, 70, 229, 0.6);
+        }
+
+        #loading {
+            display: none;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--primary);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>מנהל המיילים החכם</h1>
+        <p class="subtitle">ההמלצות נבחרו מראש. סנן, תקן, ושמור חוקים קבועים לשולחים.</p>
+    </header>
+    
+    <div class="filters">
+        <button class="filter-btn active" data-filter="all" onclick="filterEmails('all', this)">הכל</button>
+        <button class="filter-btn" data-filter="delete" onclick="filterEmails('delete', this)">🗑️ מועמדים למחיקה</button>
+        <button class="filter-btn" data-filter="handle" onclick="filterEmails('handle', this)">⚡ לטיפול</button>
+        <button class="filter-btn" data-filter="wait" onclick="filterEmails('wait', this)">⏳ להמתין</button>
+        <button class="filter-btn" data-filter="archive" onclick="filterEmails('archive', this)">📦 ארכיון</button>
+        <button class="filter-btn" data-filter="keep" onclick="filterEmails('keep', this)">➖ השאר בתיבה</button>
+    </div>
+
+    <div class="search-bar" style="margin-bottom: 1rem;">
+        <input type="text" id="senderFilter" placeholder="סנן לפי שם שולח..." onkeyup="applyFilters()" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border); font-family: 'Assistant', sans-serif; font-size: 1rem;">
+    </div>
+
+    <div class="email-list">
+        {% for email in emails %}
+        <div class="email-item" data-entryid="{{ email.EntryID }}" data-sender="{{ email.Sender }}" data-recommendation="{{ email.recommendation }}">
+            <div class="email-content">
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.25rem;">
+                    <h3 class="email-sender" style="margin: 0;">{{ email.Sender }}</h3>
+                    <span style="font-size: 0.85rem; color: var(--text-light);" dir="ltr">{{ email.ReceivedTime[:16] }}</span>
+                </div>
+                <h4 class="email-subject">{{ email.Subject }}</h4>
+                <p class="email-snippet">{{ email.BodySnippet }}</p>
+                <button onclick="openEmail('{{ email.EntryID }}')" style="margin-top: 0.5rem; background: transparent; border: 1px solid var(--primary); color: var(--primary); border-radius: 4px; padding: 0.3rem 0.8rem; cursor: pointer; font-family: 'Assistant', sans-serif; transition: all 0.2s ease;">👁️ פתח ב-Outlook</button>
+            </div>
+            <div class="action-wrapper">
+                <select class="action-select val-{{ email.recommendation }}" onchange="updateSelectColor(this)">
+                    <option value="keep" {% if email.recommendation == 'keep' %}selected{% endif %}>➖ השאר בתיבה</option>
+                    <option value="unsubscribe" {% if email.recommendation == 'unsubscribe' %}selected{% endif %}>🚫 הסר תפוצה ומחק</option>
+                    <option value="delete" {% if email.recommendation == 'delete' %}selected{% endif %}>🗑️ מחק</option>
+                    <option value="handle" {% if email.recommendation == 'handle' %}selected{% endif %}>⚡ לטפל</option>
+                    <option value="wait" {% if email.recommendation == 'wait' %}selected{% endif %}>⏳ להמתין</option>
+                    <option value="archive" {% if email.recommendation == 'archive' %}selected{% endif %}>📦 ארכיון</option>
+                </select>
+                <label class="rule-checkbox-wrapper">
+                    <input type="checkbox" class="save-rule-cb">
+                    החל תמיד לשולח זה
+                </label>
+            </div>
+        </div>
+        {% endfor %}
+        {% if not emails %}
+        <div class="email-item">
+            <p>לא נמצאו מיילים או שיש שגיאה בהתחברות ל-Outlook.</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<div class="floating-actions" style="position: fixed !important; bottom: 30px !important; left: 30px !important; z-index: 999999 !important; background: rgba(255,255,255,0.9); padding: 15px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.3);">
+    <button class="btn-submit" onclick="submitActions()" style="width: 100%;">בצע פעולות על המיילים המוצגים</button>
+    <div id="loading">מעדכן את תיבת הדואר וחוקים... אנא המתן</div>
+</div>
+
+<script>
+    function openEmail(entryId) {
+        window.open('/open/' + encodeURIComponent(entryId), '_blank');
+    }
+
+    // Update select color dynamically when user changes it
+    function updateSelectColor(selectObj) {
+        selectObj.className = "action-select val-" + selectObj.value;
+        // Update the data-recommendation so filters reflect the user's choice
+        var emailItem = selectObj.closest('.email-item');
+        if (emailItem) {
+            emailItem.setAttribute('data-recommendation', selectObj.value);
+        }
+    }
+    
+    let currentCategoryFilter = 'all';
+
+    function filterEmails(filterValue, btnObj) {
+        // Update active button
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        btnObj.classList.add('active');
+        
+        currentCategoryFilter = filterValue;
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const query = document.getElementById('senderFilter').value.toLowerCase();
+        const items = document.querySelectorAll('.email-item');
+        
+        items.forEach(item => {
+            const sender = item.getAttribute('data-sender').toLowerCase();
+            const recommendation = item.getAttribute('data-recommendation');
+            
+            const matchesCategory = (currentCategoryFilter === 'all' || recommendation === currentCategoryFilter);
+            const matchesSender = sender.includes(query);
+            
+            if (matchesCategory && matchesSender) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    async function submitActions() {
+        // ONLY gather items that are currently displayed!
+        const items = document.querySelectorAll('.email-item');
+        const actions = [];
+        let totalVisible = 0;
+        
+        items.forEach(item => {
+            // Check if item is visible
+            if (window.getComputedStyle(item).display !== 'none' && item.getAttribute('data-entryid')) {
+                totalVisible++;
+                const entryId = item.getAttribute('data-entryid');
+                const sender = item.getAttribute('data-sender');
+                const action = item.querySelector('.action-select').value;
+                const saveRule = item.querySelector('.save-rule-cb').checked;
+                
+                // We send it if it needs action OR if user wants to save a rule (even if 'keep')
+                if (action !== 'keep' || saveRule) {
+                    actions.push({ 
+                        EntryID: entryId, 
+                        Action: action,
+                        Sender: sender,
+                        SaveRule: saveRule
+                    });
+                }
+            }
+        });
+        
+        if (totalVisible === 0) {
+            alert('אין מיילים בתצוגה הנוכחית.');
+            return;
+        }
+        
+        if (actions.length === 0) {
+            alert('לא נבחרו פעולות לביצוע עבור המיילים המוצגים.');
+            return;
+        }
+
+        document.querySelector('.btn-submit').style.display = 'none';
+        document.getElementById('loading').style.display = 'block';
+
+        try {
+            const response = await fetch('/process', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ actions: actions })
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                alert('הפעולות בוצעו בהצלחה!');
+                window.location.reload();
+            } else {
+                alert('שגיאה: ' + result.message);
+                document.querySelector('.btn-submit').style.display = 'inline-block';
+                document.getElementById('loading').style.display = 'none';
+            }
+        } catch (error) {
+            alert('שגיאת תקשורת.');
+            document.querySelector('.btn-submit').style.display = 'inline-block';
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>

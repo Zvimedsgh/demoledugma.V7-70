@@ -1,0 +1,626 @@
+Public Sub A00_SetupMainSheet_V9_40()
+
+10      Dim wsMain As Worksheet
+20      Dim wsMgmt As Worksheet
+30      Dim shp As Shape
+        Dim s As Shape
+        Dim blueClr As Long
+        Dim lblShnBasis As String
+        Dim lblShnShotef As String
+        Dim lblTkufa As String
+        Dim lblPirutTkufa As String
+        Dim lblSugTaarih As String
+        Dim periodTypeList As String
+        Dim halfList As String
+        Dim quarterList As String
+        Dim monthList As String
+        Dim periodTypeFormula As String
+        Dim dvC4 As String
+        Dim dateTypeList As String   ' 7.33: was implicit Variant
+
+40      On Error GoTo ERR_HANDLER
+
+        ' Try to find Main sheet by current Hebrew name or old English name
+50      On Error Resume Next
+51      Set wsMain = ThisWorkbook.Worksheets(CONTROL_SHEET_NAME())
+52      If wsMain Is Nothing Then Set wsMain = ThisWorkbook.Worksheets("Main")
+53      On Error GoTo ERR_HANDLER
+        ' If not found, create it as the first sheet
+54      If wsMain Is Nothing Then
+            Set wsMain = ThisWorkbook.Worksheets.Add(Before:=ThisWorkbook.Worksheets(1))
+            wsMain.Name = CONTROL_SHEET_NAME()
+        End If
+        ' Rename to Hebrew if still English
+55      If wsMain.Name <> CONTROL_SHEET_NAME() Then wsMain.Name = CONTROL_SHEET_NAME()
+        ' Try to find NIHUL/hagdarot sheet by current Hebrew name or old English name
+56      On Error Resume Next
+57      Set wsMgmt = ThisWorkbook.Worksheets(MANAGEMENT_SHEET_NAME())
+58      If wsMgmt Is Nothing Then Set wsMgmt = ThisWorkbook.Worksheets("NIHUL")
+59      On Error GoTo ERR_HANDLER
+60      If wsMgmt Is Nothing Then Err.Raise vbObjectError + 9002, "A00_SetupMainSheet_V9_40", "Cannot find NIHUL/hagdarot sheet"
+        ' Rename to Hebrew if still English
+62      If wsMgmt.Name <> MANAGEMENT_SHEET_NAME() Then wsMgmt.Name = MANAGEMENT_SHEET_NAME()
+
+    ' --- NEW TITLE & ROW SHIFT ---
+    ' Since previous versions might have written the title without shifting,
+    ' we REMOVED the "If title exists" check.
+    ' If the user runs this macro, we ALWAYS insert a row and set the title.
+    wsMain.Rows("1:1").Insert Shift:=xlDown, CopyOrigin:=xlFormatFromLeftOrAbove
+    wsMain.Rows("1:1").RowHeight = 35
+    wsMain.Range("A1:I1").Merge
+    wsMain.Range("A1").Value = wsMgmt.Range("K46").Value
+    wsMain.Range("A1").Font.Color = RGB(255, 0, 0)
+    wsMain.Range("A1").Font.Bold = True
+    wsMain.Range("A1").Font.Size = 22
+    wsMain.Range("A1").HorizontalAlignment = xlCenter
+    wsMain.Range("A1").VerticalAlignment = xlCenter
+
+70      blueClr = RGB(0, 70, 140)
+        ' ---- Layout Spacing for Physical Centering ----
+        ' Instead of relying purely on Zoom (which leaves a massive empty left side on wide screens),
+        ' we physically spread out the elements.
+        wsMain.Columns("A").ColumnWidth = 50     ' Right margin (User requested 50)
+        wsMain.Columns("B").ColumnWidth = 15     ' Buttons (User requested)
+        wsMain.Columns("C:D").ColumnWidth = 5    ' Spacer
+        wsMain.Columns("E").ColumnWidth = 13     ' User requested 13
+        wsMain.Columns("F:G").ColumnWidth = 16   ' Parameter Table (reverted to F:G)
+        wsMain.Columns("H:I").ColumnWidth = 13   ' User requested 13
+        wsMain.Columns("J:K").ColumnWidth = 12   ' Exchange Rate box (reverted to J:K)
+        wsMain.Columns("L:M").ColumnWidth = 5    ' Spacer
+        wsMain.Columns("N:O").ColumnWidth = 12   ' Spacer
+        wsMain.Columns("P:T").ColumnWidth = 5    ' Left margins
+        
+        ' ---- Vertical Centering: Push everything down by making top rows even taller ----
+        wsMain.Rows("2:4").RowHeight = 45
+
+        ' ---- CLEANUP OF PREVIOUS VERSIONS ARTIFACTS ----
+        ' Versions 7.76 and 7.78 incorrectly drew borders and text in columns H:I and L:N.
+        ' This cleans up the duplicates so the grid looks clean like 7.75 again.
+        On Error Resume Next
+        wsMain.Range("H3:I18").Clear
+        wsMain.Range("L3:O18").Clear
+        On Error GoTo ERR_HANDLER
+
+        ' "shnat basis" = year of reference
+80      lblShnBasis = ChrW(1513) & ChrW(1504) & ChrW(1514) & " " & ChrW(1489) & ChrW(1505) & ChrW(1497) & ChrW(1505)
+        ' "shna shoteft" = current year
+90      lblShnShotef = ChrW(1513) & ChrW(1504) & ChrW(1492) & " " & ChrW(1513) & ChrW(1493) & ChrW(1496) & ChrW(1508) & ChrW(1514)
+        ' "tkufa" = period
+100     lblTkufa = ChrW(1514) & ChrW(1511) & ChrW(1493) & ChrW(1508) & ChrW(1492)
+        ' "pirot tkufa" = period detail
+110     lblPirutTkufa = ChrW(1508) & ChrW(1497) & ChrW(1512) & ChrW(1493) & ChrW(1496) & " " & ChrW(1514) & ChrW(1511) & ChrW(1493) & ChrW(1508) & ChrW(1492)
+        ' "sug taarih" = date type
+120     lblSugTaarih = ChrW(1505) & ChrW(1493) & ChrW(1490) & " " & ChrW(1514) & ChrW(1488) & ChrW(1512) & ChrW(1497) & ChrW(1498)
+
+        ' ---- Clear old labels from A2:D5 (no longer used) ----
+130     wsMain.Range("A3:D6").ClearContents
+
+        ' ---- Style row 2 headers (F2, G2, J2, K2) ----
+        Dim hdrRng As Range
+        Set hdrRng = Union(wsMain.Range("F3"), wsMain.Range("G3"), wsMain.Range("J3"), wsMain.Range("K3"))
+135     hdrRng.Interior.Color = RGB(0, 100, 0)
+136     hdrRng.Font.Color = RGB(255, 255, 255)
+137     hdrRng.Font.Bold = True
+138     hdrRng.Font.Size = 12
+139     hdrRng.HorizontalAlignment = xlCenter
+
+        ' ---- Write period lookup lists on NIHUL column Q ----
+        ' Q1 header: "period_type"
+250     wsMgmt.Cells(1, 17).Value = "PERIOD_TYPE"
+        ' Q2-Q5: the four period types
+        ' shnatit = yearly
+260     wsMgmt.Cells(2, 17).Value = ChrW(1513) & ChrW(1504) & ChrW(1514) & ChrW(1497)
+        ' chatzi shnati = half yearly
+270     wsMgmt.Cells(3, 17).Value = ChrW(1495) & ChrW(1510) & ChrW(1497) & " " & ChrW(1513) & ChrW(1504) & ChrW(1514) & ChrW(1497)
+        ' riv'oni = quarterly
+280     wsMgmt.Cells(4, 17).Value = ChrW(1512) & ChrW(1489) & ChrW(1506) & ChrW(1493) & ChrW(1504) & ChrW(1497)
+        ' chodshi = monthly
+290     wsMgmt.Cells(5, 17).Value = ChrW(1495) & ChrW(1493) & ChrW(1491) & ChrW(1513) & ChrW(1497)
+
+        ' R1 header: "HALF_YEAR"
+300     wsMgmt.Cells(1, 18).Value = "HALF_YEAR"
+        ' R2: machatzit rishona = first half
+310     wsMgmt.Cells(2, 18).Value = ChrW(1502) & ChrW(1495) & ChrW(1510) & ChrW(1497) & ChrW(1514) & " " & ChrW(1512) & ChrW(1488) & ChrW(1513) & ChrW(1493) & ChrW(1504) & ChrW(1492)
+        ' R3: machatzit shniya = second half
+320     wsMgmt.Cells(3, 18).Value = ChrW(1502) & ChrW(1495) & ChrW(1510) & ChrW(1497) & ChrW(1514) & " " & ChrW(1513) & ChrW(1504) & ChrW(1497) & ChrW(1492)
+
+        ' Define named ranges on NIHUL for dropdown sources
+        ' Period types: NIHUL!Q2:Q5
+330     On Error Resume Next
+340     ThisWorkbook.names("lst_period_type").Delete
+350     ThisWorkbook.names("lst_half_year").Delete
+360     ThisWorkbook.names("lst_quarter").Delete
+370     ThisWorkbook.names("lst_month").Delete
+380     On Error GoTo ERR_HANDLER
+
+390     ThisWorkbook.names.Add Name:="lst_period_type", RefersTo:="=" & MANAGEMENT_SHEET_NAME() & "!$Q$2:$Q$5"
+400     ThisWorkbook.names.Add Name:="lst_half_year", RefersTo:="=" & MANAGEMENT_SHEET_NAME() & "!$R$2:$R$3"
+
+        ' Quarter list in NIHUL column R rows 5-8
+        ' riv'on rishon = Q1
+410     wsMgmt.Cells(5, 18).Value = ChrW(1512) & ChrW(1489) & ChrW(1506) & ChrW(1493) & ChrW(1503) & " " & ChrW(1512) & ChrW(1488) & ChrW(1513) & ChrW(1493) & ChrW(1503)
+        ' riv'on sheni = Q2
+420     wsMgmt.Cells(6, 18).Value = ChrW(1512) & ChrW(1489) & ChrW(1506) & ChrW(1493) & ChrW(1503) & " " & ChrW(1513) & ChrW(1504) & ChrW(1497)
+        ' riv'on shlishi = Q3
+430     wsMgmt.Cells(7, 18).Value = ChrW(1512) & ChrW(1489) & ChrW(1506) & ChrW(1493) & ChrW(1503) & " " & ChrW(1513) & ChrW(1500) & ChrW(1497) & ChrW(1513) & ChrW(1497)
+        ' riv'on revi'i = Q4
+440     wsMgmt.Cells(8, 18).Value = ChrW(1512) & ChrW(1489) & ChrW(1506) & ChrW(1493) & ChrW(1503) & " " & ChrW(1512) & ChrW(1489) & ChrW(1497) & ChrW(1506) & ChrW(1497)
+450     ThisWorkbook.names.Add Name:="lst_quarter", RefersTo:="=" & MANAGEMENT_SHEET_NAME() & "!$R$5:$R$8"
+
+        ' Month list in NIHUL column R rows 10-21 (Hebrew month names)
+460     wsMgmt.Cells(10, 18).Value = ChrW(1497) & ChrW(1504) & ChrW(1493) & ChrW(1488) & ChrW(1512)
+470     wsMgmt.Cells(11, 18).Value = ChrW(1508) & ChrW(1489) & ChrW(1512) & ChrW(1493) & ChrW(1488) & ChrW(1512)
+480     wsMgmt.Cells(12, 18).Value = ChrW(1502) & ChrW(1512) & ChrW(1509)
+490     wsMgmt.Cells(13, 18).Value = ChrW(1488) & ChrW(1508) & ChrW(1512) & ChrW(1497) & ChrW(1500)
+500     wsMgmt.Cells(14, 18).Value = ChrW(1502) & ChrW(1488) & ChrW(1497)
+510     wsMgmt.Cells(15, 18).Value = ChrW(1497) & ChrW(1493) & ChrW(1504) & ChrW(1497)
+520     wsMgmt.Cells(16, 18).Value = ChrW(1497) & ChrW(1493) & ChrW(1500) & ChrW(1497)
+530     wsMgmt.Cells(17, 18).Value = ChrW(1488) & ChrW(1493) & ChrW(1490) & ChrW(1493) & ChrW(1505) & ChrW(1496)
+540     wsMgmt.Cells(18, 18).Value = ChrW(1505) & ChrW(1508) & ChrW(1496) & ChrW(1502) & ChrW(1489) & ChrW(1512)
+550     wsMgmt.Cells(19, 18).Value = ChrW(1488) & ChrW(1493) & ChrW(1511) & ChrW(1496) & ChrW(1493) & ChrW(1489) & ChrW(1512)
+560     wsMgmt.Cells(20, 18).Value = ChrW(1504) & ChrW(1493) & ChrW(1489) & ChrW(1502) & ChrW(1489) & ChrW(1512)
+570     wsMgmt.Cells(21, 18).Value = ChrW(1491) & ChrW(1510) & ChrW(1502) & ChrW(1489) & ChrW(1512)
+580     ThisWorkbook.names.Add Name:="lst_month", RefersTo:="=" & MANAGEMENT_SHEET_NAME() & "!$R$10:$R$21"
+
+        ' ---- rngPeriodType dropdown: period type ----
+590     wsMain.Range("rngPeriodType").Validation.Delete
+600     wsMain.Range("rngPeriodType").Validation.Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Formula1:="=lst_period_type"
+
+        ' ---- rngDateType dropdown: date type ----
+        ' bordereu / thilat bituah
+610     wsMain.Range("rngDateType").Validation.Delete
+
+620     dateTypeList = ChrW(1489) & ChrW(1493) & ChrW(1512) & ChrW(1491) & ChrW(1512) & ChrW(1493) & "," & ChrW(1514) & ChrW(1495) & ChrW(1497) & ChrW(1500) & ChrW(1514) & " " & ChrW(1489) & ChrW(1497) & ChrW(1496) & ChrW(1493) & ChrW(1495)
+630     wsMain.Range("rngDateType").Validation.Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Formula1:=dateTypeList
+
+        ' ---- C4 dependent dropdown: uses INDIRECT based on B4 value ----
+        ' We use a formula approach: map B4 value to named range
+        ' INDIRECT formula: =IF(B4=shnatit,"",IF(B4=chatzi,lst_half_year,IF(B4=riv'oni,lst_quarter,IF(B4=chodshi,lst_month,""))))
+        ' Since INDIRECT with dynamic named ranges is complex, we use Worksheet_Change event instead
+        ' For now, set C4 validation to allow any list - it will be updated by the event macro
+640     wsMain.Range("rngPeriodValue").Validation.Delete
+
+        ' ---- Remove ALL old buttons ----
+650     On Error Resume Next
+        For Each s In wsMain.Shapes
+660         s.Delete
+670     Next s
+680     On Error GoTo ERR_HANDLER
+
+        ' ---- Button 1: BuildReview ----
+        ' "1 - bdikat netunim" = Data Review
+        ' ---- Pre-calculate button heights to match Clear button's bottom ----
+        Dim btnSearchTop As Single
+        Dim btnClearTop As Single
+        Dim btnClearBottom As Single
+        btnSearchTop = wsMain.Range("F13").Top + wsMain.Range("F13").Height + 5
+        btnClearTop = btnSearchTop + 25 + 5
+        btnClearBottom = btnClearTop + 25
+
+        Dim startTop As Single
+        Dim totalAvailHeight As Single
+        Dim btnGap As Single
+        Dim calcBtnHeight As Single
+        Dim btnTop As Single
+        
+        startTop = wsMain.Range("B3").Top
+        btnGap = 3
+        totalAvailHeight = btnClearBottom - startTop
+        calcBtnHeight = (totalAvailHeight - (5 * btnGap)) / 6
+        btnTop = startTop
+
+        ' ---- Button 1: BuildReview ----
+        Set shp = wsMain.Shapes.AddShape(msoShapeRoundedRectangle, wsMain.Range("B3").Left + 2, btnTop, 80, calcBtnHeight)
+        btnTop = shp.Top + shp.Height + btnGap
+        shp.Name = "btnBuildReview"
+        shp.Fill.ForeColor.RGB = blueClr
+        shp.TextFrame2.TextRange.Text = "1" & vbCrLf & ChrW(1489) & ChrW(1491) & ChrW(1497) & ChrW(1511) & ChrW(1514) & vbCrLf & ChrW(1504) & ChrW(1514) & ChrW(1493) & ChrW(1504) & ChrW(1497) & ChrW(1501)
+        shp.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = RGB(255, 255, 255)
+        shp.TextFrame2.TextRange.Font.Size = 10
+        shp.TextFrame2.TextRange.Font.Bold = msoTrue
+        shp.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+        shp.OnAction = "BuildReview"
+
+        ' ---- Button 2: ApplyCorrectionsAndBuildReports ----
+        Set shp = wsMain.Shapes.AddShape(msoShapeRoundedRectangle, wsMain.Range("B3").Left + 2, btnTop, 80, calcBtnHeight)
+        btnTop = shp.Top + shp.Height + btnGap
+        shp.Name = "btnApplyCorrections"
+        shp.Fill.ForeColor.RGB = RGB(0, 120, 60)
+        shp.TextFrame2.TextRange.Text = "2" & vbCrLf & ChrW(1497) & ChrW(1497) & ChrW(1513) & ChrW(1493) & ChrW(1501) & vbCrLf & ChrW(1493) & ChrW(1491) & ChrW(1493) & ChrW(34) & ChrW(1495) & ChrW(1493) & ChrW(1514)
+        shp.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = RGB(255, 255, 255)
+        shp.TextFrame2.TextRange.Font.Size = 10
+        shp.TextFrame2.TextRange.Font.Bold = msoTrue
+        shp.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+        shp.OnAction = "ApplyCorrectionsAndBuildReports"
+
+        ' ---- Button 3: BuildPresentation ----
+        Set shp = wsMain.Shapes.AddShape(msoShapeRoundedRectangle, wsMain.Range("B3").Left + 2, btnTop, 80, calcBtnHeight)
+        btnTop = shp.Top + shp.Height + btnGap
+        shp.Name = "btnBuildPresentation"
+        shp.Fill.ForeColor.RGB = RGB(160, 80, 0)
+        shp.TextFrame2.TextRange.Text = "3" & vbCrLf & ChrW(1497) & ChrW(1497) & ChrW(1510) & ChrW(1493) & ChrW(1512) & vbCrLf & ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1514)
+        shp.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = RGB(255, 255, 255)
+        shp.TextFrame2.TextRange.Font.Size = 10
+        shp.TextFrame2.TextRange.Font.Bold = msoTrue
+        shp.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+        shp.OnAction = "BuildPresentation"
+
+        ' ---- Button 4: Save Reports (Pro Only) ----
+        Set shp = wsMain.Shapes.AddShape(msoShapeRoundedRectangle, wsMain.Range("B3").Left + 2, btnTop, 80, calcBtnHeight)
+        btnTop = shp.Top + shp.Height + btnGap
+        shp.Name = "btnSaveReports"
+        shp.Fill.ForeColor.RGB = RGB(50, 120, 190)
+        shp.TextFrame2.TextRange.Text = "4" & vbCrLf & ChrW(1513) & ChrW(1502) & ChrW(1497) & ChrW(1512) & ChrW(1514) & vbCrLf & ChrW(1491) & ChrW(1493) & ChrW(1495) & ChrW(1493) & ChrW(1514)
+        shp.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = RGB(255, 255, 255)
+        shp.TextFrame2.TextRange.Font.Size = 10
+        shp.TextFrame2.TextRange.Font.Bold = msoTrue
+        shp.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+        shp.OnAction = "ProVersionOnly"
+
+        ' ---- Button 5: View Reports (Pro Only) ----
+        Set shp = wsMain.Shapes.AddShape(msoShapeRoundedRectangle, wsMain.Range("B3").Left + 2, btnTop, 80, calcBtnHeight)
+        btnTop = shp.Top + shp.Height + btnGap
+        shp.Name = "btnViewReports"
+        shp.Fill.ForeColor.RGB = RGB(50, 170, 110)
+        shp.TextFrame2.TextRange.Text = "5" & vbCrLf & ChrW(1510) & ChrW(1508) & ChrW(1497) & ChrW(1497) & ChrW(1492) & vbCrLf & ChrW(1489) & ChrW(1491) & ChrW(1493) & ChrW(1495) & ChrW(1493) & ChrW(1514)
+        shp.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = RGB(255, 255, 255)
+        shp.TextFrame2.TextRange.Font.Size = 10
+        shp.TextFrame2.TextRange.Font.Bold = msoTrue
+        shp.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+        shp.OnAction = "ProVersionOnly"
+
+        ' ---- Button 6: New Clients? (Pro Only) ----
+        Set shp = wsMain.Shapes.AddShape(msoShapeRoundedRectangle, wsMain.Range("B3").Left + 2, btnTop, 80, calcBtnHeight)
+        btnTop = shp.Top + shp.Height + 10 ' 10 points before show sheets
+        shp.Name = "btnNewClients"
+        shp.Fill.ForeColor.RGB = RGB(210, 130, 50)
+        shp.TextFrame2.TextRange.Text = "6" & vbCrLf & ChrW(1500) & ChrW(1511) & ChrW(1493) & ChrW(1495) & ChrW(1493) & ChrW(1514) & vbCrLf & ChrW(1495) & ChrW(1491) & ChrW(1513) & ChrW(1497) & ChrW(1501) & "?"
+        shp.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = RGB(255, 255, 255)
+        shp.TextFrame2.TextRange.Font.Size = 10
+        shp.TextFrame2.TextRange.Font.Bold = msoTrue
+        shp.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+        shp.OnAction = "ProVersionOnly"
+
+        ' Button: Show/Hide hidden sheets - placed below buttons
+        Set shp = wsMain.Shapes.AddShape(msoShapeRoundedRectangle, wsMain.Range("L17").Left, wsMain.Range("L17").Top, 160, 30)
+        shp.Name = "btnShowHidden"
+        shp.Fill.ForeColor.RGB = RGB(80, 80, 80)
+        shp.TextFrame2.TextRange.Text = ChrW(1492) & ChrW(1510) & ChrW(1490) & "/" & ChrW(1492) & ChrW(1505) & ChrW(1514) & ChrW(1512) & " " & ChrW(1490) & ChrW(1497) & ChrW(1500) & ChrW(1497) & ChrW(1493) & ChrW(1504) & ChrW(1493) & ChrW(1514)
+        shp.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = RGB(255, 255, 255)
+        shp.TextFrame2.TextRange.Font.Size = 10
+        shp.TextFrame2.TextRange.Font.Bold = msoTrue
+        shp.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+        shp.OnAction = "ToggleHiddenSheets"
+        
+        ' ---- Restore Credit Text in A16 aligned left (near B) ----
+        On Error Resume Next
+        wsMain.Range("A19:F19").UnMerge
+        wsMain.Range("A19:F19").Clear
+        wsMain.Range("F17:G17").UnMerge
+        wsMain.Range("F17:G17").Clear
+        wsMain.Range("B17:C17").UnMerge
+        wsMain.Range("B17:C17").Clear
+        wsMain.Range("A17").Value = ChrW(1508) & ChrW(1497) & ChrW(1514) & ChrW(1493) & ChrW(1495) & " " & ChrW(1490) & ChrW(1493) & ChrW(1512) & ChrW(1504) & ChrW(1496) & ChrW(1511) & " 054-6677396"
+        wsMain.Range("A17").Font.Size = 12
+        wsMain.Range("A17").Font.Bold = True
+        wsMain.Range("A17").Font.Color = RGB(0, 100, 0)
+        wsMain.Range("A17").HorizontalAlignment = xlLeft
+        wsMain.Range("A17").VerticalAlignment = xlCenter
+        On Error GoTo ERR_HANDLER
+
+        ' ---- Store Hebrew message texts in column S of hagdarot ----
+        ' S1=header, S2=done+found, S3=issues, S4=done ok, S5=line, S6=error
+        ' S7=step, S8=confirm title, S9=btn2 confirm, S10=setup err, S11=dropdown err, S12=setup ok
+        ' S13-S16=confirmation lines 1-4
+865     wsMgmt.Cells(1, 19).Value = ChrW(1492) & ChrW(1493) & ChrW(1491) & ChrW(1506) & ChrW(1493) & ChrW(1514) & " " & ChrW(1502) & ChrW(1506) & ChrW(1512) & ChrW(1499) & ChrW(1514)
+866     wsMgmt.Cells(2, 19).Value = ChrW(1492) & ChrW(1505) & ChrW(1514) & ChrW(1497) & ChrW(1497) & ChrW(1501) & " " & "-" & " " & ChrW(1504) & ChrW(1502) & ChrW(1510) & ChrW(1488) & ChrW(1493) & " "
+867     wsMgmt.Cells(3, 19).Value = " " & ChrW(1495) & ChrW(1512) & ChrW(1497) & ChrW(1490) & ChrW(1493) & ChrW(1514)
+868     wsMgmt.Cells(4, 19).Value = ChrW(1492) & ChrW(1505) & ChrW(1514) & ChrW(1497) & ChrW(1497) & ChrW(1501) & " " & ChrW(1489) & ChrW(1492) & ChrW(1510) & ChrW(1500) & ChrW(1495) & ChrW(1492)
+869     wsMgmt.Cells(5, 19).Value = ChrW(1513) & ChrW(1493) & ChrW(1512) & ChrW(1492) & " "
+        wsMgmt.Cells(6, 19).Value = ChrW(1513) & ChrW(1490) & ChrW(1497) & ChrW(1488) & ChrW(1492) & " "
+        wsMgmt.Cells(7, 19).Value = ChrW(1513) & ChrW(1500) & ChrW(1489) & ":" & " "
+        wsMgmt.Cells(8, 19).Value = ChrW(1488) & ChrW(1497) & ChrW(1513) & ChrW(1493) & ChrW(1512) & " " & ChrW(1500) & ChrW(1508) & ChrW(1504) & ChrW(1497) & " " & ChrW(1506) & ChrW(1497) & ChrW(1489) & ChrW(1493) & ChrW(1491)
+        wsMgmt.Cells(9, 19).Value = ChrW(1492) & ChrW(1488) & ChrW(1501) & " " & ChrW(1500) & ChrW(1497) & ChrW(1497) & ChrW(1513) & ChrW(1501) & " " & ChrW(1514) & ChrW(1497) & ChrW(1511) & ChrW(1493) & ChrW(1504) & ChrW(1497) & ChrW(1501) & " " & ChrW(1493) & ChrW(1500) & ChrW(1497) & ChrW(1497) & ChrW(1510) & ChrW(1512) & " " & ChrW(1491) & ChrW(1493) & ChrW(1495) & ChrW(1493) & ChrW(1514) & "?"
+        wsMgmt.Cells(10, 19).Value = ChrW(1513) & ChrW(1490) & ChrW(1497) & ChrW(1488) & ChrW(1492) & " " & ChrW(1489) & ChrW(1492) & ChrW(1490) & ChrW(1491) & ChrW(1512) & ChrW(1514) & " " & ChrW(1491) & ChrW(1507) & " " & ChrW(1492) & ChrW(1489) & ChrW(1497) & ChrW(1514) & ":" & " "
+        wsMgmt.Cells(11, 19).Value = ChrW(1513) & ChrW(1490) & ChrW(1497) & ChrW(1488) & ChrW(1492) & " " & ChrW(1489) & ChrW(1506) & ChrW(1491) & ChrW(1499) & ChrW(1493) & ChrW(1503) & " " & ChrW(1514) & ChrW(1511) & ChrW(1493) & ChrW(1508) & ChrW(1492) & ":" & " "
+        wsMgmt.Cells(12, 19).Value = ChrW(1490) & ChrW(1497) & ChrW(1500) & ChrW(1497) & ChrW(1493) & ChrW(1503) & " " & ChrW(1491) & ChrW(1507) & " " & ChrW(1492) & ChrW(1489) & ChrW(1497) & ChrW(1514) & " " & ChrW(1492) & ChrW(1493) & ChrW(1511) & ChrW(1501) & " " & ChrW(1489) & ChrW(1492) & ChrW(1510) & ChrW(1500) & ChrW(1495) & ChrW(1492) & "!"
+        wsMgmt.Cells(13, 19).Value = "1" & "." & " " & ChrW(1492) & ChrW(1488) & ChrW(1501) & " " & ChrW(1492) & ChrW(1506) & ChrW(1500) & ChrW(1497) & ChrW(1514) & " " & ChrW(1511) & ChrW(1493) & ChrW(1489) & ChrW(1509) & " " & ChrW(1513) & ChrW(1500) & ChrW(1497) & ChrW(1508) & ChrW(1492) & " " & ChrW(1506) & ChrW(1491) & ChrW(1499) & ChrW(1504) & ChrW(1497) & "?"
+        wsMgmt.Cells(14, 19).Value = "2" & "." & " " & ChrW(1492) & ChrW(1488) & ChrW(1501) & " " & ChrW(1513) & ChrW(1502) & ChrW(1512) & ChrW(1514) & " " & ChrW(1488) & ChrW(1514) & " " & _
+            ChrW(1492) & ChrW(1506) & ChrW(1497) & ChrW(1489) & ChrW(1493) & ChrW(1491) & " " & ChrW(1492) & ChrW(1488) & ChrW(1495) & ChrW(1512) & ChrW(1493) & ChrW(1503) & " " & "(" & ChrW(1492) & ChrW(1504) & ChrW(1514) & ChrW(1493) & ChrW(1504) & ChrW(1497) & ChrW(1501) & " " & _
+            ChrW(1489) & ChrW(1495) & ChrW(1493) & ChrW(1489) & ChrW(1512) & ChrW(1514) & " " & ChrW(1494) & ChrW(1493) & " " & ChrW(1497) & ChrW(1502) & ChrW(1495) & ChrW(1511) & ChrW(1493) & " " & _
+            ChrW(1489) & ChrW(1514) & ChrW(1492) & ChrW(1500) & ChrW(1497) & ChrW(1498) & " " & ChrW(1492) & ChrW(1506) & ChrW(1497) & ChrW(1489) & ChrW(1493) & ChrW(1491) & ")"
+        wsMgmt.Cells(15, 19).Value = "3" & "." & " " & ChrW(1492) & ChrW(1488) & ChrW(1501) & " " & ChrW(1489) & ChrW(1495) & ChrW(1512) & ChrW(1514) & " " & ChrW(1488) & ChrW(1514) & " " & ChrW(1508) & ChrW(1512) & ChrW(1496) & ChrW(1497) & " " & ChrW(1492) & ChrW(1506) & ChrW(1497) & ChrW(1489) & ChrW(1493) & ChrW(1491) & " " & ChrW(1492) & ChrW(1504) & ChrW(1491) & ChrW(1512) & ChrW(1513) & " " & ChrW(1489) & ChrW(1490) & ChrW(1497) & ChrW(1500) & ChrW(1497) & ChrW(1493) & ChrW(1503) & " " & ChrW(1491) & ChrW(1507) & " " & ChrW(1492) & ChrW(1489) & ChrW(1497) & ChrW(1514) & "?"
+        wsMgmt.Cells(16, 19).Value = "4" & "." & " " & ChrW(1500) & ChrW(1495) & ChrW(1509) & " " & ChrW(1506) & ChrW(1500) & " " & "O" & "K" & " " & ChrW(1500) & ChrW(1492) & ChrW(1502) & ChrW(1513) & ChrW(1498)
+        ' S17 = "don't show this message again?" text
+        wsMgmt.Cells(17, 19).Value = ChrW(1492) & ChrW(1488) & ChrW(1501) & " " & ChrW(1500) & ChrW(1492) & ChrW(1510) & ChrW(1497) & ChrW(1490) & " " & ChrW(1492) & ChrW(1493) & ChrW(1491) & ChrW(1506) & ChrW(1492) & " " & ChrW(1494) & ChrW(1493) & " " & ChrW(1513) & ChrW(1493) & ChrW(1489) & "?"
+        ' S20 = flag: "1" means don't show confirmation again (empty = show)
+        ' Don't overwrite S20 if already set
+
+        ' ---- Set Error_Email parameter if not exists ----
+895     Dim paramLastRow As Long
+896     paramLastRow = wsMgmt.Cells(wsMgmt.Rows.count, COL_PARAM_NAME).End(xlUp).Row
+897     Dim foundEmail As Boolean
+898     foundEmail = False
+899     Dim pr As Long
+        For pr = 1 To paramLastRow
+            If UCase$(Trim$(CStr(wsMgmt.Cells(pr, COL_PARAM_NAME).Value2))) = "ERROR_EMAIL" Then foundEmail = True: Exit For
+        Next pr
+        If Not foundEmail Then
+            wsMgmt.Cells(paramLastRow + 1, COL_PARAM_NAME).Value = "ERROR_EMAIL"
+            wsMgmt.Cells(paramLastRow + 1, COL_PARAM_VALUE).Value = "zvi@gorentech.co.il"
+            paramLastRow = paramLastRow + 1
+        End If
+
+        ' ---- Set BACKUP_PATH parameter if not exists ----
+        Dim foundBackup As Boolean
+        foundBackup = False
+        For pr = 1 To paramLastRow
+            If UCase$(Trim$(CStr(wsMgmt.Cells(pr, COL_PARAM_NAME).Value2))) = "BACKUP_PATH" Then foundBackup = True: Exit For
+        Next pr
+        If Not foundBackup Then
+            wsMgmt.Cells(paramLastRow + 1, COL_PARAM_NAME).Value = "BACKUP_PATH"
+            wsMgmt.Cells(paramLastRow + 1, COL_PARAM_VALUE).Value = "C:\DEMO PROJECT\BACKUPS"
+        End If
+
+        ' ---- Set default values if empty ----
+900     If IsEmpty(wsMain.Range("rngPeriodType").Value) Or wsMain.Range("rngPeriodType").Value = "" Then
+902         wsMain.Range("rngPeriodType").Value = ChrW(1513) & ChrW(1504) & ChrW(1514) & ChrW(1497)
+904     End If
+
+        ' ---- Set default value for rngFilterType if empty ----
+        If IsEmpty(wsMain.Range("G10").Value) Or wsMain.Range("G10").Value = "" Then
+            wsMain.Range("G10").Value = ChrW(1489) & ChrW(1495) & ChrW(1512) & ChrW(47) & ChrW(1497)
+        End If
+
+        ' ---- rngFilterType dropdown: report filter type ----
+        ' Options: bechar/i, chevra, teler, sochen, anaf, anaf merkaz
+        Dim filterTypeList As String
+905     filterTypeList = ChrW(1489) & ChrW(1495) & ChrW(1512) & ChrW(47) & ChrW(1497) & "," & ChrW(1495) & ChrW(1489) & ChrW(1512) & ChrW(1492) & "," & ChrW(1496) & ChrW(1500) & ChrW(1512) & "," & ChrW(1505) & ChrW(1493) & ChrW(1499) & ChrW(1503) & "," & ChrW(1506) & ChrW(1504) & ChrW(1507) & "," & ChrW(1506) & ChrW(1504) & ChrW(1507) & " " & ChrW(1502) & ChrW(1512) & ChrW(1499) & ChrW(1494)
+        ' Use direct cell reference G9 in case named range not yet defined
+906     On Error Resume Next
+        wsMain.Range("G10").Validation.Delete
+907     wsMain.Range("G10").Validation.Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Formula1:=filterTypeList
+        wsMain.Range("G11").Validation.Delete
+908     On Error GoTo ERR_HANDLER
+        ' Create/update ALL named ranges for home sheet cells
+        On Error Resume Next
+        ThisWorkbook.names("rngCurrentYear").Delete
+        ThisWorkbook.names("rngBaseYear").Delete
+        ThisWorkbook.names("rngPeriodType").Delete
+        ThisWorkbook.names("rngPeriodValue").Delete
+        ThisWorkbook.names("rngDateType").Delete
+        ThisWorkbook.names("rngFilterType").Delete
+        ThisWorkbook.names("rngFilterValue").Delete
+        On Error GoTo ERR_HANDLER
+        ' v7.70: G3 is labeled "shnat basis" (base year), G4 is labeled "shna shoteft" (current year).
+        ' Previous mapping was inverted, causing BuildReview to read the wrong year.
+        ThisWorkbook.names.Add Name:="rngBaseYear", RefersTo:="='" & wsMain.Name & "'!$G$4"
+        ThisWorkbook.names.Add Name:="rngCurrentYear", RefersTo:="='" & wsMain.Name & "'!$G$5"
+        ThisWorkbook.names.Add Name:="rngPeriodType", RefersTo:="='" & wsMain.Name & "'!$G$6"
+        ThisWorkbook.names.Add Name:="rngPeriodValue", RefersTo:="='" & wsMain.Name & "'!$G$7"
+        ThisWorkbook.names.Add Name:="rngDateType", RefersTo:="='" & wsMain.Name & "'!$G$8"
+        ThisWorkbook.names.Add Name:="rngFilterType", RefersTo:="='" & wsMain.Name & "'!$G$10"
+        ThisWorkbook.names.Add Name:="rngFilterValue", RefersTo:="='" & wsMain.Name & "'!$G$11"
+
+        ' ---- Client name filter (F12 label, G12 Data Validation dropdown) ----
+        ' "shem lakoach" = ?? ????
+        wsMain.Range("F13").Value = ChrW(1513) & ChrW(1501) & " " & ChrW(1500) & ChrW(1511) & ChrW(1493) & ChrW(1495)
+        wsMain.Range("F13").Font.Bold = True
+        wsMain.Range("F13").Font.Size = 12
+        wsMain.Range("F13").Font.Color = RGB(0, 70, 140)
+
+        ' Create/update named range for G12
+        On Error Resume Next
+        ThisWorkbook.names("rngClientName").Delete
+        On Error GoTo ERR_HANDLER
+        ThisWorkbook.names.Add Name:="rngClientName", RefersTo:="='" & wsMain.Name & "'!$G$13"
+
+        ' Set default value "bechar/i" = ???/?
+        If IsEmpty(wsMain.Range("G13").Value) Or wsMain.Range("G13").Value = "" Then
+            wsMain.Range("G13").Value = ChrW(1489) & ChrW(1495) & ChrW(1512) & ChrW(47) & ChrW(1497)
+        End If
+
+        ' Remove old ComboBox if exists (from previous versions)
+        On Error Resume Next
+        wsMain.OLEObjects("cmbClientName").Delete
+        On Error GoTo ERR_HANDLER
+
+        ' Remove Data Validation from G12 (from previous versions)
+        On Error Resume Next
+        wsMain.Range("G13").Validation.Delete
+        On Error GoTo ERR_HANDLER
+
+        ' Add search button (tight under table F)
+        Dim btnSearch As Shape
+        On Error Resume Next
+        wsMain.Shapes("btnSearchClient").Delete
+        On Error GoTo ERR_HANDLER
+        Set btnSearch = wsMain.Shapes.AddShape(msoShapeRoundedRectangle, _
+            wsMain.Range("F14").Left + (wsMain.Range("F14").Width - 50) / 2, _
+            btnSearchTop, 50, 25)
+        btnSearch.Name = "btnSearchClient"
+        btnSearch.TextFrame2.TextRange.Text = ChrW(1495) & ChrW(1508) & ChrW(1513)  ' "???"
+        btnSearch.TextFrame2.TextRange.Font.Size = 9
+        btnSearch.TextFrame2.TextRange.Font.Bold = msoTrue
+        btnSearch.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+        btnSearch.Fill.ForeColor.RGB = RGB(70, 130, 180)
+        btnSearch.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = RGB(255, 255, 255)
+        btnSearch.OnAction = "SearchClientName"
+
+        ' Add "kulam" (all) button (tight under table G)
+        Dim btnAll As Shape
+        On Error Resume Next
+        wsMain.Shapes("btnAllClients").Delete
+        On Error GoTo ERR_HANDLER
+        Set btnAll = wsMain.Shapes.AddShape(msoShapeRoundedRectangle, _
+            wsMain.Range("G14").Left + (wsMain.Range("G14").Width - 50) / 2, _
+            btnSearchTop, 50, 25)
+        btnAll.Name = "btnAllClients"
+        btnAll.TextFrame2.TextRange.Text = ChrW(1499) & ChrW(1493) & ChrW(1500) & ChrW(1501)  ' "????"
+        btnAll.TextFrame2.TextRange.Font.Size = 9
+        btnAll.TextFrame2.TextRange.Font.Bold = msoTrue
+        btnAll.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+        btnAll.Fill.ForeColor.RGB = RGB(60, 160, 60)
+        btnAll.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = RGB(255, 255, 255)
+        btnAll.OnAction = "ResetClientFilter"
+
+        ' clear selection button tight under search buttons
+        Dim btnClearSel As Shape
+        On Error Resume Next
+        wsMain.Shapes("btnClearSelection").Delete
+        On Error GoTo ERR_HANDLER
+        Set btnClearSel = wsMain.Shapes.AddShape(msoShapeRoundedRectangle, _
+            wsMain.Range("F15:G15").Left + (wsMain.Range("F15:G15").Width - 105) / 2, _
+            btnClearTop, 105, 25)
+        btnClearSel.Name = "btnClearSelection"
+        ' "naki bechira" = clear selection
+        btnClearSel.TextFrame2.TextRange.Text = ChrW(1488) & ChrW(1497) & ChrW(1508) & ChrW(1493) & ChrW(1505) & " " & ChrW(1508) & ChrW(1512) & ChrW(1502) & ChrW(1496) & ChrW(1512) & ChrW(1497) & ChrW(1501)
+        btnClearSel.TextFrame2.TextRange.Font.Size = 9
+        btnClearSel.TextFrame2.TextRange.Font.Bold = msoTrue
+        btnClearSel.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+        btnClearSel.Fill.ForeColor.RGB = RGB(160, 60, 60)
+        btnClearSel.TextFrame2.TextRange.Font.Fill.ForeColor.RGB = RGB(255, 255, 255)
+        btnClearSel.OnAction = "ClearSelection"
+
+
+        ' ---- Set RTL and font size 14 for ALL sheets in workbook ----
+        Dim wsLoop As Worksheet
+        For Each wsLoop In ThisWorkbook.Worksheets
+            wsLoop.DisplayRightToLeft = True
+            wsLoop.Cells.Font.Size = 14
+        Next wsLoop
+
+        ' ---- Exchange rate info message at J5:K7 ----
+        Dim rngMsg As Range
+        ' Clear any old wider merge (e.g. J5:L7 from previous versions)
+        wsMain.Range("J6:L8").UnMerge
+        Set rngMsg = wsMain.Range("J6:K8")
+        rngMsg.Merge
+        ' Message: line1="???? ?????? ?"? ??? ?????" line2="?? ?? ????? ???" line3="???? ???? ????? ???"
+        Dim msgTxt As String
+        ' Line 1: hasha'ar mit'adken al pi bank israel
+        msgTxt = ChrW(1492) & ChrW(1513) & ChrW(1506) & ChrW(1512) & " " & _
+            ChrW(1502) & ChrW(1514) & ChrW(1506) & ChrW(1491) & ChrW(1499) & ChrW(1503) & " " & _
+            ChrW(1506) & ChrW(34) & ChrW(1508) & " " & _
+            ChrW(1489) & ChrW(1504) & ChrW(1511) & " " & _
+            ChrW(1497) & ChrW(1513) & ChrW(1512) & ChrW(1488) & ChrW(1500) & vbLf
+        ' Line 2: im lo yimatze sha'ar
+        msgTxt = msgTxt & ChrW(1488) & ChrW(1501) & " " & _
+            ChrW(1500) & ChrW(1488) & " " & _
+            ChrW(1497) & ChrW(1497) & ChrW(1502) & ChrW(1510) & ChrW(1488) & " " & _
+            ChrW(1513) & ChrW(1506) & ChrW(1512) & vbLf
+        ' Line 3: yeshamesh hasha'ar harashum kan
+        msgTxt = msgTxt & ChrW(1497) & ChrW(1513) & ChrW(1502) & ChrW(1513) & " " & _
+            ChrW(1492) & ChrW(1513) & ChrW(1506) & ChrW(1512) & " " & _
+            ChrW(1492) & ChrW(1512) & ChrW(1513) & ChrW(1493) & ChrW(1501) & " " & _
+            ChrW(1499) & ChrW(1488) & ChrW(1503)
+        rngMsg.Value = msgTxt
+        rngMsg.Font.Size = 10
+        rngMsg.Font.Color = RGB(0, 70, 180)
+        rngMsg.Font.Italic = True
+        rngMsg.WrapText = True
+        rngMsg.VerticalAlignment = xlCenter
+        rngMsg.HorizontalAlignment = xlCenter
+        ' Border as Shape (rectangle) around J5:K7 - works reliably with merged cells
+        Dim borderShp As Shape
+        On Error Resume Next
+        wsMain.Shapes("shpMsgBorder").Delete
+        On Error GoTo ERR_HANDLER
+        Set borderShp = wsMain.Shapes.AddShape(msoShapeRectangle, _
+            rngMsg.Left, rngMsg.Top, rngMsg.Width, rngMsg.Height)
+        borderShp.Name = "shpMsgBorder"
+        borderShp.Fill.Visible = msoFalse
+        borderShp.Line.ForeColor.RGB = RGB(0, 0, 120)
+        borderShp.Line.Weight = 1.5
+        borderShp.Placement = xlMoveAndSize
+
+        ' ---- Border for exchange rate cells J3:K4 using native cell borders instead of a shape (fixes weird leftover lines) ----
+        Dim rngRates As Range
+        Set rngRates = wsMain.Range("J4:K5")
+        On Error Resume Next
+        wsMain.Shapes("shpRateBorder").Delete
+        On Error GoTo ERR_HANDLER
+        rngRates.BorderAround xlContinuous, xlMedium, , RGB(0, 0, 120)
+        
+        ' ---- Center J3:K4 horizontally and vertically ----
+        rngRates.HorizontalAlignment = xlCenter
+        rngRates.VerticalAlignment = xlCenter
+
+        ' ---- Populate Currency Rates ----
+        wsMain.Range("J4").Value = ChrW(1491) & ChrW(1493) & ChrW(1500) & ChrW(1512) ' Dollar
+        wsMain.Range("J5").Value = ChrW(1488) & ChrW(1497) & ChrW(1512) & ChrW(1493) & " " & ChrW(8364) ' Euro + ג‚¬ symbol
+        wsMain.Range("K4").Value = 2.991
+        wsMain.Range("K5").Value = 3.4114
+
+        ' ---- 7.33: borders for F3:G12 (single Range.Borders block) ----
+        With wsMain.Range("F4:G13").Borders
+            .LineStyle = xlContinuous
+            .Color = RGB(0, 70, 140)
+            .Weight = xlThin
+        End With
+
+        ' ---- Green pastel background for home page (Extended to AZ to cover shrinking) ----
+        wsMain.Range("A2:AZ51").Interior.Color = RGB(220, 240, 220)
+        
+        ' ---- Pastel coloring for parameters table & currencies ----
+        wsMain.Range("G4:G13").Interior.Color = RGB(255, 245, 225) ' Pastel orange/yellow for parameters
+        wsMain.Range("F4:F13").Interior.Color = RGB(225, 245, 255) ' Pastel blue for values
+        wsMain.Range("J4:K5").Interior.Color = RGB(255, 255, 200) ' Pastel yellow for currency rates
+
+        ' ---- Re-apply row 2 header colors (overwritten by pastel above) ----
+        hdrRng.Interior.Color = RGB(0, 100, 0)
+
+        ' ---- Navigate to A1 ----
+        wsMain.Activate
+        wsMain.Range("A2").Select
+
+910     MsgBoxU wsMgmt.Cells(12, 19).Value, vbInformation
+
+        ' ---- v7.61: conditional formatting on G6 and G10 ----
+        ' Helper values in NIHUL!Z1 (shnati) and NIHUL!Z2 (bachar/i),
+        ' formula references those cells (avoids Hebrew literals).
+        On Error Resume Next
+        wsMgmt.Range("Z1").Value = ChrW(1513) & ChrW(1504) & ChrW(1514) & ChrW(1497)
+        wsMgmt.Range("Z2").Value = ChrW(1489) & ChrW(1495) & ChrW(1512) & ChrW(47) & ChrW(1497)
+        Dim mgmtRef As String
+        mgmtRef = "'" & MANAGEMENT_SHEET_NAME() & "'"
+        wsMain.Range("G7").FormatConditions.Delete
+        wsMain.Range("G7").FormatConditions.Add Type:=xlExpression, _
+            Formula1:="=AND(LEN($G$5)>0,$G$5<>" & mgmtRef & "!$Z$1,$G$5<>" & mgmtRef & "!$Z$2,OR($G$6="""",$G$6=" & mgmtRef & "!$Z$2))"
+        wsMain.Range("G7").FormatConditions(wsMain.Range("G7").FormatConditions.count).Interior.Color = RGB(255, 215, 0)
+        wsMain.Range("G11").FormatConditions.Delete
+        wsMain.Range("G11").FormatConditions.Add Type:=xlExpression, _
+            Formula1:="=AND(LEN($G$9)>0,$G$9<>" & mgmtRef & "!$Z$2,OR($G$10="""",$G$10=" & mgmtRef & "!$Z$2))"
+        wsMain.Range("G11").FormatConditions(wsMain.Range("G11").FormatConditions.count).Interior.Color = RGB(255, 215, 0)
+        On Error GoTo ERR_HANDLER
+
+        ' ---- Override years to 2024/2025 and block UI with transparent shape ----
+        wsMain.Range("G4").Value = 2024
+        wsMain.Range("G5").Value = 2025
+        On Error Resume Next
+        wsMain.Shapes("shpProYears").Delete
+        On Error GoTo ERR_HANDLER
+        Dim rngYearsBlock As Range
+        Set rngYearsBlock = wsMain.Range("G4:G5")
+        Dim shpYears As Shape
+        Set shpYears = wsMain.Shapes.AddShape(msoShapeRectangle, rngYearsBlock.Left, rngYearsBlock.Top, rngYearsBlock.Width, rngYearsBlock.Height)
+        shpYears.Name = "shpProYears"
+        shpYears.Fill.Visible = msoFalse
+        shpYears.Line.Visible = msoFalse
+        shpYears.OnAction = "ProVersionOnly"
+
+        ' ---- Remove Page Break lines (which can look like random lines between columns) ----
+        wsMain.DisplayPageBreaks = False
+
+        ' v7.62: removed sheet protection ? it broke Validation.Add for G6/G10 dropdowns
+        ' after session reopen (UserInterfaceOnly does not persist). Trade-off:
+        ' 2-clicks-needed on buttons is acceptable per user.
+        ' HideRibbon                              ' v7.57 - user explicitly requested to keep Ribbon
+        ShowRibbon                              ' Ensure ribbon is visible
+
+920     Exit Sub
+
+ERR_HANDLER:
+930     MsgBoxU wsMgmt.Cells(10, 19).Value & Err.Description, vbCritical
+
+End Sub

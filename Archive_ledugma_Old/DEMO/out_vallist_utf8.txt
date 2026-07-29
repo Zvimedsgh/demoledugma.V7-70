@@ -1,0 +1,4 @@
+﻿Number of unique main branches: 15
+Length of comma-separated valList for main branches: 105
+Number of unique branches: 87
+Length of comma-separated valList for branches: 1006

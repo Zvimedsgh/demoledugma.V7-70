@@ -1,0 +1,300 @@
+
+' ============================================================================
+' HELPER: Apply zebra striping to a result sheet based on its tab color
+' ============================================================================
+Private Sub ApplyZebraStriping(ByVal ws As Worksheet)
+    On Error Resume Next
+    Dim tabClr As Long
+    tabClr = ws.Tab.Color
+    If tabClr = 0 Then Exit Sub  ' no tab color set
+    
+    Dim rC As Long, gC As Long, bC As Long
+    rC = tabClr Mod 256
+    gC = (tabClr \ 256) Mod 256
+    bC = (tabClr \ 65536) Mod 256
+    
+    ' Light: blend 92% toward white (almost white with hint of color)
+    Dim zebraLight As Long
+    zebraLight = RGB(rC + (255 - rC) * 0.92, gC + (255 - gC) * 0.92, bC + (255 - bC) * 0.92)
+    ' Dark: blend 55% toward white (noticeably colored)
+    Dim zebraDark As Long
+    zebraDark = RGB(rC + (255 - rC) * 0.55, gC + (255 - gC) * 0.55, bC + (255 - bC) * 0.55)
+    
+    ' Determine data start row: if row 1 is merged (title), data starts at row 4; otherwise row 3
+    Dim dataStart As Long
+    If ws.Range("A1").MergeCells Then
+        dataStart = 4  ' title=1, headers=2-3, data from 4
+    Else
+        dataStart = 3  ' headers=1-2, data from 3
+    End If
+    
+    Dim lastRow As Long
+    lastRow = ws.Cells(ws.Rows.count, 1).End(xlUp).Row
+    
+    ' AutoFit column A to fit text, ensure minimum width of 20
+    ws.Columns(1).AutoFit
+    If ws.Columns(1).ColumnWidth < 20 Then ws.Columns(1).ColumnWidth = 20
+
+    ' Add thin light-gray borders to the data content area (7.33: collapsed)
+    Dim dataRng As Range
+    Set dataRng = ws.Range(ws.Cells(dataStart, 1), ws.Cells(lastRow, 16))
+    With dataRng.Borders
+        .LineStyle = xlContinuous
+        .Weight = xlHairline
+        .Color = RGB(180, 180, 180)
+    End With
+
+    Dim zr As Long
+    For zr = dataStart To lastRow
+        If (zr - dataStart) Mod 2 = 0 Then
+            ws.Range(ws.Cells(zr, 1), ws.Cells(zr, 16)).Interior.Color = zebraLight
+        Else
+            ws.Range(ws.Cells(zr, 1), ws.Cells(zr, 16)).Interior.Color = zebraDark
+        End If
+    Next zr
+
+    ' Distinct background for totals row (last row with bold font)
+    If lastRow >= dataStart Then
+        If ws.Cells(lastRow, 1).Font.Bold Then
+            ' v7.60: bold gold matching the presentation total row
+            ws.Range(ws.Cells(lastRow, 1), ws.Cells(lastRow, 16)).Interior.Color = RGB(255, 217, 102)
+            ' Font: black for guaranteed visibility on any color
+            ws.Range(ws.Cells(lastRow, 1), ws.Cells(lastRow, 16)).Font.Color = RGB(0, 0, 0)
+            ws.Range(ws.Cells(lastRow, 1), ws.Cells(lastRow, 16)).Font.Bold = True
+        End If
+    End If
+
+    ' Ensure RTL display
+    ws.DisplayRightToLeft = True
+
+
+    On Error GoTo 0
+End Sub
+
+
+' ============================================================================
+' PUBLIC (7.37): EmbedSourceSheets
+' Scans a folder for YYYY.xlsx files and embeds each one as a hidden
+' internal sheet named "__src_<year>". After running, the workbook is
+' self-contained for the embedded years -- BuildReview and ApplyCorrections
+' will read from the internal sheets and never touch the external files.
+'
+' Use this when you want to ship a portable demo workbook to someone who
+' should not need to install or copy any source folders.
+' ============================================================================
+Public Sub EmbedSourceSheets()
+        On Error GoTo ERR_HANDLER
+
+        Dim folder As String
+10      folder = SOURCE_FOLDER()
+20      folder = InputBox("Source folder containing YYYY.xlsx files:" & vbCrLf & _
+                "Each YYYY.xlsx will be embedded as a hidden sheet named __src_YYYY", _
+                "EmbedSourceSheets", folder)
+30      If folder = "" Then Exit Sub
+40      If Right$(folder, 1) <> "\" Then folder = folder & "\"
+
+        Dim fso As Object
+50      Set fso = CreateObject("Scripting.FileSystemObject")
+60      If Not fso.FolderExists(folder) Then
+70          MsgBoxU "Folder not found: " & folder, vbCritical
+80          Exit Sub
+90      End If
+
+        ' --- Find YYYY.xlsx / YYYY.xls files ---
+        Dim foundYears As Object
+100     Set foundYears = CreateObject("Scripting.Dictionary")
+
+        Dim file As Object, baseName As String, ext As String
+110     For Each file In fso.GetFolder(folder).Files
+120         baseName = fso.GetBaseName(file.Name)
+130         ext = LCase$(fso.GetExtensionName(file.Name))
+140         If (ext = "xlsx" Or ext = "xls") And Len(baseName) = 4 And IsNumeric(baseName) Then
+150             If Not foundYears.Exists(baseName) Then foundYears.Add baseName, True
+160         End If
+170     Next file
+
+180     If foundYears.count = 0 Then
+190         MsgBoxU "No YYYY.xlsx files in: " & folder, vbExclamation
+200         Exit Sub
+210     End If
+
+        ' --- Confirm with user ---
+        Dim listMsg As String, yKey As Variant
+220     For Each yKey In foundYears.keys
+230         listMsg = listMsg & "  " & yKey & vbCrLf
+240     Next yKey
+250     If MsgBox("Embed these years as hidden internal sheets?" & vbCrLf & vbCrLf & listMsg, _
+                vbYesNo + vbQuestion, "EmbedSourceSheets") <> vbYes Then Exit Sub
+
+        ' --- App state ---
+        Dim prevSU As Boolean, prevDA As Boolean, prevCalc As XlCalculation
+260     prevSU = Application.ScreenUpdating
+270     prevDA = Application.DisplayAlerts
+280     prevCalc = Application.Calculation
+290     Application.ScreenUpdating = False
+300     Application.DisplayAlerts = False
+310     Application.Calculation = xlCalculationManual
+
+        ' --- Embed each ---
+        Dim count As Long
+320     count = 0
+330     For Each yKey In foundYears.keys
+340         EmbedOneYear CStr(yKey), folder
+350         count = count + 1
+360     Next yKey
+
+370     Application.ScreenUpdating = prevSU
+380     Application.DisplayAlerts = prevDA
+390     Application.Calculation = prevCalc
+
+400     MsgBoxU "Embedded " & count & " source files as hidden internal sheets." & vbCrLf & vbCrLf & _
+                listMsg & vbCrLf & _
+                "The workbook is now self-contained for these years.", vbInformation
+410     Exit Sub
+
+ERR_HANDLER:
+500     On Error Resume Next
+510     Application.ScreenUpdating = True
+520     Application.DisplayAlerts = True
+530     Application.Calculation = xlCalculationAutomatic
+540     MsgBoxU "Error in EmbedSourceSheets:" & vbCrLf & Err.Description, vbCritical
+End Sub
+
+' Helper for EmbedSourceSheets - embed a single YYYY file
+Private Sub EmbedOneYear(ByVal yearVal As String, ByVal folder As String)
+        Dim internalName As String
+10      internalName = "__src_" & yearVal
+
+        ' Delete existing internal sheet if present
+20      DeleteSheetIfExists internalName
+
+        ' Locate external file
+        Dim fso As Object
+30      Set fso = CreateObject("Scripting.FileSystemObject")
+        Dim srcPath As String
+40      srcPath = folder & yearVal & ".xlsx"
+50      If Not fso.FileExists(srcPath) Then srcPath = folder & yearVal & ".xls"
+60      If Not fso.FileExists(srcPath) Then Exit Sub
+
+        ' Open source
+        Dim wbSrc As Workbook
+70      Set wbSrc = Workbooks.Open(srcPath, ReadOnly:=True, UpdateLinks:=0)
+        Dim wsSrc As Worksheet
+80      Set wsSrc = OpenDataSheet(wbSrc)
+
+        ' Copy the data sheet into ThisWorkbook
+90      wsSrc.Copy After:=ThisWorkbook.Worksheets(ThisWorkbook.Worksheets.count)
+        Dim wsNew As Worksheet
+100     Set wsNew = ThisWorkbook.Worksheets(ThisWorkbook.Worksheets.count)
+110     wsNew.Name = internalName
+120     wsNew.Visible = xlSheetVeryHidden
+
+130     wbSrc.Close SaveChanges:=False
+End Sub
+
+
+' ============================================================================
+' v7.58: moved here from earlier in the file so module-level declarations
+' come before any Sub/Function (fixes 'Only comments may appear after
+' End Sub' compile error).
+' ============================================================================
+#If VBA7 Then
+Private Function CBTProc(ByVal nCode As Long, ByVal wParam As LongPtr, ByVal lParam As LongPtr) As LongPtr
+#Else
+Private Function CBTProc(ByVal nCode As Long, ByVal wParam As Long, ByVal lParam As Long) As Long
+#End If
+    On Error Resume Next
+    If nCode = HCBT_ACTIVATE Then
+        SetWindowPos wParam, 0, mHookX, mHookY, 0, 0, SWP_NOSIZE Or SWP_NOZORDER
+        UnhookWindowsHookEx mHook
+        mHook = 0
+    End If
+    CBTProc = CallNextHookEx(mHook, nCode, wParam, lParam)
+End Function
+
+' v7.57: install a one-shot CBT hook that moves the next MsgBox to (X, Y).
+' The hook auto-uninstalls itself on first activation.
+Private Sub PositionNextMsgBox(ByVal X As Long, ByVal Y As Long)
+    On Error Resume Next
+    mHookX = X
+    mHookY = Y
+    mHook = SetWindowsHookEx(5, AddressOf CBTProc, 0, GetCurrentThreadId())  ' WH_CBT = 5
+End Sub
+
+' v7.57: hide / show the Excel Ribbon
+Public Sub HideRibbon()
+    On Error Resume Next
+    Application.ExecuteExcel4Macro "Show.ToolBar(""Ribbon"",False)"
+End Sub
+Public Sub ShowRibbon()
+    On Error Resume Next
+    Application.ExecuteExcel4Macro "Show.ToolBar(""Ribbon"",True)"
+End Sub
+
+' ============================================================================
+' PUBLIC (7.71): AutoFitHomeToScreen - Adjusts zoom to fit the dashboard to screen
+' ============================================================================
+Public Sub AutoFitHomeToScreen()
+    On Error Resume Next
+    Dim ws As Worksheet
+    Set ws = ThisWorkbook.Worksheets(CONTROL_SHEET_NAME())
+    If ws Is Nothing Then Exit Sub
+    
+    ws.Activate
+    ' Select columns A through T to include the balanced left and right margins
+    ws.Columns("A:T").Select
+    ActiveWindow.Zoom = True
+    
+    ' Return focus to a safe cell
+    ws.Range("D1").Select
+End Sub
+
+' ============================================================================
+' PUBLIC: Macro for buttons that are only active in the full version
+' ============================================================================
+Public Sub ProVersionOnly()
+    MsgBoxU ChrW(1508) & ChrW(1506) & ChrW(1497) & ChrW(1500) & " " & ChrW(1489) & ChrW(1490) & ChrW(1512) & ChrW(1505) & ChrW(1492) & " " & ChrW(1492) & ChrW(1502) & ChrW(1500) & ChrW(1488) & ChrW(1492) & " " & ChrW(1489) & ChrW(1500) & ChrW(1489) & ChrW(1491), vbInformation, ChrW(1502) & ChrW(1506) & ChrW(1512) & ChrW(1499) & ChrW(1514)
+End Sub
+
+
+' ============================================================================
+' MACRO: ApplyDemoRestrictions
+' Instantly updates the UI to show 2024/2025, blocks typing, and blocks clicks
+' ============================================================================
+Public Sub ApplyDemoRestrictions()
+    On Error GoTo ERR_HANDLER
+    Dim wsMain As Worksheet
+    Set wsMain = ThisWorkbook.Worksheets(ChrW(1491) & ChrW(1507) & " " & ChrW(1492) & ChrW(1489) & ChrW(1497) & ChrW(1514))
+    
+    ' Set the values
+    wsMain.Range("G4").Value = "2024"
+    wsMain.Range("G5").Value = "2025"
+    
+    ' Block typing via Data Validation
+    With wsMain.Range("G4:G5")
+        .Validation.Delete
+        .Validation.Add Type:=xlValidateCustom, AlertStyle:=xlValidAlertStop, Formula1:="=FALSE"
+        .Validation.ShowError = True
+        .Validation.ErrorMessage = ChrW(1508) & ChrW(1506) & ChrW(1497) & ChrW(1500) & " " & ChrW(1489) & ChrW(1490) & ChrW(1512) & ChrW(1505) & ChrW(1492) & " " & ChrW(1492) & ChrW(1502) & ChrW(1500) & ChrW(1488) & ChrW(1492) & " " & ChrW(1489) & ChrW(1500) & ChrW(1489) & ChrW(1491)
+    End With
+    
+    ' Block clicking via transparent shape
+    On Error Resume Next
+    wsMain.Shapes("shpProYears").Delete
+    On Error GoTo ERR_HANDLER
+    
+    Dim rngYearsBlock As Range
+    Set rngYearsBlock = wsMain.Range("G4:G5")
+    Dim shpYears As Shape
+    Set shpYears = wsMain.Shapes.AddShape(msoShapeRectangle, rngYearsBlock.Left, rngYearsBlock.Top, rngYearsBlock.Width, rngYearsBlock.Height)
+    shpYears.Name = "shpProYears"
+    shpYears.Fill.Visible = msoFalse
+    shpYears.Line.Visible = msoFalse
+    shpYears.OnAction = "ProVersionOnly"
+    
+    MsgBox "UI updated to Demo restrictions (2024/2025).", vbInformation
+    Exit Sub
+    
+ERR_HANDLER:
+    MsgBox "Error: " & Err.Description, vbCritical
+End Sub

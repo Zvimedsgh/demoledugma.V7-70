@@ -1,0 +1,3 @@
+﻿wsMain.Range addresses: ['A1', 'A16', 'A18:F18', 'A2:D5', 'B16:C16', 'B2', 'F12', 'F13', 'F14:G14', 'F16', 'F16:G16', 'F2', 'F3:F12', 'F3:G12', 'G10', 'G12', 'G13', 'G2', 'G3', 'G3:G12', 'G3:G4', 'G4', 'G5', 'G6', 'G7', 'G9', 'H12', 'H2:I17', 'J2', 'J3', 'J3:K4', 'J4', 'J5:K7', 'J5:L7', 'K2', 'K3', 'K4', 'L16', 'L2:O17']
+ThisWorkbook...Range addresses: ['F16']
+Named ranges RefersTo: ['$G$10', '$G$12', '$G$3', '$G$4', '$G$5', '$G$6', '$G$7', '$G$9']

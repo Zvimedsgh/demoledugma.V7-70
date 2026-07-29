@@ -1,0 +1,78 @@
+﻿173 Private Const MB_RTLREADING As Long = &H100000
+175 Private Const MB_SYSTEMMODAL As Long = &H1000
+345 100     If fso.FileExists(p) Then
+376 100     End If
+420 100             For monthIdx = 1 To 12
+487 100     Dim disp() As String
+584 490     If cnt = 0 Then Err.Raise vbObjectError + 1001, "BuildReview", "NO CHECKED FIELDS"
+617 520     If yearVal = "" Then Err.Raise vbObjectError + 1002, "BuildReview", "B3 IS EMPTY"
+621 548     If wsSrc Is Nothing Then Err.Raise vbObjectError + 1003, "BuildReview", "SOURCE NOT FOUND FOR YEAR: " & yearVal
+624 580     If lastRow < 2 Then Err.Raise vbObjectError + 1006, "BuildReview", "NO DATA ROWS IN SOURCE"
+787 1000    actionCol = cnt + 3
+788 1010    If outRow > 2 Then
+789 1020        Set rng = wsRev.Range(wsRev.Cells(2, actionCol), wsRev.Cells(outRow - 1, actionCol))
+791 1025        rng.Value = ChrW(1492) & ChrW(1506) & ChrW(1489) & ChrW(1512) & " " & ChrW(1500) & ChrW(1489) & ChrW(1491) & ChrW(1497) & ChrW(1511) & ChrW(1492)
+803 1100    wsRev.Rows(1).Font.Bold = True
+890 100     Dim dictBranch As Object
+1144 1000                Else
+1145 1010                    dictHasUnhandled(CStr(srcRowNum)) = True
+1146 1020                    unhandledCount = unhandledCount + 1
+1174 1100    debugStep = "BUILD_BASE_CURRENT"
+1490 100         wsBase.Columns.AutoFit
+1630 100             outArr(outRow, BASE_COL_COMPANY) = oneFix
+1657 100     wsBase.Cells(1, BASE_COL_COMPNUM).Value = "CompNum"
+1691 100     Dim lastRowRef As Long
+1876 1000        Next r
+1879 1010        For r = 2 To lastRowRef
+1880 1020            m = 0
+1899 1100                docsRef = docsRef + 1
+2053 100     ws.Cells(1, 2).HorizontalAlignment = xlCenter
+2134 100     wsOut.Cells(3, 2).Value = ChrW(1506) & ChrW(1512) & ChrW(1498)
+2196 100         k = Trim$(CStr(ws.Cells(r, COL_HELPER_KEY).Value2))
+2236 100     For r = 3 To lastRow
+2273 100         fName = Trim$(CStr(ws.Cells(r, COL_FIELD_NAME_HE).Value2))
+2301 100     For Each k In dictCol.keys
+2326 100             Exit Function
+2349 100         If nm = UCase$(paramName) Then
+2378 100     Next i
+2414 100     On Error GoTo 0
+2555 100     IsIgnorableRow = allBlank
+2611 100         HebrewMonthName = ChrW(1502) & ChrW(1488) & ChrW(1497)
+2709 100     lblTkufa = ChrW(1514) & ChrW(1511) & ChrW(1493) & ChrW(1508) & ChrW(1492)
+2721 135     hdrRng.Interior.Color = RGB(0, 100, 0)
+2926 wsMain.Range("A16").Font.Color = RGB(0, 100, 0)
+3191 hdrRng.Interior.Color = RGB(0, 100, 0)
+3279 100         listName = "lst_half_year"
+3347 100     If filterType = "" Or filterType = selectText Then GoTo CLEAN_EXIT
+3474 100     If Not SheetExists(SHEET_COMPANIES()) Then
+3686 1000    On Error GoTo ERR_HANDLER
+3689 1010    With wsMain.Range("F20")
+3690 1020        .Value = ""
+3776 100     tmpWs.Cells(1, 1).Value = ""
+3864 100     idx = 0
+3909 250     CallExportOneChart tmpWs, chartItems, arrNames, arrDocR, arrDocC, refYear, yearVal, RGB(128, 100, 162), RGB(75, 172, 198), imgDoc, "#,##0"
+3961 100         tmpWs.Cells(ci + 1, 3).Value = arrCur(ci)
+4024 54      wW = slideW - 100
+4032 100     shp.TextFrame.TextRange.Text = ChrW(1502) & ChrW(1510) & ChrW(1490) & ChrW(1514) & " " & ChrW(1492) & ChrW(1504) & ChrW(1492) & ChrW(1500) & ChrW(1492)
+4059 222     Set shp = ppSlide.Shapes.AddTextbox(1, wL + 30, wT + wH - 100, wW - 60, 70)
+4069 290     Set shp = ppSlide.Shapes.AddShape(1, 50, slideH - 35, slideW - 100, 5)
+4113 100     Exit Sub
+4156 100     Exit Sub
+4289 470     blueClr = RGB(0, 100, 170)
+4367 653             chgVal = (arrPremC(idx) - arrPremR(idx)) / Abs(arrPremR(idx)) * 100
+4377 663             chgVal = (CDbl(arrDocC(idx)) - CDbl(arrDocR(idx))) / Abs(CDbl(arrDocR(idx))) * 100
+4387 673             chgVal = (CDbl(arrInsC(idx)) - CDbl(arrInsR(idx))) / Abs(CDbl(arrInsR(idx))) * 100
+4397 683             chgVal = (CDbl(arrPolC(idx)) - CDbl(arrPolR(idx))) / Abs(CDbl(arrPolR(idx))) * 100
+4407 693             chgVal = (arrCommC(idx) - arrCommR(idx)) / Abs(arrCommR(idx)) * 100
+4449 843         tbl.Cell(totR, 13).Shape.TextFrame.TextRange.Text = Format$((totPC - totPR) / Abs(totPR) * 100, "0.0") & "%"
+4457 853         tbl.Cell(totR, 10).Shape.TextFrame.TextRange.Text = Format$((CDbl(totDC) - CDbl(totDR)) / Abs(CDbl(totDR)) * 100, "0.0") & "%"
+4465 863         tbl.Cell(totR, 7).Shape.TextFrame.TextRange.Text = Format$((CDbl(totIC) - CDbl(totIR)) / Abs(CDbl(totIR)) * 100, "0.0") & "%"
+4473 873         tbl.Cell(totR, 4).Shape.TextFrame.TextRange.Text = Format$((CDbl(totPolC) - CDbl(totPolR)) / Abs(CDbl(totPolR)) * 100, "0.0") & "%"
+4481 883         tbl.Cell(totR, 1).Shape.TextFrame.TextRange.Text = Format$((totCC - totCR) / Abs(totCR) * 100, "0.0") & "%"
+4492 895         tbl.Cell(totR, c).Shape.Fill.ForeColor.RGB = RGB(255, 217, 102)
+4521 100     shp.TextFrame.MarginBottom = 0
+4555 100     Dim actionCol As Long
+4826 shp.Fill.ForeColor.RGB = RGB(0, 100, 170)
+5423 ws.Range(ws.Cells(lastRow, 1), ws.Cells(lastRow, 16)).Interior.Color = RGB(255, 217, 102)
+5468 100     Set foundYears = CreateObject("Scripting.Dictionary")
+5551 100     Set wsNew = ThisWorkbook.Worksheets(ThisWorkbook.Worksheets.count)

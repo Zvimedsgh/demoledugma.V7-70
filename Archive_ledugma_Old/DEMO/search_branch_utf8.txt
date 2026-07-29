@@ -1,0 +1,81 @@
+﻿120 Private Const KEY_BRANCH_NAME As String = "BRANCH_NAME"
+135 Private Const RAW_BRANCHNUM As Long = 15
+136 Private Const RAW_BRANCHNAME As Long = 16
+160 Private Const BASE_COL_BRANCHNAME As Long = 11
+161 Private Const BASE_COL_BRANCHNUM As Long = 12
+162 Private Const BASE_COL_MAINBRANCH As Long = 13
+284 Private Function SHEET_BRANCH() As String
+286 SHEET_BRANCH = ChrW(1506) & ChrW(1504) & ChrW(1508) & ChrW(1497) & ChrW(1501)
+289 Private Function SHEET_MAINBRANCH() As String
+291 SHEET_MAINBRANCH = ChrW(1506) & ChrW(1504) & ChrW(1507) & " " & ChrW(1502) & ChrW(1512) & ChrW(1499) & ChrW(1494)
+326 ' 7.33: "????" placeholder for an unmapped main branch (excluded from reports)
+327 Private Function TXT_INVALID_BRANCH() As String
+328 TXT_INVALID_BRANCH = ChrW(1495) & ChrW(1493) & ChrW(1489) & ChrW(1492)
+586 Dim dictBranch As Object
+587 495     Set dictBranch = LoadBranchMapping(wsMgmt)
+591 Dim dictBranches As Object, dictMainBranches As Object
+599 Set dictBranches = CreateObject("Scripting.Dictionary")
+600 Set dictMainBranches = CreateObject("Scripting.Dictionary")
+604 dictBranches.CompareMode = vbTextCompare
+605 dictMainBranches.CompareMode = vbTextCompare
+711 ' Check branch mapping - if branch not in translation table
+713 900         brKey = UCase$(Trim$(CStr(wsSrc.Cells(r, RAW_BRANCHNAME).Value2)))
+715 920             If Not dictBranch.Exists(brKey) Then
+716 921                 singleCode = "UNKNOWN_BRANCH"
+738 966         tmpVal = Trim$(CStr(wsSrc.Cells(r, RAW_BRANCHNAME).Value2))
+739 If tmpVal <> "" Then If Not dictBranches.Exists(tmpVal) Then dictBranches.Add tmpVal, 1
+741 969             If dictBranch.Exists(UCase$(tmpVal)) Then
+742 971                 mbVal = dictBranch(UCase$(tmpVal))
+743 972                 If Not dictMainBranches.Exists(mbVal) Then dictMainBranches.Add mbVal, 1
+777 If dictBranches.count > 0 Then
+778 arrKeys = dictBranches.keys
+781 If dictMainBranches.count > 0 Then
+782 arrKeys = dictMainBranches.keys
+890 100     Dim dictBranch As Object
+1066 650     debugStep = "LOAD_BRANCH"
+1067 660     Set dictBranch = LoadBranchMapping(wsMgmt)
+1177 1130    Set wsBase = BuildBaseSheet(wsSrc, baseSheetName, yearVal, dateCol, dollarRate, threshold, dictBranch, dictCorrections, dictIgnore, countCurrent)
+1269 3170    Set wsBaseRef = BuildBaseSheet(wsRef, refBaseSheetName, refYear, dateCol, dollarRate, threshold, dictBranch, dictRefCorr, dictRefIgnore, countRef)
+1311 filterCol = BASE_COL_MAINBRANCH
+1313 filterCol = BASE_COL_BRANCHNAME
+1356 2650    debugStep = "BUILD_BRANCH"
+1357 2660    BuildComparisonSheet wsBase, wsBaseRef, SHEET_BRANCH(), BASE_COL_BRANCHNAME, minMonth, maxMonth, yearVal, refYear, filterCol, filterValue, hashvaatText & SHEET_BRANCH() & " | " & titlePrefix, clientFilter
+1358 ThisWorkbook.Worksheets(SHEET_BRANCH()).Tab.Color = RGB(255, 218, 185)  ' pastel peach
+1359 ApplyZebraStriping ThisWorkbook.Worksheets(SHEET_BRANCH())
+1361 2665    debugStep = "BUILD_MAINBRANCH"
+1362 2666    BuildComparisonSheet wsBase, wsBaseRef, SHEET_MAINBRANCH(), BASE_COL_MAINBRANCH, minMonth, maxMonth, yearVal, refYear, filterCol, filterValue, hashvaatText & SHEET_MAINBRANCH() & " | " & titlePrefix, clientFilter
+1363 ThisWorkbook.Worksheets(SHEET_MAINBRANCH()).Tab.Color = RGB(255, 182, 193)  ' pastel pink
+1364 ApplyZebraStriping ThisWorkbook.Worksheets(SHEET_MAINBRANCH())
+1467 '   - Maps RAW_BRANCHNAME -> dictBranch for MainBranch column
+1475 ByVal dictBranch As Object, ByVal dictCorrections As Object, _
+1567 630         outArr(outRow, BASE_COL_BRANCHNAME) = srcArr(r, RAW_BRANCHNAME)
+1568 640         outArr(outRow, BASE_COL_BRANCHNUM) = srcArr(r, RAW_BRANCHNUM)
+1570 ' Main branch mapping
+1571 650         brKey = UCase$(Trim$(CStr(srcArr(r, RAW_BRANCHNAME))))
+1572 660         If dictBranch.Exists(brKey) Then
+1573 670             outArr(outRow, BASE_COL_MAINBRANCH) = dictBranch(brKey)
+1575 690             outArr(outRow, BASE_COL_MAINBRANCH) = srcArr(r, RAW_BRANCHNAME)
+1632 120             outArr(outRow, BASE_COL_BRANCHNAME) = oneFix
+1658 110     wsBase.Cells(1, BASE_COL_BRANCHNAME).Value = "BranchName"
+1659 120     wsBase.Cells(1, BASE_COL_BRANCHNUM).Value = "BranchNum"
+1660 130     wsBase.Cells(1, BASE_COL_MAINBRANCH).Value = "MainBranch"
+1674 ' HELPER: Build comparison sheet (companies, branch, tellers, agents, months)
+1714 ' Exclude MainBranch = "????" from all reports
+1715 211             If StrComp(Trim$(CStr(wsCurrent.Cells(r, BASE_COL_MAINBRANCH).Value2)), ChrW(1495) & ChrW(1493) & ChrW(1489) & ChrW(1492), vbTextCompare) = 0 Then GoTo SkipCurKey
+1738 ' Exclude MainBranch = "????" from all reports
+1739 331             If StrComp(Trim$(CStr(wsRef.Cells(r, BASE_COL_MAINBRANCH).Value2)), ChrW(1495) & ChrW(1493) & ChrW(1489) & ChrW(1492), vbTextCompare) = 0 Then GoTo SkipRefKey
+1844 ' Exclude MainBranch = "????" from all reports
+1845 861             If StrComp(Trim$(CStr(wsCurrent.Cells(r, BASE_COL_MAINBRANCH).Value2)), ChrW(1495) & ChrW(1493) & ChrW(1489) & ChrW(1492), vbTextCompare) = 0 Then GoTo NextCurRow
+1885 ' Exclude MainBranch = "????" from all reports
+1886 1061            If StrComp(Trim$(CStr(wsRef.Cells(r, BASE_COL_MAINBRANCH).Value2)), ChrW(1495) & ChrW(1493) & ChrW(1489) & ChrW(1492), vbTextCompare) = 0 Then GoTo NextRefRow2
+2207 155     If Not dict.Exists("MISSING_BRANCH_NAME") Then dict("MISSING_BRANCH_NAME") = ChrW(1495) & ChrW(1505) & ChrW(1512) & " " & ChrW(1513) & ChrW(1501) & " " & ChrW(1506) & ChrW(1504) & ChrW(1507)
+2224 ' HELPER: Load branch mapping from NIHUL
+2226 Private Function LoadBranchMapping(ByVal ws As Worksheet) As Object
+2243 170     Set LoadBranchMapping = dict
+2246 190     Err.Raise Err.Number, "LoadBranchMapping:" & Erl, Err.Description
+3513 350     If SheetExists(SHEET_MAINBRANCH()) Then
+3515 370         sheetList(sheetCount) = SHEET_MAINBRANCH()
+4809 ' ---- Button 1: Milon Anafim (Branch Dictionary) -> A40 ----
+4812 shp.Name = "navBranch"
+4820 shp.OnAction = "NavToBranch"
+4882 Public Sub NavToBranch()

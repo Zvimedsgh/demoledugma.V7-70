@@ -1,0 +1,14 @@
+[
+  "לקוחות יקרים, נבקשכם לבצע העברה בנקאית ישירות אל חברת Vestis.",
+  "<strong>חשוב:</strong> נא לוודא כי עמלות כל הבנקים מסומנות כ-\"OURS\" (המשלם נושא בכל העמלות)",
+  "פרטי חשבון להעברה",
+  "<span class=\"modal__detail-label\">IBAN:</span>",
+  "<span class=\"modal__detail-value modal__detail-value--mono\">RO18INGB0000999917822688</span>",
+  "<span class=\"modal__detail-label\">בנק:</span>",
+  "<span class=\"modal__detail-label\">BIC (SWIFT):</span>",
+  "<button class=\"modal__copy-btn\" id=\"copy-iban-btn\">",
+  "<span>העתק IBAN</span>",
+  "// Copy IBAN button",
+  "const copyBtn = document.getElementById('copy-iban-btn');",
+  "navigator.clipboard.writeText('RO18INGB0000999917822688').then(() => {"
+]

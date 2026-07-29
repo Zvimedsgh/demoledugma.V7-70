@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>הנחיות לשימוש בהדגמה</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            color: #2c3e50;
+            line-height: 1.8;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+        }
+        h1 {
+            color: #1a5f7a;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+            font-size: 28px;
+            margin-top: 0;
+        }
+        p.subtitle {
+            font-size: 1.15em;
+            color: #7f8c8d;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+        ol {
+            margin-top: 20px;
+            padding-right: 25px;
+        }
+        li {
+            margin-bottom: 18px;
+            font-size: 16px;
+        }
+        li strong {
+            color: #2980b9;
+        }
+        .note {
+            background-color: #ebf5fb;
+            border-right: 5px solid #3498db;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+            font-weight: 600;
+            color: #2471a3;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ecf0f1;
+            text-align: center;
+            color: #95a5a6;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>הנחיות לשימוש בהדגמה (Demo)</h1>
+        
+        <h2>שלב א': הוראות חילוץ והפעלה ראשונית</h2>
+        <ol>
+            <li><strong>חילוץ הקבצים (חשוב!):</strong> אין להפעיל את קובץ האקסל ישירות מתוך ה-ZIP. תחילה עליכם לחלץ (Extract) את כל תוכן קובץ ה-ZIP לתיקייה רגילה במחשב שלכם.</li>
+            <li><strong>שחרור חסימת אבטחה (קריטי!):</strong> מכיוון שהקובץ ירד מהאינטרנט, מיקרוסופט חוסמת אוטומטית פקודות מאקרו. כדי לעקוף זאת: לחצו <strong>מקש ימני</strong> על קובץ האקסל שחילצתם ובחרו ב-<strong>מאפיינים (Properties)</strong>. בתחתית החלון שנפתח, סמנו <span style="color:red;font-weight:bold;">V</span> בתיבת <strong>שחרר חסימה (Unblock)</strong> ולחצו "אישור" (OK).</li>
+            <li><strong>פתיחת הקובץ:</strong> פתחו את קובץ האקסל <code>Demo_Reports_System_V9.33.xlsm</code> לאחר ששחררתם את החסימה.</li>
+            <li><strong>אישור עריכה והפעלת תוכן:</strong> אם מופיעה שורה צהובה למעלה, לחצו תחילה על <strong>"הפוך עריכה לזמינה" (Enable Editing)</strong> ולאחר מכן על <strong>"הפוך תוכן לזמין" (Enable Content)</strong>.</li>
+        </ol>
+        
+        <hr style="border: 0; border-top: 1px solid #bdc3c7; margin: 30px 0;">
+
+        <h2>שלב ב': הנחיות לשימוש</h2>
+        <p class="subtitle">המוצר הסופי משוכלל יותר אך עובד על אותו עיקרון מרכזי.</p>
+        
+        <ol>
+            <li><strong>בחירת שנת בסיס ושנה נוכחית:</strong> בהדגמה לא ניתן לשנות את השנים הנבדקות, הדבר אפשרי רק בגירסה המלאה. <i>במוצר המוגמר מפיקים נתונים מתוכנת ניהול הביטוחים עבור שנת הבסיס והנוכחית ושומרים אותם במיקום מוגדר מראש על המחשב.</i></li>
+            <li><strong>בחירת תקופת השוואה:</strong> ניתן לבחור לאיזו תקופה רוצים את ההשוואה (שנתי, חצי שנתי, רבעוני, חודשי) על ידי בחירת התא (G7) ולחיצה על החץ משמאל לתא. לאחר בחירת התקופה, התא שמתחתיו "נדלק" וניתן לבחור בו את הנתון המתאים.</li>
+            <li><strong>דוחות פרטניים:</strong> ניתן לבקש דו"ח פרטני לחברה, סוכן, ענף, טלר וענף מרכז (תא G9). לאחר הבחירה, התא שמתחתיו "נדלק" ובוחרים בו את הנתון המתאים.</li>
+            <li><strong>חיפוש לקוח:</strong> ניתן לחפש לקוח ספציפי – בלחיצה על כפתור "חפש", נפתח גיליון חדש ובו אפשר להקיש שם לקוח מלא או חלקי ולבחור את המתאים (בדמו הלקוחות שונו לשמות מוסווים: 'לקוח1', 'לקוח 2' וכו'). בוחרים את הלקוח הרלוונטי ולוחצים על כפתור "בחר" שנפתח.</li>
+            <li><strong>בדיקה ראשונית:</strong> בפעם הראשונה שבודקים, יש ללחוץ על <b>כפתור מס' 1</b> ולענות על השאלות שמופיעות.</li>
+            <li><strong>טיפול בחריגים:</strong> מתקבל קובץ עם חריגים. אפשר לטפל בכל שורה ולרשום זאת ברשימה הנפתחת בעמודה N. ניתן לתקן בקובץ, להתעלם, או להעביר לבכיר לטיפול. בסיום לוחצים על "סיימתי לעדכן". שורות שסומנו "להעברה לבדיקה" יצורפו אוטומטית למייל שייפתח (לכתובת שהוגדרה מראש) ויש לשלוח ולאשר.</li>
+            <li><strong>חזרה אוטומטית:</strong> לאחר האישור תועברו אוטומטית בחזרה לדף הבית.</li>
+            <li><strong>עיבוד נתונים:</strong> לוחצים על <b>כפתור מס' 2</b> – הנתונים יעובדו וייווצרו גיליונות לכל סוג חתך (חברה, ענף וכו').</li>
+            <li><strong>הפקת מצגת:</strong> אפשר לייצר מצגת בלחיצה על <b>כפתור מס' 3</b>. <i>הערה: בהדגמה פעולה זו יכולה לקחת מעט זמן, זה תוקן ושופר במוצר המוגמר.</i><br>
+            <span style="color:#2980b9;font-weight:600;">* אפשר לצפות במצגת לדוגמה בקובץ "מצגת הנהלה" המצורף.</span>
+            </li>
+            <li><strong>שמירה והדפסה (במוצר המוגמר בלבד):</strong> נוסף כפתור לשמירה והדפסה כדי שניתן יהיה להעביר את הדוחות והמצגת לנמענים השונים.</li>
+            <li><strong>לקוחות חדשים (במוצר המוגמר בלבד):</strong> נוסף כפתור לשליפת לקוחות חדשים לצורך הצעת ביטוחי חיים.</li>
+        </ol>
+
+        <div class="footer">
+            תודה רבה ועבודה נעימה!
+        </div>
+    </div>
+</body>
+</html>
